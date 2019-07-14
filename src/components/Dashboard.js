@@ -7,9 +7,8 @@ function Dashboard(props) {
   const { firebase, user } = React.useContext(FirebaseContext);
 
   React.useEffect(() => {
-    const unsubscribe = getGroups();
-    return () => unsubscribe();
-  }, []);
+    getGroups();
+  }, [groups]);
 
   function logout() {
     firebase.logout();
@@ -17,14 +16,9 @@ function Dashboard(props) {
   }
 
   async function getGroups() {
-    firebase.db
-      .collection("groups")
-      .get()
-      .then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-          setGroups({ id: doc.id, ...doc.data() });
-        });
-      });
+    const snapshot = await firebase.db.collection("groups").get();
+    const allGroups = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setGroups(allGroups);
   }
 
   function submit(event) {
@@ -44,11 +38,10 @@ function Dashboard(props) {
     }
   }
 
-  console.log(groups);
   return (
     <>
       {user && <p>Hello {user.displayName}</p>}
-      {groups && <p>{groups.name}</p>}
+      {groups && groups.map(group => <p>{group.name}</p>)}
       <form onSubmit={submit}>
         <input
           type="text"
