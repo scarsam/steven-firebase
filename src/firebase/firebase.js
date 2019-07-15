@@ -20,7 +20,13 @@ class Firebase {
   }
 
   async socialLogin() {
-    return await this.auth.signInWithPopup(this.facebookProvider);
+    const credentials = await this.auth.signInWithPopup(this.facebookProvider);
+    return await this.db
+      .collection("users")
+      .doc(credentials.user.uid)
+      .set({
+        groups: []
+      });
   }
 
   async logout() {
