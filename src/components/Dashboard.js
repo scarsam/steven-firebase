@@ -1,4 +1,5 @@
 import React from "react";
+import { Link, withRouter } from "react-router-dom";
 import { FirebaseContext } from "../firebase";
 
 function Dashboard(props) {
@@ -8,17 +9,24 @@ function Dashboard(props) {
 
   React.useEffect(() => {
     getGroups();
-  }, [groups]);
+  }, []);
 
   function logout() {
     firebase.logout();
     props.history.push("/");
   }
 
-  async function getGroups() {
-    const snapshot = await firebase.db.collection("groups").get();
-    const allGroups = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setGroups(allGroups);
+  function getGroups() {
+    return firebase.db
+      .collection("groups")
+      .get()
+      .then(snapshot => {
+        const groups = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setGroups(groups);
+      });
   }
 
   function submit(event) {
@@ -34,6 +42,7 @@ function Dashboard(props) {
         name,
         created: Date.now()
       };
+      setGroups([newGroup, ...groups]);
       firebase.db.collection("groups").add(newGroup);
     }
   }
@@ -41,7 +50,12 @@ function Dashboard(props) {
   return (
     <>
       {user && <p>Hello {user.displayName}</p>}
-      {groups && groups.map(group => <p>{group.name}</p>)}
+      {groups &&
+        groups.map(group => (
+          <div>
+            <Link to={`/group/${group.id}`}>{group.name}</Link>
+          </div>
+        ))}
       <form onSubmit={submit}>
         <input
           type="text"
@@ -57,4 +71,4 @@ function Dashboard(props) {
   );
 }
 
-export default Dashboard;
+export default withRouter(Dashboard);

@@ -4,6 +4,7 @@ import useAuth from "./components/Auth";
 import firebase, { FirebaseContext } from "./firebase";
 import login from "./components/Login";
 import dashboard from "./components/Dashboard";
+import group from "./components/Group";
 
 function App() {
   const user = useAuth();
@@ -15,6 +16,7 @@ function App() {
         <Switch>
           <Route exact path="/" component={login} />
           <Route path="/dashboard" component={dashboard} />
+          <Route path="/group/:groupId" component={group} />
         </Switch>
       </FirebaseContext.Provider>
     </BrowserRouter>
