@@ -1,5 +1,6 @@
 import React from "react";
 import { FirebaseContext } from "../firebase";
+import CopyClipboard from "./CopyClipboard";
 
 function Group(props) {
   const [group, setGroup] = React.useState(null);
@@ -18,7 +19,18 @@ function Group(props) {
     });
   }
 
-  return !group ? <div>Loading...</div> : <div>Group name: {group.name}</div>;
+  return !group ? (
+    <div>Loading...</div>
+  ) : (
+    <>
+      <CopyClipboard group={group.id} />
+      <div>Group name: {group.name}</div>
+      <div>
+        Group users:
+        {group.users && group.users.map(user => <p>{user.name}</p>)}
+      </div>
+    </>
+  );
 }
 
 export default Group;

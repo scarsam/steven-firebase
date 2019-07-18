@@ -39,6 +39,7 @@ function Dashboard(props) {
           id: user.uid,
           name: user.displayName
         },
+        user: [],
         name,
         created: Date.now()
       };

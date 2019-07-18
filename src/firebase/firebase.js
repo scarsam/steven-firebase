@@ -29,6 +29,19 @@ class Firebase {
       });
   }
 
+  async joinGroup(group) {
+    const credentials = await this.auth.signInWithPopup(this.facebookProvider);
+
+    return await this.db
+      .collection("groups")
+      .doc(group)
+      .update({
+        users: [
+          { id: credentials.user.uid, name: credentials.user.displayName }
+        ]
+      });
+  }
+
   async logout() {
     await this.auth.signOut();
   }
