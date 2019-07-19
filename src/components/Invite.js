@@ -2,13 +2,13 @@ import React from "react";
 import { FirebaseContext } from "../firebase";
 
 function Invite(props) {
-  const { firebase } = React.useContext(FirebaseContext);
+  const { user, firebase } = React.useContext(FirebaseContext);
 
   async function onSubmit(event) {
     const groupId = props.match.params.groupId;
     event.preventDefault();
     try {
-      await firebase.joinGroup(groupId);
+      await firebase.joinGroup(groupId, user);
       props.history.push(`/group/${groupId}`);
     } catch (err) {
       console.error("Failed social sign in", err);
@@ -16,7 +16,7 @@ function Invite(props) {
   }
   return (
     <form onSubmit={onSubmit}>
-      <button type="submit">Login</button>
+      <button type="submit">Join Group</button>
     </form>
   );
 }

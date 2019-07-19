@@ -29,16 +29,18 @@ class Firebase {
       });
   }
 
-  async joinGroup(group) {
-    const credentials = await this.auth.signInWithPopup(this.facebookProvider);
-
+  async joinGroup(group, existingUser) {
+    let user;
+    if (existingUser) {
+      user = existingUser;
+    } else {
+      user = await this.auth.signInWithPopup(this.facebookProvider);
+    }
     return await this.db
       .collection("groups")
       .doc(group)
       .update({
-        users: [
-          { id: credentials.user.uid, name: credentials.user.displayName }
-        ]
+        users: [{ id: user.uid, name: user.displayName }]
       });
   }
 
