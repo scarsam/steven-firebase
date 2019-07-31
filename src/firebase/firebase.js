@@ -40,8 +40,9 @@ class Firebase {
     return await this.db
       .collection("groups")
       .doc(group)
-      .collection('users')
-      .add({ id: user.uid, name: user.displayName });
+      .update({
+        users: app.firestore.FieldValue.arrayUnion({ id: user.uid, name: user.displayName })
+      });
   }
 
   async logout() {
