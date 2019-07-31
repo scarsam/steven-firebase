@@ -17,10 +17,11 @@ class Firebase {
     this.auth = app.auth();
     this.db = app.firestore();
     this.facebookProvider = new app.auth.FacebookAuthProvider();
+    this.googleProvider = new app.auth.GoogleAuthProvider();
   }
 
-  async socialLogin() {
-    const credentials = await this.auth.signInWithPopup(this.facebookProvider);
+  async socialLogin(provider) {
+    const credentials = (provider === 'google') ? await this.auth.signInWithPopup(this.googleProvider) : await this.auth.signInWithPopup(this.facebookProvider);
     return await this.db
       .collection("users")
       .doc(credentials.user.uid)
@@ -39,9 +40,8 @@ class Firebase {
     return await this.db
       .collection("groups")
       .doc(group)
-      .update({
-        users: [{ id: user.uid, name: user.displayName }]
-      });
+      .collection('users')
+      .add({ id: user.uid, name: user.displayName });
   }
 
   async logout() {
