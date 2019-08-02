@@ -4,11 +4,13 @@ import { FirebaseContext } from "../firebase";
 
 function Dashboard(props) {
   const [name, setName] = React.useState("");
-  const [groups, setGroups] = React.useState([]);
+  const [createdGroups, setCreatedGroups] = React.useState([]);
+  const [joinedGroups, setJoinedGroups] = React.useState([]);
   const { firebase, user } = React.useContext(FirebaseContext);
 
   React.useEffect(() => {
-    getGroups();
+    getCreatedGroups();
+    getJoinedGroups();
   }, []);
 
   function logout() {
@@ -16,17 +18,34 @@ function Dashboard(props) {
     props.history.push("/");
   }
 
-  function getGroups() {
+  function getCreatedGroups() {
     return firebase.db
-      .collection("groups")
-      .get()
-      .then(snapshot => {
-        const groups = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setGroups(groups);
-      });
+    .collection("users")
+    .doc(user.uid)
+    .collection("groups")
+    .get()
+    .then(snapshot => {
+      const groups = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setCreatedGroups(groups);
+    });
+  }
+
+  function getJoinedGroups() {
+    return firebase.db
+    .collectionGroup("groups")
+    .where('users', 'array-contains', { id: user.uid, name: user.displayName })
+    .get()
+    .then(snapshot => {
+      const groups = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }
+      ));
+      setJoinedGroups(groups);
+    });
   }
 
   function submit(event) {
@@ -34,25 +53,33 @@ function Dashboard(props) {
     if (!user) {
       props.history.push("/login");
     } else {
+      const newGroupRef = firebase.db.collection("users").doc(user.uid).collection('groups').doc();
       const newGroup = {
+        id: newGroupRef.id,
         owner: {
           id: user.uid,
           name: user.displayName
         },
-        user: [],
+        users: [],
         name,
         created: Date.now()
       };
-      setGroups([newGroup, ...groups]);
-      firebase.db.collection("groups").add(newGroup);
+      setCreatedGroups([newGroup, ...createdGroups]);
+      newGroupRef.set(newGroup)
     }
   }
 
   return (
     <>
       {user && <p>Hello {user.displayName}</p>}
-      {groups &&
-        groups.map(group => (
+      {createdGroups &&
+        createdGroups.map(group => (
+          <div>
+            <Link to={`/group/${group.id}`}>{group.name}</Link>
+          </div>
+        ))}
+      {joinedGroups &&
+        joinedGroups.map(group => (
           <div>
             <Link to={`/group/${group.id}`}>{group.name}</Link>
           </div>

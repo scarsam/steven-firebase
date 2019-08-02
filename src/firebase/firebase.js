@@ -25,24 +25,23 @@ class Firebase {
     return await this.db
       .collection("users")
       .doc(credentials.user.uid)
-      .set({
-        groups: []
-      });
   }
 
   async joinGroup(group, existingUser) {
+    const groupRef = await firebase.db.collectionGroup("groups").where('id', '==', group)
     let user;
     if (existingUser) {
       user = existingUser;
     } else {
       user = await this.auth.signInWithPopup(this.facebookProvider);
     }
-    return await this.db
-      .collection("groups")
-      .doc(group)
-      .update({
-        users: app.firestore.FieldValue.arrayUnion({ id: user.uid, name: user.displayName })
-      });
+    groupRef.get().then(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        doc.ref.update({
+          users: app.firestore.FieldValue.arrayUnion({ id: user.uid, name: user.displayName })
+        })
+      })
+    });
   }
 
   async logout() {

@@ -7,15 +7,17 @@ function Group(props) {
 
   const { firebase, user } = React.useContext(FirebaseContext);
   const groupId = props.match.params.groupId;
-  const groupRef = firebase.db.collection("groups").doc(groupId);
+  const groupRef = firebase.db.collectionGroup("groups").where('id', '==', groupId)
 
   React.useEffect(() => {
     getGroup();
   }, []);
 
   function getGroup() {
-    groupRef.get().then(doc => {
-      setGroup({ ...doc.data(), id: doc.id });
+    groupRef.get().then(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        setGroup({ ...doc.data(), id: doc.id });
+      })
     });
   }
 
@@ -23,6 +25,7 @@ function Group(props) {
     <div>Loading...</div>
   ) : (
     <>
+      {console.log(group)}
       <CopyClipboard group={group.id} />
       <div>Group name: {group.name}</div>
       <div>

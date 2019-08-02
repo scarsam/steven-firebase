@@ -11,7 +11,9 @@ function App() {
   const user = useAuth();
   console.log({ user });
 
-  return (
+  return !user ? (
+    <p>Loading</p>
+  ) : (
     <BrowserRouter>
       <FirebaseContext.Provider value={{ user, firebase }}>
         <Switch>
