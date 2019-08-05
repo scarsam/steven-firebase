@@ -50,23 +50,19 @@ function Dashboard(props) {
 
   function submit(event) {
     event.preventDefault();
-    if (!user) {
-      props.history.push("/login");
-    } else {
-      const newGroupRef = firebase.db.collection("users").doc(user.uid).collection('groups').doc();
-      const newGroup = {
-        id: newGroupRef.id,
-        owner: {
-          id: user.uid,
-          name: user.displayName
-        },
-        users: [],
-        name,
-        created: Date.now()
-      };
-      setCreatedGroups([newGroup, ...createdGroups]);
-      newGroupRef.set(newGroup)
-    }
+    const newGroupRef = firebase.db.collection("users").doc(user.uid).collection('groups').doc();
+    const newGroup = {
+      id: newGroupRef.id,
+      owner: {
+        id: user.uid,
+        name: user.displayName
+      },
+      users: [],
+      name,
+      created: Date.now()
+    };
+    setCreatedGroups([newGroup, ...createdGroups]);
+    newGroupRef.set(newGroup)
   }
 
   return (
@@ -75,12 +71,14 @@ function Dashboard(props) {
       {createdGroups &&
         createdGroups.map(group => (
           <div>
+            <p>Groups you've created</p>
             <Link to={`/group/${group.id}`}>{group.name}</Link>
           </div>
         ))}
       {joinedGroups &&
         joinedGroups.map(group => (
           <div>
+            <p>Groups you've joined</p>
             <Link to={`/group/${group.id}`}>{group.name}</Link>
           </div>
         ))}

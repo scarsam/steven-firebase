@@ -25,7 +25,6 @@ function Group(props) {
     <div>Loading...</div>
   ) : (
     <>
-      {console.log(group)}
       <CopyClipboard group={group.id} />
       <div>Group name: {group.name}</div>
       <div>
