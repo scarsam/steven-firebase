@@ -1,6 +1,4 @@
-import app from "firebase/app";
-import "firebase/auth";
-import "firebase/firestore";
+import firebase from "firebase/app";
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -11,43 +9,51 @@ const config = {
   messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID
 };
 
-class Firebase {
-  constructor() {
-    app.initializeApp(config);
-    this.auth = app.auth();
-    this.db = app.firestore();
-    this.facebookProvider = new app.auth.FacebookAuthProvider();
-    this.googleProvider = new app.auth.GoogleAuthProvider();
-  }
+firebase.initializeApp(config);
 
-  async socialLogin(provider) {
-    const credentials = (provider === 'google') ? await this.auth.signInWithPopup(this.googleProvider) : await this.auth.signInWithPopup(this.facebookProvider);
-    return await this.db
-      .collection("users")
-      .doc(credentials.user.uid)
-  }
+// class Firebase {
+//   constructor() {
+//     app.initializeApp(config);
+//     this.auth = app.auth();
+//     this.db = app.firestore();
+//     this.facebookProvider = new app.auth.FacebookAuthProvider();
+//     this.googleProvider = new app.auth.GoogleAuthProvider();
+//   }
 
-  async joinGroup(group, existingUser) {
-    const groupRef = await firebase.db.collectionGroup("groups").where('id', '==', group)
-    let user;
-    if (existingUser) {
-      user = existingUser;
-    } else {
-      user = await this.auth.signInWithPopup(this.facebookProvider);
-    }
-    groupRef.get().then(querySnapshot => {
-      querySnapshot.forEach(doc => {
-        doc.ref.update({
-          users: app.firestore.FieldValue.arrayUnion({ id: user.uid, name: user.displayName })
-        })
-      })
-    });
-  }
+//   async socialLogin(provider) {
+//     const credentials =
+//       provider === "google"
+//         ? await this.auth.signInWithPopup(this.googleProvider)
+//         : await this.auth.signInWithPopup(this.facebookProvider);
+//     return await this.db.collection("users").doc(credentials.user.uid);
+//   }
 
-  async logout() {
-    await this.auth.signOut();
-  }
-}
+//   async joinGroup(group, existingUser) {
+//     const groupRef = await firebase.db
+//       .collectionGroup("groups")
+//       .where("id", "==", group);
+//     let user;
+//     if (existingUser) {
+//       user = existingUser;
+//     } else {
+//       user = await this.auth.signInWithPopup(this.facebookProvider);
+//     }
+//     groupRef.get().then(querySnapshot => {
+//       querySnapshot.forEach(doc => {
+//         doc.ref.update({
+//           users: app.firestore.FieldValue.arrayUnion({
+//             id: user.uid,
+//             name: user.displayName
+//           })
+//         });
+//       });
+//     });
+//   }
 
-const firebase = new Firebase();
+//   async logout() {
+//     await this.auth.signOut();
+//   }
+// }
+
+// const firebase = new Firebase();
 export default firebase;

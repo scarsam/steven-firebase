@@ -1,29 +1,34 @@
 import React from "react";
-import { FirebaseContext } from "../firebase";
+import { connect } from "react-redux";
+import { auth, logout } from "../store/actions/userActions";
 
 function Login(props) {
-  const { firebase } = React.useContext(FirebaseContext);
-
-  async function onSubmit(event) {
+  function auth(event) {
     const provider = event.target.dataset.provider;
     event.preventDefault();
-    try {
-      await firebase.socialLogin(provider);
-      props.history.push("/dashboard");
-    } catch (err) {
-      console.error("Failed social sign in", err);
-    }
+    props.auth(provider);
+    props.history.push("/");
   }
+
   return (
     <>
-      <form onSubmit={onSubmit} data-provider={'google'}>
+      <form onSubmit={auth} data-provider={"google"}>
         <button type="submit">Login with Google</button>
       </form>
-      <form onSubmit={onSubmit} data-provider={'facebook'}>
+      <form onSubmit={auth} data-provider={"facebook"}>
         <button type="submit">Login with Facebook</button>
       </form>
+      <button onClick={() => props.logout()}>logout</button>
     </>
   );
 }
 
-export default Login;
+const mapDispatchToProps = dispatch => ({
+  auth: provider => dispatch(auth(provider)),
+  logout: () => dispatch(logout)
+});
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(Login);
