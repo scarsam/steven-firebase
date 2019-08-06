@@ -1,9 +1,17 @@
-import { USER_AUTH, ERROR_AUTH } from "../types";
+import {
+  USER_REQUEST,
+  USER_SUCCESS,
+  USER_ERROR,
+  USER_LOGOUT,
+  CURRENT_USER,
+  NO_CURRENT_USER
+} from "../types";
 import firebase from "../../firebase/firebase";
 import "firebase/auth";
 import "firebase/firestore";
 
 export const auth = provider => async dispatch => {
+  dispatch({ type: USER_REQUEST });
   try {
     const googleProvider = new firebase.auth.GoogleAuthProvider();
     const facebookProvider = new firebase.auth.FacebookAuthProvider();
@@ -15,20 +23,33 @@ export const auth = provider => async dispatch => {
       .firestore()
       .collection("users")
       .doc(credentials.user.uid);
-    dispatch({ type: USER_AUTH, payload: user });
+    dispatch({ type: USER_SUCCESS, payload: user });
   } catch (err) {
-    dispatch({ type: ERROR_AUTH, payload: err });
+    dispatch({ type: USER_ERROR, payload: err });
   }
 };
 
 export const userListener = async dispatch => {
-  firebase.auth().onAuthStateChanged(async user => {
-    if (user) {
-      dispatch({ type: USER_AUTH, payload: user });
-    }
-  });
+  dispatch({ type: USER_REQUEST });
+  try {
+    await firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        dispatch({ type: CURRENT_USER, payload: user });
+      } else {
+        dispatch({ type: NO_CURRENT_USER, payload: null });
+      }
+    });
+  } catch (err) {
+    dispatch({ type: USER_ERROR, payload: err });
+  }
 };
 
 export const logout = async dispatch => {
-  await firebase.auth().signOut();
+  dispatch({ type: USER_REQUEST });
+  try {
+    await firebase.auth().signOut();
+    dispatch({ type: USER_LOGOUT });
+  } catch (err) {
+    dispatch({ type: USER_ERROR, payload: err });
+  }
 };
