@@ -1,17 +1,21 @@
 import React from "react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-// import useAuth from "./components/Auth";
+import { connect } from "react-redux";
 import firebase, { FirebaseContext } from "./firebase";
 import login from "./components/Login";
 import dashboard from "./components/Dashboard";
 import group from "./components/Group";
 import invite from "./components/Invite";
+import { userListener } from "./store/actions/userActions";
 import PrivateRouter from "./PrivateRoute";
 
-function App() {
-  // const user = useAuth();
+function App(props) {
   const user = {};
   console.log({ user });
+
+  React.useEffect(() => {
+    props.userListener();
+  }, []);
 
   return (
     <BrowserRouter>
@@ -27,4 +31,11 @@ function App() {
   );
 }
 
-export default App;
+const mapDispatchToProps = dispatch => ({
+  userListener: () => dispatch(userListener)
+});
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(App);

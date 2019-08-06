@@ -21,6 +21,14 @@ export const auth = provider => async dispatch => {
   }
 };
 
+export const userListener = async dispatch => {
+  firebase.auth().onAuthStateChanged(async user => {
+    if (user) {
+      dispatch({ type: USER_AUTH, payload: user });
+    }
+  });
+};
+
 export const logout = async dispatch => {
   await firebase.auth().signOut();
 };
