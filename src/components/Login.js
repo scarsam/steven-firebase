@@ -1,13 +1,12 @@
 import React from "react";
 import { connect } from "react-redux";
-import { auth, logout } from "../store/actions/userActions";
+import { auth } from "../store/actions/userActions";
 
 function Login(props) {
   function auth(event) {
     const provider = event.target.dataset.provider;
     event.preventDefault();
     props.auth(provider);
-    props.history.push("/");
   }
 
   return (
@@ -18,14 +17,12 @@ function Login(props) {
       <form onSubmit={auth} data-provider={"facebook"}>
         <button type="submit">Login with Facebook</button>
       </form>
-      <button onClick={() => props.logout()}>logout</button>
     </>
   );
 }
 
 const mapDispatchToProps = dispatch => ({
-  auth: provider => dispatch(auth(provider)),
-  logout: () => dispatch(logout)
+  auth: provider => dispatch(auth(provider))
 });
 
 export default connect(

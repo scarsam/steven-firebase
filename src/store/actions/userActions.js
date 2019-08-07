@@ -1,3 +1,7 @@
+import "firebase/auth";
+import "firebase/firestore";
+import firebase from "../../firebase/firebase";
+import history from "../../History";
 import {
   USER_REQUEST,
   USER_SUCCESS,
@@ -6,9 +10,6 @@ import {
   CURRENT_USER,
   NO_CURRENT_USER
 } from "../types";
-import firebase from "../../firebase/firebase";
-import "firebase/auth";
-import "firebase/firestore";
 
 export const auth = provider => async dispatch => {
   dispatch({ type: USER_REQUEST });
@@ -24,6 +25,7 @@ export const auth = provider => async dispatch => {
       .collection("users")
       .doc(credentials.user.uid);
     dispatch({ type: USER_SUCCESS, payload: user });
+    history.push("/dashboard");
   } catch (err) {
     dispatch({ type: USER_ERROR, payload: err });
   }
@@ -49,6 +51,7 @@ export const logout = async dispatch => {
   try {
     await firebase.auth().signOut();
     dispatch({ type: USER_LOGOUT });
+    history.push("/");
   } catch (err) {
     dispatch({ type: USER_ERROR, payload: err });
   }
