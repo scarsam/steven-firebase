@@ -1,24 +1,33 @@
 import React from "react";
 import { connect } from "react-redux";
-import { logout } from "./store/actions/userActions";
+import { logout, userListener } from "./store/actions/userActions";
 import { useSelector } from "react-redux";
 
 function Layout(props) {
   const { user } = useSelector(state => state.userState);
 
+  React.useEffect(() => {
+    props.userListener();
+  }, [user]);
+
   return (
     <>
       <header>
         This is the header
-        {user && <button onClick={() => props.logout()}>logout</button>}
+        {user && (
+          <button onClick={() => props.logout()}>
+            logout {user.displayName}
+          </button>
+        )}
       </header>
-      <main>{props.children}</main>
+      {user ? <main>{props.children}</main> : <p>Loading...</p>}
       <footer>This is the footer</footer>
     </>
   );
 }
 
 const mapDispatchToProps = dispatch => ({
+  userListener: () => dispatch(userListener),
   logout: () => dispatch(logout)
 });
 

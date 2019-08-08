@@ -7,7 +7,10 @@ import {
   JOINED_GROUPS_ERROR,
   CREATED_GROUPS_REQUEST,
   CREATED_GROUPS_SUCCESS,
-  CREATED_GROUPS_ERROR
+  CREATED_GROUPS_ERROR,
+  CREATE_GROUP_REQUEST,
+  CREATE_GROUP_SUCCESS,
+  CREATE_GROUP_ERROR
 } from "../types";
 
 export const getJoinedGroups = user => async dispatch => {
@@ -51,5 +54,31 @@ export const getCreatedGroups = user => async dispatch => {
       });
   } catch (err) {
     dispatch({ type: CREATED_GROUPS_ERROR, payload: err });
+  }
+};
+
+export const createGroup = (user, name) => async dispatch => {
+  dispatch({ type: CREATE_GROUP_REQUEST });
+  try {
+    const newGroupRef = await firebase
+      .firestore()
+      .collection("users")
+      .doc(user.uid)
+      .collection("groups")
+      .doc();
+    const newGroup = {
+      id: newGroupRef.id,
+      owner: {
+        id: user.uid,
+        name: user.displayName
+      },
+      users: [],
+      name,
+      created: Date.now()
+    };
+    newGroupRef.set(newGroup);
+    dispatch({ type: CREATE_GROUP_SUCCESS, payload: newGroup });
+  } catch (err) {
+    dispatch({ type: CREATE_GROUP_ERROR, payload: err });
   }
 };

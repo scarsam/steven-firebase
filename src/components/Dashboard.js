@@ -3,61 +3,32 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import {
   getJoinedGroups,
-  getCreatedGroups
+  getCreatedGroups,
+  createGroup
 } from "../store/actions/groupAction";
-import { useSelector } from "react-redux";
 
-function Dashboard(props) {
-  const { user } = useSelector(state => state.userState);
-  const { joinedGroups, createdGroups } = useSelector(
-    state => state.groupState
-  );
+function Dashboard({
+  user,
+  groups,
+  getCreatedGroups,
+  getJoinedGroups,
+  createGroup
+}) {
   const [name, setName] = React.useState("");
 
   React.useEffect(() => {
-    props.getCreatedGroups(user);
-    props.getJoinedGroups(user);
+    getCreatedGroups(user);
+    getJoinedGroups(user);
   }, []);
 
-  // function submit(event) {
-  //   event.preventDefault();
-  //   const newGroupRef = firebase.db
-  //     .collection("users")
-  //     .doc(user.uid)
-  //     .collection("groups")
-  //     .doc();
-  //   const newGroup = {
-  //     id: newGroupRef.id,
-  //     owner: {
-  //       id: user.uid,
-  //       name: user.displayName
-  //     },
-  //     users: [],
-  //     name,
-  //     created: Date.now()
-  //   };
-  //   setCreatedGroups([newGroup, ...createdGroups]);
-  //   newGroupRef.set(newGroup);
-  // }
+  const submit = event => {
+    event.preventDefault();
+    createGroup(user, name);
+  };
 
   return (
     <>
-      {user && <p>Hello {user.displayName}</p>}
-      {createdGroups &&
-        createdGroups.map(group => (
-          <div>
-            <p>Groups you've created</p>
-            <Link to={`/group/${group.id}`}>{group.name}</Link>
-          </div>
-        ))}
-      {joinedGroups &&
-        joinedGroups.map(group => (
-          <div>
-            <p>Groups you've joined</p>
-            <Link to={`/group/${group.id}`}>{group.name}</Link>
-          </div>
-        ))}
-      {/* <form onSubmit={submit}>
+      <form onSubmit={submit}>
         <input
           type="text"
           name="name"
@@ -66,17 +37,37 @@ function Dashboard(props) {
           onChange={event => setName(event.target.value)}
         />
         <button type="submit">Create Group</button>
-      </form> */}
+      </form>
+      <h4>Groups you've created</h4>
+      {groups.createdGroups &&
+        groups.createdGroups.map(group => (
+          <div>
+            <Link to={`/group/${group.id}`}>{group.name}</Link>
+          </div>
+        ))}
+      <h4>Groups you've joined</h4>
+      {groups.joinedGroups &&
+        groups.joinedGroups.map(group => (
+          <div>
+            <Link to={`/group/${group.id}`}>{group.name}</Link>
+          </div>
+        ))}
     </>
   );
 }
 
 const mapDispatchToProps = dispatch => ({
   getJoinedGroups: user => dispatch(getJoinedGroups(user)),
-  getCreatedGroups: user => dispatch(getCreatedGroups(user))
+  getCreatedGroups: user => dispatch(getCreatedGroups(user)),
+  createGroup: (user, name) => dispatch(createGroup(user, name))
+});
+
+const mapStateToProps = state => ({
+  user: state.userState.user,
+  groups: state.groupState
 });
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(Dashboard);

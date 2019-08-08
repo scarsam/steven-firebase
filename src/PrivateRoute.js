@@ -10,7 +10,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
     <Route
       {...rest}
       render={props =>
-        !user.pending ? (
+        user.pending ? (
           <></>
         ) : user ? (
           <Component {...props} />
