@@ -1,7 +1,10 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import { getJoinedGroups, getCreatedGroups } from "./store/actions/groupAction";
+import {
+  getJoinedGroups,
+  getCreatedGroups
+} from "../store/actions/groupAction";
 import { useSelector } from "react-redux";
 
 function Dashboard(props) {
