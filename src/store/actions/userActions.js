@@ -1,7 +1,7 @@
 import "firebase/auth";
 import "firebase/firestore";
-import firebase from "../../firebase/firebase";
-import history from "../../History";
+import firebase from "../../firebase";
+import history from "../../routes/History";
 import {
   USER_REQUEST,
   USER_SUCCESS,

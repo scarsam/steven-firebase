@@ -1,38 +1,36 @@
 import React from "react";
-import { FirebaseContext } from "../firebase";
 import CopyClipboard from "./CopyClipboard";
+import { connect } from "react-redux";
+import { getGroup } from "../store/actions/groupAction";
 
 function Group(props) {
-  const [group, setGroup] = React.useState(null);
-
-  const { firebase, user } = React.useContext(FirebaseContext);
+  const { getGroup, group } = props;
   const groupId = props.match.params.groupId;
-  const groupRef = firebase.db.collectionGroup("groups").where('id', '==', groupId)
 
   React.useEffect(() => {
-    getGroup();
+    getGroup(groupId);
   }, []);
 
-  function getGroup() {
-    groupRef.get().then(querySnapshot => {
-      querySnapshot.forEach(doc => {
-        setGroup({ ...doc.data(), id: doc.id });
-      })
-    });
-  }
-
-  return !group ? (
-    <div>Loading...</div>
-  ) : (
-    <>
-      <CopyClipboard group={group.id} />
-      <div>Group name: {group.name}</div>
-      <div>
-        Group users:
-        {group.users && group.users.map(user => <p>{user.name}</p>)}
-      </div>
-    </>
+  return (
+    group && (
+      <>
+        <CopyClipboard group={groupId} />
+        <p>Group name: {group.name}</p>
+      </>
+    )
   );
 }
 
-export default Group;
+const mapDispatchToProps = dispatch => ({
+  getGroup: id => dispatch(getGroup(id))
+});
+
+const mapStateToProps = state => ({
+  user: state.userState,
+  group: state.groupState.group
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Group);

@@ -9,12 +9,17 @@ function CopyClipboard(props) {
     return false;
   }
 
-  const url = `/group/${props.group}/invite`;
+  const url = `${window.location.href}/${props.group}/invite`;
 
   return (
     <>
       <button onClick={() => copyText()}>Copy invite link</button>
-      <input ref={inputEl} type="text" defaultValue={url} />
+      <input
+        style={{ opacity: "0" }}
+        ref={inputEl}
+        type="text"
+        defaultValue={url}
+      />
     </>
   );
 }

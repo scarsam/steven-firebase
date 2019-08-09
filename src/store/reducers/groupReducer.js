@@ -7,12 +7,16 @@ import {
   CREATED_GROUPS_ERROR,
   CREATE_GROUP_REQUEST,
   CREATE_GROUP_SUCCESS,
-  CREATE_GROUP_ERROR
+  CREATE_GROUP_ERROR,
+  GET_GROUP_REQUEST,
+  GET_GROUP_SUCCESS,
+  GET_GROUP_ERROR
 } from "../types";
 
 const initialState = {
   createdGroups: [],
   joinedGroups: [],
+  group: null,
   error: null,
   pending: false
 };
@@ -28,6 +32,7 @@ function groupReducer(state = initialState, action) {
       return {
         ...state,
         joinedGroups: action.payload,
+        group: null,
         pending: false
       };
     case JOINED_GROUPS_ERROR:
@@ -45,6 +50,7 @@ function groupReducer(state = initialState, action) {
       return {
         ...state,
         createdGroups: action.payload,
+        group: null,
         pending: false
       };
     case CREATED_GROUPS_ERROR:
@@ -65,6 +71,23 @@ function groupReducer(state = initialState, action) {
         pending: false
       };
     case CREATE_GROUP_ERROR:
+      return {
+        ...state,
+        error: action.payload,
+        pending: false
+      };
+    case GET_GROUP_REQUEST:
+      return {
+        ...state,
+        pending: true
+      };
+    case GET_GROUP_SUCCESS:
+      return {
+        ...state,
+        group: action.payload,
+        pending: false
+      };
+    case GET_GROUP_ERROR:
       return {
         ...state,
         error: action.payload,

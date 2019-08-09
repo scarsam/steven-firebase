@@ -1,6 +1,6 @@
 import "firebase/auth";
 import "firebase/firestore";
-import firebase from "../../firebase/firebase";
+import firebase from "../../firebase";
 import {
   JOINED_GROUPS_REQUEST,
   JOINED_GROUPS_SUCCESS,
@@ -10,7 +10,10 @@ import {
   CREATED_GROUPS_ERROR,
   CREATE_GROUP_REQUEST,
   CREATE_GROUP_SUCCESS,
-  CREATE_GROUP_ERROR
+  CREATE_GROUP_ERROR,
+  GET_GROUP_REQUEST,
+  GET_GROUP_SUCCESS,
+  GET_GROUP_ERROR
 } from "../types";
 
 export const getJoinedGroups = user => async dispatch => {
@@ -54,6 +57,27 @@ export const getCreatedGroups = user => async dispatch => {
       });
   } catch (err) {
     dispatch({ type: CREATED_GROUPS_ERROR, payload: err });
+  }
+};
+
+export const getGroup = id => async dispatch => {
+  dispatch({ type: GET_GROUP_REQUEST });
+  try {
+    await firebase
+      .firestore()
+      .collectionGroup("groups")
+      .where("id", "==", id)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          dispatch({
+            type: GET_GROUP_SUCCESS,
+            payload: { ...doc.data(), id: doc.id }
+          });
+        });
+      });
+  } catch (err) {
+    dispatch({ type: GET_GROUP_ERROR, payload: err });
   }
 };
 

@@ -1,14 +1,14 @@
 import React from "react";
 import { connect } from "react-redux";
-import { logout, userListener } from "./store/actions/userActions";
+import { logout, userListener } from "../store/actions/userActions";
 import { useSelector } from "react-redux";
 
-function Layout(props) {
+function PrivateLayout(props) {
   const { user } = useSelector(state => state.userState);
 
   React.useEffect(() => {
     props.userListener();
-  }, [user]);
+  }, []);
 
   return (
     <>
@@ -34,4 +34,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   null,
   mapDispatchToProps
-)(Layout);
+)(PrivateLayout);
