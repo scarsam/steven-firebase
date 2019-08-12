@@ -14,7 +14,7 @@ function Group(props) {
   return (
     group && (
       <>
-        <CopyClipboard group={groupId} />
+        <CopyClipboard />
         <p>Group name: {group.name}</p>
       </>
     )
@@ -26,7 +26,6 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mapStateToProps = state => ({
-  user: state.userState,
   group: state.groupState.group
 });
 

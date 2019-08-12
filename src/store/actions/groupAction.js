@@ -5,6 +5,9 @@ import {
   JOINED_GROUPS_REQUEST,
   JOINED_GROUPS_SUCCESS,
   JOINED_GROUPS_ERROR,
+  JOIN_GROUP_REQUEST,
+  JOIN_GROUP_SUCCESS,
+  JOIN_GROUP_ERROR,
   CREATED_GROUPS_REQUEST,
   CREATED_GROUPS_SUCCESS,
   CREATED_GROUPS_ERROR,
@@ -81,15 +84,51 @@ export const getGroup = id => async dispatch => {
   }
 };
 
+export const joinGroup = (user, id) => async dispatch => {
+  dispatch({ type: JOIN_GROUP_REQUEST });
+  try {
+    await firebase
+      .firestore()
+      .collectionGroup("groups")
+      .where("id", "==", id)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          doc.ref.update({
+            users: firebase.firestore.FieldValue.arrayUnion({ user })
+          });
+        });
+      });
+    dispatch({ type: JOIN_GROUP_SUCCESS });
+  } catch (err) {
+    dispatch({ type: JOIN_GROUP_ERROR, payload: err });
+  }
+};
+
 export const createGroup = (user, name) => async dispatch => {
   dispatch({ type: CREATE_GROUP_REQUEST });
   try {
+    let groupIndex;
+    const increment = firebase.firestore.FieldValue.increment(1);
+
+    const statsRef = await firebase
+      .firestore()
+      .collection("users")
+      .doc(user.uid)
+      .collection("groups")
+      .doc("--stats--");
+
+    await statsRef.update({ index: increment });
+    await statsRef.get().then(doc => {
+      groupIndex = doc.data().index;
+    });
+
     const newGroupRef = await firebase
       .firestore()
       .collection("users")
       .doc(user.uid)
       .collection("groups")
-      .doc();
+      .doc(`${groupIndex}`);
     const newGroup = {
       id: newGroupRef.id,
       owner: {

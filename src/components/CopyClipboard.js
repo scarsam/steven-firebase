@@ -1,6 +1,6 @@
 import React from "react";
 
-function CopyClipboard(props) {
+function CopyClipboard() {
   const inputEl = React.useRef(null);
 
   function copyText() {
@@ -9,8 +9,7 @@ function CopyClipboard(props) {
     return false;
   }
 
-  const url = `${window.location.href}/${props.group}/invite`;
-
+  const url = `${window.location.href}/invite`;
   return (
     <>
       <button onClick={() => copyText()}>Copy invite link</button>

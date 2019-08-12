@@ -1,25 +1,17 @@
 import React from "react";
-import { Route, Redirect } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { connect } from "react-redux";
+import { Route } from "react-router-dom";
 
-const PrivateRoute = ({ component: Component, ...rest }) => {
-  const user = useSelector(state => state.userState);
+const PrivateRoute = ({ component: Component, user, location, ...rest }) => {
   return (
     // Show the component only when the user is logged in
     // Otherwise, redirect the user to /signin page
-    <Route
-      {...rest}
-      render={props =>
-        user.pending ? (
-          <></>
-        ) : user ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to="/" />
-        )
-      }
-    />
+    <Route {...rest} render={props => user && <Component {...props} />} />
   );
 };
 
-export default PrivateRoute;
+const mapStateToProps = state => ({
+  user: state.userState.user
+});
+
+export default connect(mapStateToProps)(PrivateRoute);

@@ -1,33 +1,39 @@
 import React from "react";
 import { Router, Switch, Route } from "react-router-dom";
 import login from "./components/Login";
-import PrivateLayout from "./layouts/PrivateLayout";
-import PublicLayout from "./layouts/PublicLayout";
+import Layout from "./layouts/Layout";
 import dashboard from "./components/Dashboard";
 import group from "./components/Group";
 import invite from "./components/Invite";
-import PrivateRouter from "./routes/PrivateRoute";
 import history from "./routes/History";
+import PrivateRouter from "./routes/PrivateRoute";
+import { connect } from "react-redux";
+import { userListener } from "./store/actions/userActions";
 
-function App(props) {
+function App({ userListener }) {
+  React.useEffect(() => {
+    userListener();
+  }, []);
+
   return (
     <Router history={history}>
       <Switch>
-        <Route exact path={["/", "/group/:groupId/invite"]}>
-          <PublicLayout>
-            <Route exact path="/" component={login} />
-            <Route path="/group/:groupId/invite" component={invite} />
-          </PublicLayout>
-        </Route>
-        <Route exact path={["/dashboard", "/group/:groupId"]}>
-          <PrivateLayout>
-            <PrivateRouter path="/dashboard" component={dashboard} />
-            <PrivateRouter path="/group/:groupId" component={group} />
-          </PrivateLayout>
-        </Route>
+        <Layout>
+          <Route exact path="/" component={login} />
+          <Route path="/group/:groupId/invite" component={invite} />
+          <PrivateRouter path="/dashboard" component={dashboard} />
+          <PrivateRouter exact path="/group/:groupId" component={group} />
+        </Layout>
       </Switch>
     </Router>
   );
 }
 
-export default App;
+const mapDispatchToProps = dispatch => ({
+  userListener: () => dispatch(userListener)
+});
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(App);

@@ -16,15 +16,35 @@ export const auth = provider => async dispatch => {
   try {
     const googleProvider = new firebase.auth.GoogleAuthProvider();
     const facebookProvider = new firebase.auth.FacebookAuthProvider();
-    const credentials =
+    const response =
       provider === "google"
         ? await firebase.auth().signInWithPopup(googleProvider)
         : await firebase.auth().signInWithPopup(facebookProvider);
-    const user = await firebase
+    await firebase
       .firestore()
       .collection("users")
-      .doc(credentials.user.uid);
-    dispatch({ type: USER_SUCCESS, payload: user });
+      .doc(response.user.uid);
+    dispatch({ type: USER_SUCCESS, payload: response.user });
+    history.push("/dashboard");
+  } catch (err) {
+    dispatch({ type: USER_ERROR, payload: err });
+  }
+};
+
+export const authAndJoin = provider => async dispatch => {
+  dispatch({ type: USER_REQUEST });
+  try {
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    const facebookProvider = new firebase.auth.FacebookAuthProvider();
+    const response =
+      provider === "google"
+        ? await firebase.auth().signInWithPopup(googleProvider)
+        : await firebase.auth().signInWithPopup(facebookProvider);
+    await firebase
+      .firestore()
+      .collection("users")
+      .doc(response.user.uid);
+    dispatch({ type: USER_SUCCESS, payload: response.user });
     history.push("/dashboard");
   } catch (err) {
     dispatch({ type: USER_ERROR, payload: err });
@@ -39,6 +59,7 @@ export const userListener = async dispatch => {
         dispatch({ type: CURRENT_USER, payload: user });
       } else {
         dispatch({ type: NO_CURRENT_USER, payload: null });
+        history.push("/");
       }
     });
   } catch (err) {

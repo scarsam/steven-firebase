@@ -41,14 +41,14 @@ function Dashboard({
       <h4>Groups you've created</h4>
       {groups.createdGroups &&
         groups.createdGroups.map(group => (
-          <div>
+          <div key={group.id}>
             <Link to={`/group/${group.id}`}>{group.name}</Link>
           </div>
         ))}
       <h4>Groups you've joined</h4>
       {groups.joinedGroups &&
         groups.joinedGroups.map(group => (
-          <div>
+          <div key={group.id}>
             <Link to={`/group/${group.id}`}>{group.name}</Link>
           </div>
         ))}

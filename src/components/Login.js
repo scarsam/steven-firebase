@@ -3,11 +3,11 @@ import { connect } from "react-redux";
 import { auth } from "../store/actions/userActions";
 
 function Login(props) {
-  function auth(event) {
+  const auth = event => {
     const provider = event.target.dataset.provider;
     event.preventDefault();
     props.auth(provider);
-  }
+  };
 
   return (
     <>
