@@ -17,3 +17,9 @@ const store = createStore(
 );
 
 export default store;
+
+// TODO:
+// Delete documents and fix incrementer
+// Add slug in url
+// Delete group
+// Leave group
