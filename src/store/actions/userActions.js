@@ -14,6 +14,7 @@ export const auth = provider => async dispatch => {
   const { user, error } = await dbSocialAuth(provider);
   if (user) dispatch({ type: USER_SUCCESS, payload: user });
   if (error) dispatch({ type: USER_ERROR, payload: error });
+  history.push("/dashboard");
 };
 
 export const userListener = async dispatch => {

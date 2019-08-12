@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { logout } from "../store/actions/userActions";
 
 function Layout({ pending, user, logout, children }) {
-  console.log(user);
   return (
     <>
       <header>

@@ -165,6 +165,7 @@ export const dbUserListener = async () => {
         data.user = user;
       }
     });
+    return data;
   } catch (err) {
     data.error = err;
   }
