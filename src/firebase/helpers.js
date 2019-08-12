@@ -1,8 +1,11 @@
 import firebase from "./index";
+import "firebase/auth";
+import "firebase/firestore";
 
-const data = { groups: [], group: null, error: null, user: null };
+// Group db
 
 export const dbJoinedGroups = async user => {
+  const data = { groups: [], error: null };
   try {
     await firebase
       .firestore()
@@ -26,6 +29,7 @@ export const dbJoinedGroups = async user => {
 };
 
 export const dbCreatedGroups = async user => {
+  const data = { groups: [], error: null };
   try {
     await firebase
       .firestore()
@@ -47,6 +51,7 @@ export const dbCreatedGroups = async user => {
 };
 
 export const dbFindGroup = async id => {
+  const data = { group: null, error: null };
   try {
     await firebase
       .firestore()
@@ -65,6 +70,7 @@ export const dbFindGroup = async id => {
 };
 
 export const dbJoinGroup = async (user, id) => {
+  const data = { error: null };
   try {
     await firebase
       .firestore()
@@ -87,25 +93,8 @@ export const dbJoinGroup = async (user, id) => {
   return data;
 };
 
-export const dbSocialAuth = async provider => {
-  try {
-    const googleProvider = new firebase.auth.GoogleAuthProvider();
-    const facebookProvider = new firebase.auth.FacebookAuthProvider();
-    const response =
-      provider === "google"
-        ? await firebase.auth().signInWithPopup(googleProvider)
-        : await firebase.auth().signInWithPopup(facebookProvider);
-    await firebase
-      .firestore()
-      .collection("users")
-      .doc(response.user.uid);
-    data.user = response.user;
-  } catch (err) {
-    data.error = err;
-  }
-};
-
 export const dbCreateGroup = async (user, name) => {
+  const data = { group: null, error: null };
   try {
     let groupIndex;
     const increment = firebase.firestore.FieldValue.increment(1);
@@ -140,6 +129,52 @@ export const dbCreateGroup = async (user, name) => {
     };
     newGroupRef.set(newGroup);
     data.group = newGroup;
+  } catch (err) {
+    data.error = err;
+  }
+  return data;
+};
+
+// User db
+
+export const dbSocialAuth = async provider => {
+  const data = { user: null, error: null };
+  try {
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    const facebookProvider = new firebase.auth.FacebookAuthProvider();
+    const response =
+      provider === "google"
+        ? await firebase.auth().signInWithPopup(googleProvider)
+        : await firebase.auth().signInWithPopup(facebookProvider);
+    await firebase
+      .firestore()
+      .collection("users")
+      .doc(response.user.uid);
+    data.user = response.user;
+  } catch (err) {
+    data.error = err;
+  }
+  return data;
+};
+
+export const dbUserListener = async () => {
+  const data = { user: null, error: null };
+  try {
+    await firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        data.user = user;
+      }
+    });
+  } catch (err) {
+    data.error = err;
+  }
+  return data;
+};
+
+export const dbLogout = async () => {
+  const data = { error: null };
+  try {
+    await firebase.auth().signOut();
   } catch (err) {
     data.error = err;
   }

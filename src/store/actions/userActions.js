@@ -1,6 +1,4 @@
-import "firebase/auth";
-import "firebase/firestore";
-import firebase from "../../firebase";
+import { dbLogout, dbSocialAuth, dbUserListener } from "../../firebase/helpers";
 import history from "../../routes/History";
 import {
   USER_REQUEST,
@@ -13,72 +11,34 @@ import {
 
 export const auth = provider => async dispatch => {
   dispatch({ type: USER_REQUEST });
-  try {
-    const googleProvider = new firebase.auth.GoogleAuthProvider();
-    const facebookProvider = new firebase.auth.FacebookAuthProvider();
-    const response =
-      provider === "google"
-        ? await firebase.auth().signInWithPopup(googleProvider)
-        : await firebase.auth().signInWithPopup(facebookProvider);
-    await firebase
-      .firestore()
-      .collection("users")
-      .doc(response.user.uid);
-    dispatch({ type: USER_SUCCESS, payload: response.user });
-    history.push("/dashboard");
-  } catch (err) {
-    dispatch({ type: USER_ERROR, payload: err });
-  }
-};
-
-export const authAndJoin = provider => async dispatch => {
-  dispatch({ type: USER_REQUEST });
-  try {
-    const googleProvider = new firebase.auth.GoogleAuthProvider();
-    const facebookProvider = new firebase.auth.FacebookAuthProvider();
-    const response =
-      provider === "google"
-        ? await firebase.auth().signInWithPopup(googleProvider)
-        : await firebase.auth().signInWithPopup(facebookProvider);
-    await firebase
-      .firestore()
-      .collection("users")
-      .doc(response.user.uid);
-    dispatch({ type: USER_SUCCESS, payload: response.user });
-    history.push("/dashboard");
-  } catch (err) {
-    dispatch({ type: USER_ERROR, payload: err });
-  }
+  const { user, error } = await dbSocialAuth(provider);
+  if (user) dispatch({ type: USER_SUCCESS, payload: user });
+  if (error) dispatch({ type: USER_ERROR, payload: error });
 };
 
 export const userListener = async dispatch => {
   dispatch({ type: USER_REQUEST });
-  try {
-    await firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        dispatch({ type: CURRENT_USER, payload: user });
-      } else {
-        dispatch({ type: NO_CURRENT_USER, payload: null });
-        if (window.location.pathname.includes("invite")) {
-          const url = window.location.pathname;
-          history.push(url);
-        } else {
-          history.push("/");
-        }
-      }
-    });
-  } catch (err) {
-    dispatch({ type: USER_ERROR, payload: err });
+  const { user, error } = await dbUserListener();
+  if (user) dispatch({ type: CURRENT_USER, payload: user });
+  if (error) dispatch({ type: USER_ERROR, payload: error });
+  if (!user && !error) {
+    dispatch({ type: NO_CURRENT_USER, payload: null });
+    if (window.location.pathname.includes("invite")) {
+      const url = window.location.pathname;
+      history.push(url);
+    } else {
+      history.push("/");
+    }
   }
 };
 
 export const logout = async dispatch => {
   dispatch({ type: USER_REQUEST });
-  try {
-    await firebase.auth().signOut();
+  const { error } = await dbLogout();
+  if (error) {
+    dispatch({ type: USER_ERROR, payload: error });
+  } else {
     dispatch({ type: USER_LOGOUT });
     history.push("/");
-  } catch (err) {
-    dispatch({ type: USER_ERROR, payload: err });
   }
 };
