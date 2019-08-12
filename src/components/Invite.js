@@ -12,22 +12,18 @@ function Invite(props) {
   }, []);
 
   const submit = event => {
-    event.preventDefault();
-    joinGroup(user, groupId);
-  };
-
-  const auth = event => {
     const provider = event.target.dataset.provider;
     event.preventDefault();
-    props.auth(provider);
+    joinGroup(provider, user, groupId);
   };
 
-  return !user ? (
+  return !user && group ? (
     <>
-      <form onSubmit={auth} data-provider={"google"}>
+      <p>Join {group.name}</p>
+      <form onSubmit={submit} data-provider={"google"}>
         <button type="submit">Login with Google</button>
       </form>
-      <form onSubmit={auth} data-provider={"facebook"}>
+      <form onSubmit={submit} data-provider={"facebook"}>
         <button type="submit">Login with Facebook</button>
       </form>
     </>
@@ -44,7 +40,7 @@ function Invite(props) {
 
 const mapDispatchToProps = dispatch => ({
   getGroup: id => dispatch(getGroup(id)),
-  joinGroup: (user, id) => dispatch(joinGroup(user, id)),
+  joinGroup: (provider, user, id) => dispatch(joinGroup(provider, user, id)),
   auth: provider => dispatch(auth(provider))
 });
 

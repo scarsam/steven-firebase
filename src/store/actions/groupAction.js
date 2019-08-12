@@ -1,5 +1,6 @@
 import "firebase/auth";
 import "firebase/firestore";
+import history from "../../routes/History";
 import firebase from "../../firebase";
 import {
   JOINED_GROUPS_REQUEST,
@@ -16,7 +17,10 @@ import {
   CREATE_GROUP_ERROR,
   GET_GROUP_REQUEST,
   GET_GROUP_SUCCESS,
-  GET_GROUP_ERROR
+  GET_GROUP_ERROR,
+  USER_REQUEST,
+  USER_SUCCESS,
+  USER_ERROR
 } from "../types";
 
 export const getJoinedGroups = user => async dispatch => {
@@ -84,7 +88,28 @@ export const getGroup = id => async dispatch => {
   }
 };
 
-export const joinGroup = (user, id) => async dispatch => {
+export const joinGroup = (provider, user, id) => async dispatch => {
+  if (!user) {
+    dispatch({ type: USER_REQUEST });
+    try {
+      const googleProvider = new firebase.auth.GoogleAuthProvider();
+      const facebookProvider = new firebase.auth.FacebookAuthProvider();
+      const response =
+        provider === "google"
+          ? await firebase.auth().signInWithPopup(googleProvider)
+          : await firebase.auth().signInWithPopup(facebookProvider);
+      await firebase
+        .firestore()
+        .collection("users")
+        .doc(response.user.uid);
+      dispatch({ type: USER_SUCCESS, payload: response.user });
+
+      user = response.user;
+    } catch (err) {
+      dispatch({ type: USER_ERROR, payload: err });
+    }
+  }
+
   dispatch({ type: JOIN_GROUP_REQUEST });
   try {
     await firebase
@@ -95,11 +120,15 @@ export const joinGroup = (user, id) => async dispatch => {
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
           doc.ref.update({
-            users: firebase.firestore.FieldValue.arrayUnion({ user })
+            users: firebase.firestore.FieldValue.arrayUnion({
+              id: user.uid,
+              name: user.displayName
+            })
           });
         });
       });
     dispatch({ type: JOIN_GROUP_SUCCESS });
+    history.push(`/group/${id}`);
   } catch (err) {
     dispatch({ type: JOIN_GROUP_ERROR, payload: err });
   }

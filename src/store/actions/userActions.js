@@ -59,7 +59,12 @@ export const userListener = async dispatch => {
         dispatch({ type: CURRENT_USER, payload: user });
       } else {
         dispatch({ type: NO_CURRENT_USER, payload: null });
-        history.push("/");
+        if (window.location.pathname.includes("invite")) {
+          const url = window.location.pathname;
+          history.push(url);
+        } else {
+          history.push("/");
+        }
       }
     });
   } catch (err) {
