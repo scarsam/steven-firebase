@@ -7,16 +7,18 @@ import group from "./components/Group";
 import invite from "./components/Invite";
 import history from "./routes/History";
 import PrivateRouter from "./routes/PrivateRoute";
-import { connect } from "react-redux";
-import { userListener } from "./store/actions/userActions";
+import { createGlobalStyle } from "styled-components";
 
-function App({ userListener }) {
-  React.useEffect(() => {
-    userListener();
-  }, []);
+const GlobalStyle = createGlobalStyle`
+  body {
+    background-color: red;
+  }
+`;
 
+function App() {
   return (
     <Router history={history}>
+      <GlobalStyle />
       <Switch>
         <Layout>
           <Route exact path="/" component={login} />
@@ -29,11 +31,4 @@ function App({ userListener }) {
   );
 }
 
-const mapDispatchToProps = dispatch => ({
-  userListener: () => dispatch(userListener)
-});
-
-export default connect(
-  null,
-  mapDispatchToProps
-)(App);
+export default App;

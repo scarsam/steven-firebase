@@ -19,10 +19,9 @@ export const auth = provider => async dispatch => {
 
 export const userListener = async dispatch => {
   dispatch({ type: USER_REQUEST });
-  const { user, error } = await dbUserListener();
+  const user = await dbUserListener();
   if (user) dispatch({ type: CURRENT_USER, payload: user });
-  if (error) dispatch({ type: USER_ERROR, payload: error });
-  if (!user && !error) {
+  if (!user) {
     dispatch({ type: NO_CURRENT_USER, payload: null });
     if (window.location.pathname.includes("invite")) {
       const url = window.location.pathname;

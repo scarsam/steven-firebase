@@ -5,7 +5,7 @@ import "firebase/firestore";
 // Group db
 
 export const dbJoinedGroups = async user => {
-  const data = { groups: [], error: null };
+  const data = {};
   try {
     await firebase
       .firestore()
@@ -29,7 +29,7 @@ export const dbJoinedGroups = async user => {
 };
 
 export const dbCreatedGroups = async user => {
-  const data = { groups: [], error: null };
+  const data = {};
   try {
     await firebase
       .firestore()
@@ -51,7 +51,7 @@ export const dbCreatedGroups = async user => {
 };
 
 export const dbFindGroup = async id => {
-  const data = { group: null, error: null };
+  const data = {};
   try {
     await firebase
       .firestore()
@@ -70,7 +70,7 @@ export const dbFindGroup = async id => {
 };
 
 export const dbJoinGroup = async (user, id) => {
-  const data = { error: null };
+  const data = {};
   try {
     await firebase
       .firestore()
@@ -94,7 +94,7 @@ export const dbJoinGroup = async (user, id) => {
 };
 
 export const dbCreateGroup = async (user, name) => {
-  const data = { group: null, error: null };
+  const data = {};
   try {
     let groupIndex;
     const increment = firebase.firestore.FieldValue.increment(1);
@@ -138,7 +138,7 @@ export const dbCreateGroup = async (user, name) => {
 // User db
 
 export const dbSocialAuth = async provider => {
-  const data = { user: null, error: null };
+  const data = {};
   try {
     const googleProvider = new firebase.auth.GoogleAuthProvider();
     const facebookProvider = new firebase.auth.FacebookAuthProvider();
@@ -157,23 +157,20 @@ export const dbSocialAuth = async provider => {
   return data;
 };
 
-export const dbUserListener = async () => {
-  const data = { user: null, error: null };
-  try {
-    await firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        data.user = user;
-      }
-    });
-    return data;
-  } catch (err) {
-    data.error = err;
-  }
-  return data;
+export const dbUserListener = () => {
+  return new Promise((resolve, reject) => {
+    try {
+      firebase.auth().onAuthStateChanged(user => {
+        resolve(user);
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
 };
 
 export const dbLogout = async () => {
-  const data = { error: null };
+  const data = {};
   try {
     await firebase.auth().signOut();
   } catch (err) {

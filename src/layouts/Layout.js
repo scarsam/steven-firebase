@@ -1,16 +1,22 @@
 import React from "react";
 import { connect } from "react-redux";
 import { logout } from "../store/actions/userActions";
+import styled from "styled-components";
+
+const Header = styled.header`
+  display: flex;
+  height: 40px;
+`;
 
 function Layout({ pending, user, logout, children }) {
   return (
     <>
-      <header>
-        This is the header
+      <Header>
+        Steven
         {user && (
           <button onClick={() => logout()}>logout {user.displayName}</button>
         )}
-      </header>
+      </Header>
       {pending ? <p>Loading...</p> : <main>{children}</main>}
       <footer>This is the footer</footer>
     </>
