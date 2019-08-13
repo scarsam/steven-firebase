@@ -29,8 +29,18 @@ import {
   USER_ERROR,
   DELETE_GROUP_REQUEST,
   DELETE_GROUP_SUCCESS,
-  DELETE_GROUP_ERROR
+  DELETE_GROUP_ERROR,
+  LEAVE_GROUP_REQUEST,
+  LEAVE_GROUP_SUCCESS,
+  LEAVE_GROUP_ERROR
 } from "../types";
+
+export const leaveGroup = id => async dispatch => {
+  dispatch({ type: LEAVE_GROUP_REQUEST });
+  const { group, error } = await dbLeaveGroup(id);
+  if (group) dispatch({ type: LEAVE_GROUP_SUCCESS, payload: group });
+  if (error) dispatch({ type: LEAVE_GROUP_ERROR, payload: error });
+};
 
 export const deleteGroup = id => async dispatch => {
   dispatch({ type: DELETE_GROUP_REQUEST });
