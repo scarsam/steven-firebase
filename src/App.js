@@ -11,7 +11,11 @@ import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
   body {
-    background-color: red;
+    background: #2193b0; /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #2193b0, #6dd5ed); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #2193b0, #6dd5ed);
+    padding: 0;
+    margin: 0;
   }
 `;
 

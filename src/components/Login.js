@@ -1,6 +1,18 @@
 import React from "react";
 import { connect } from "react-redux";
 import { auth } from "../store/actions/userActions";
+import styled from "styled-components";
+
+const FormWrapper = styled.div`
+  background-color: white;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 350px;
+  height: 400px
+  width: 100%;
+`;
 
 function Login(props) {
   const auth = event => {
@@ -10,14 +22,14 @@ function Login(props) {
   };
 
   return (
-    <>
+    <FormWrapper>
       <form onSubmit={auth} data-provider={"google"}>
         <button type="submit">Login with Google</button>
       </form>
       <form onSubmit={auth} data-provider={"facebook"}>
         <button type="submit">Login with Facebook</button>
       </form>
-    </>
+    </FormWrapper>
   );
 }
 
