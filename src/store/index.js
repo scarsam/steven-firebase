@@ -22,5 +22,4 @@ store.dispatch(userListener);
 export default store;
 
 // TODO:
-// Delete group
 // Leave group
