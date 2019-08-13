@@ -4,7 +4,8 @@ import {
   dbFindGroup,
   dbJoinGroup,
   dbSocialAuth,
-  dbCreateGroup
+  dbCreateGroup,
+  dbDeleteGroup
 } from "../../firebase/helpers";
 import history from "../../routes/History";
 import {
@@ -25,8 +26,18 @@ import {
   GET_GROUP_ERROR,
   USER_REQUEST,
   USER_SUCCESS,
-  USER_ERROR
+  USER_ERROR,
+  DELETE_GROUP_REQUEST,
+  DELETE_GROUP_SUCCESS,
+  DELETE_GROUP_ERROR
 } from "../types";
+
+export const deleteGroup = id => async dispatch => {
+  dispatch({ type: DELETE_GROUP_REQUEST });
+  const { group, error } = await dbDeleteGroup(id);
+  if (group) dispatch({ type: DELETE_GROUP_SUCCESS, payload: group });
+  if (error) dispatch({ type: DELETE_GROUP_ERROR, payload: error });
+};
 
 export const getJoinedGroups = user => async dispatch => {
   dispatch({ type: JOINED_GROUPS_REQUEST });

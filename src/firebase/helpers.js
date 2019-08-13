@@ -4,6 +4,26 @@ import "firebase/firestore";
 
 // Group db
 
+export const dbDeleteGroup = async id => {
+  const data = {};
+  try {
+    await firebase
+      .firestore()
+      .collectionGroup("groups")
+      .where("id", "==", id)
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          doc.ref.delete();
+        });
+      });
+    data.group = id;
+  } catch (err) {
+    data.error = err;
+  }
+  return data;
+};
+
 export const dbJoinedGroups = async user => {
   const data = {};
   try {

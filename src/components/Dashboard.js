@@ -5,7 +5,8 @@ import { Link } from "react-router-dom";
 import {
   getJoinedGroups,
   getCreatedGroups,
-  createGroup
+  createGroup,
+  deleteGroup
 } from "../store/actions/groupAction";
 
 function Dashboard({
@@ -13,7 +14,8 @@ function Dashboard({
   groups,
   getCreatedGroups,
   getJoinedGroups,
-  createGroup
+  createGroup,
+  deleteGroup
 }) {
   const [name, setName] = React.useState("");
 
@@ -25,6 +27,14 @@ function Dashboard({
   const submit = event => {
     event.preventDefault();
     createGroup(user, name);
+  };
+
+  const onDeleteGroup = id => {
+    deleteGroup(id);
+  };
+
+  const leaveGroup = () => {
+    console.log("leave group");
   };
 
   return (
@@ -46,6 +56,9 @@ function Dashboard({
             <Link to={`/group/${group.id}/${slugify(group.name)}`}>
               {group.name}
             </Link>
+            <button onClick={() => onDeleteGroup(group.id)}>
+              Delete group
+            </button>
           </div>
         ))}
       <h4>Groups you've joined</h4>
@@ -55,6 +68,7 @@ function Dashboard({
             <Link to={`/group/${group.id}/${slugify(group.name)}`}>
               {group.name}
             </Link>
+            <button onClick={leaveGroup}>Leave group</button>
           </div>
         ))}
     </>
@@ -64,7 +78,8 @@ function Dashboard({
 const mapDispatchToProps = dispatch => ({
   getJoinedGroups: user => dispatch(getJoinedGroups(user)),
   getCreatedGroups: user => dispatch(getCreatedGroups(user)),
-  createGroup: (user, name) => dispatch(createGroup(user, name))
+  createGroup: (user, name) => dispatch(createGroup(user, name)),
+  deleteGroup: id => dispatch(deleteGroup(id))
 });
 
 const mapStateToProps = state => ({

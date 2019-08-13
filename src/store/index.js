@@ -22,6 +22,5 @@ store.dispatch(userListener);
 export default store;
 
 // TODO:
-// Add slug in url
 // Delete group
 // Leave group
