@@ -26,9 +26,13 @@ function App() {
       <Switch>
         <Layout>
           <Route exact path="/" component={login} />
-          <Route path="/group/:groupId/invite" component={invite} />
+          <Route path="/group/:groupId/:groupName/invite" component={invite} />
           <PrivateRouter path="/dashboard" component={dashboard} />
-          <PrivateRouter exact path="/group/:groupId" component={group} />
+          <PrivateRouter
+            exact
+            path="/group/:groupId/:groupName"
+            component={group}
+          />
         </Layout>
       </Switch>
     </Router>

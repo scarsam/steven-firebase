@@ -102,11 +102,9 @@ export const dbCreateGroup = async (user, name) => {
     const statsRef = await firebase
       .firestore()
       .collection("users")
-      .doc(user.uid)
-      .collection("groups")
       .doc("--stats--");
 
-    await statsRef.update({ index: increment });
+    await statsRef.set({ index: increment }, { merge: true });
     await statsRef.get().then(doc => {
       groupIndex = doc.data().index;
     });

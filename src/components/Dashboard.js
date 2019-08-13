@@ -1,4 +1,5 @@
 import React from "react";
+import { slugify } from "../utils/slugify";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import {
@@ -42,14 +43,18 @@ function Dashboard({
       {groups.createdGroups &&
         groups.createdGroups.map(group => (
           <div key={group.id}>
-            <Link to={`/group/${group.id}`}>{group.name}</Link>
+            <Link to={`/group/${group.id}/${slugify(group.name)}`}>
+              {group.name}
+            </Link>
           </div>
         ))}
       <h4>Groups you've joined</h4>
       {groups.joinedGroups &&
         groups.joinedGroups.map(group => (
           <div key={group.id}>
-            <Link to={`/group/${group.id}`}>{group.name}</Link>
+            <Link to={`/group/${group.id}/${slugify(group.name)}`}>
+              {group.name}
+            </Link>
           </div>
         ))}
     </>
