@@ -5,7 +5,8 @@ import {
   dbJoinGroup,
   dbSocialAuth,
   dbCreateGroup,
-  dbDeleteGroup
+  dbDeleteGroup,
+  dbLeaveGroup
 } from "../../firebase/helpers";
 import history from "../../routes/History";
 import {
@@ -35,10 +36,10 @@ import {
   LEAVE_GROUP_ERROR
 } from "../types";
 
-export const leaveGroup = id => async dispatch => {
+export const leaveGroup = (user, id) => async dispatch => {
   dispatch({ type: LEAVE_GROUP_REQUEST });
-  const { group, error } = await dbLeaveGroup(id);
-  if (group) dispatch({ type: LEAVE_GROUP_SUCCESS, payload: group });
+  const { group, error } = await dbLeaveGroup(user, id);
+  if (group) dispatch({ type: LEAVE_GROUP_SUCCESS, payload: group, user });
   if (error) dispatch({ type: LEAVE_GROUP_ERROR, payload: error });
 };
 

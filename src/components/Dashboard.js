@@ -37,7 +37,7 @@ function Dashboard({
   };
 
   const onLeaveGroup = id => {
-    leaveGroup(id);
+    leaveGroup(user, id);
   };
 
   return (
@@ -83,7 +83,7 @@ const mapDispatchToProps = dispatch => ({
   getCreatedGroups: user => dispatch(getCreatedGroups(user)),
   createGroup: (user, name) => dispatch(createGroup(user, name)),
   deleteGroup: id => dispatch(deleteGroup(id)),
-  leaveGroup: id => dispatch(leaveGroup(id))
+  leaveGroup: (user, id) => dispatch(leaveGroup(user, id))
 });
 
 const mapStateToProps = state => ({

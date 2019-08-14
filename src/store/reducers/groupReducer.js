@@ -16,7 +16,10 @@ import {
   JOIN_GROUP_ERROR,
   DELETE_GROUP_REQUEST,
   DELETE_GROUP_SUCCESS,
-  DELETE_GROUP_ERROR
+  DELETE_GROUP_ERROR,
+  LEAVE_GROUP_REQUEST,
+  LEAVE_GROUP_SUCCESS,
+  LEAVE_GROUP_ERROR
 } from "../types";
 
 const initialState = {
@@ -29,6 +32,25 @@ const initialState = {
 
 function groupReducer(state = initialState, action) {
   switch (action.type) {
+    case LEAVE_GROUP_REQUEST:
+      return {
+        ...state,
+        pending: true
+      };
+    case LEAVE_GROUP_SUCCESS:
+      return {
+        ...state,
+        pending: false,
+        joinedGroups: state.joinedGroups
+          .find(group => group.id === action.payload)
+          .users.filter(group => group.users === action.user)
+      };
+    case LEAVE_GROUP_ERROR:
+      return {
+        ...state,
+        pending: false,
+        error: action.payload
+      };
     case DELETE_GROUP_REQUEST:
       return {
         ...state,

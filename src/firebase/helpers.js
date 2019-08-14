@@ -4,17 +4,23 @@ import "firebase/firestore";
 
 // Group db
 
-export const dbLeaveGroup = async id => {
+export const dbLeaveGroup = async (user, id) => {
   const data = {};
+  debugger;
   try {
     await firebase
       .firestore()
       .collectionGroup("groups")
       .where("id", "==", id)
       .get()
-      .then(snapshot => {
-        snapshot.forEach(doc => {
-          doc.ref.delete();
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          doc.ref.update({
+            users: firebase.firestore.FieldValue.arrayRemove({
+              id: user.uid,
+              name: user.displayName
+            })
+          });
         });
       });
     data.group = id;
