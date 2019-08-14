@@ -23,11 +23,13 @@ const Main = styled.main`
   min-height: 80vh;
 `;
 
-const Footer = styled.footer`
-  align-items: center;
+const Loading = styled.p`
+  color: white;
   display: flex;
-  height: 10vh;
+  font-weight: 500;
+  align-items: center;
   justify-content: center;
+  min-height: 80vh;
 `;
 
 function Layout({ pending, user, logout, children }) {
@@ -39,8 +41,7 @@ function Layout({ pending, user, logout, children }) {
           <button onClick={() => logout()}>logout {user.displayName}</button>
         )}
       </Header>
-      {pending ? <p>Loading...</p> : <Main>{children}</Main>}
-      <Footer>This is the footer</Footer>
+      {pending ? <Loading>Loading...</Loading> : <Main>{children}</Main>}
     </>
   );
 }
