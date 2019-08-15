@@ -47,7 +47,7 @@ function Login(props) {
 
   return (
     <FormWrapper>
-      <IntroHeading>Get started</IntroHeading>
+      <IntroHeading>Split expenses with friends</IntroHeading>
       <IntroText>Less stress when sharing expenses with your partner. Keep track of your shared expenses and balances with housemates, trips, groups, friends, and family.</IntroText>
       <Form onSubmit={auth} data-provider={"google"}>
         <button className='btn google' type="submit">
