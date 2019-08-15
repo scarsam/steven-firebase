@@ -55,6 +55,7 @@ const Footer = styled.p`
 `;
 
 const Container = styled.div`
+  align-items: center;
   max-width: 500px;
   display: flex;
   justify-content: center;
