@@ -53,6 +53,33 @@ const ButtonWrapper = styled.div`
   margin-top: 20px;
 `;
 
+const AddGroupForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  input {
+    height: 30px;
+    border-radius: 3px;
+    border: 1px solid #6dd5ed;
+    margin: 15px 0 10px 0;
+    padding: 0 5px;
+  }
+`;
+
+const FormButton = styled.button`
+  background-color: #6dd5ed;
+  padding: 10px 15px !important;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 5px;
+  right: 5px;
+`;
+
+const Width100 = styled.div`
+  width: 100%;
+`;
+
 function Dashboard({
   user,
   groups,
@@ -96,20 +123,23 @@ function Dashboard({
   return (
     <>
       <Wrapper>
-        <h4>Groups you've created</h4>
-        {groups.createdGroups &&
-          groups.createdGroups.map(group => (
-            <Group key={group.id}>
-              <Link to={`/group/${group.id}/${slugify(group.name)}`}>
-                {group.name}
-              </Link>
-              {group.users.length} members
-              <button onClick={() => onDeleteGroup(group.id)}>
-                Delete group
-              </button>
-            </Group>
-          ))}
-        {groups.joinedGroups.length > 0 (
+        {groups.createdGroups.length > 0 && (
+          <>
+            <h4>Groups you've created</h4>
+            {groups.createdGroups.map(group => (
+              <Group key={group.id}>
+                <Link to={`/group/${group.id}/${slugify(group.name)}`}>
+                  {group.name}
+                </Link>
+                {group.users.length} members
+                <button onClick={() => onDeleteGroup(group.id)}>
+                  Delete group
+                </button>
+              </Group>
+            ))}
+          </>
+        )}
+        {groups.joinedGroups.length > 0 && (
           <>
             <h4>Groups you've joined</h4>
             {groups.joinedGroups.map(group => (
@@ -133,19 +163,26 @@ function Dashboard({
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel="Example Modal"
+        portalClassName="modal"
       >
-        <button onClick={closeModal}>close</button>
-        <div>I am a modal</div>
-        <form onSubmit={submit}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Group name"
-            value={name}
-            onChange={event => setName(event.target.value)}
-          />
-          <button type="submit">Create Group</button>
-        </form>
+        <CloseButton className="btn" onClick={closeModal}>
+          x
+        </CloseButton>
+        <Width100>
+          <div>Create a new group</div>
+          <AddGroupForm onSubmit={submit}>
+            <input
+              type="text"
+              name="name"
+              placeholder="Group name"
+              value={name}
+              onChange={event => setName(event.target.value)}
+            />
+            <FormButton className="btn" type="submit">
+              Create Group
+            </FormButton>
+          </AddGroupForm>
+        </Width100>
       </Modal>
     </>
   );

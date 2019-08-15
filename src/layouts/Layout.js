@@ -81,7 +81,7 @@ function Layout({ pending, user, logout, children }) {
           <Container>{children}</Container>
         </Main>
       )}
-      <Footer>Made with ❤️ by ️Sam Ojling</Footer>
+      <Footer>Made with ❤️ by ️1325 Mason</Footer>
     </>
   );
 }

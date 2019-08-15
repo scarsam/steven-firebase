@@ -44,6 +44,22 @@ const GlobalStyle = createGlobalStyle`
     color: white;
     background-color: #dd4b39;
   }
+  .modal {
+    .ReactModal__Overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ReactModal__Content {
+      width: 300px;
+      height: 150px;
+      position: relative !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 `;
 
 function App() {
