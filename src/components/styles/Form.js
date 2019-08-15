@@ -20,6 +20,7 @@ const ButtonStyles = styled.button`
   font-size: 15px;
   font-weight: 500;
   &:hover {
+    opacity: 0.9;
     cursor: pointer;
   }
   .provider {
