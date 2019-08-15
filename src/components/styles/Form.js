@@ -31,7 +31,7 @@ const ButtonStyles = styled.button`
 export const LoginForm = ({ provider, cb }) => (
   <Form onSubmit={cb} data-provider={provider}>
     <ButtonStyles provider={provider} type="submit">
-      Continue with with <span className='provider'>{provider}</span>
+      Continue with <span className='provider'>{provider}</span>
     </ButtonStyles>
   </Form>
 );
