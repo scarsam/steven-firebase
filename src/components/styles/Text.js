@@ -14,7 +14,8 @@ const H1Styles = styled.h1`
 
 const H4Styles = styled.h4`
   font-size: 17px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  margin-top: ${props => (props.marginTop === true ? "20px" : "0")};
 `;
 
 export const TextLarge = ({ text }) => (
@@ -23,4 +24,6 @@ export const TextLarge = ({ text }) => (
 
 export const H1 = ({ text }) => <H1Styles>{text}</H1Styles>;
 
-export const H4 = ({ text }) => <H4Styles>{text}</H4Styles>;
+export const H4 = ({ text, marginTop }) => (
+  <H4Styles marginTop={marginTop}>{text}</H4Styles>
+);

@@ -39,14 +39,39 @@ const DeleteGroupStyles = styled.button`
   }
 `;
 
+const CloseButtonStyles = styled.button`
+  border: 0;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 14px;
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const ButtonWrapperStyles = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+`;
+
 export const Button = ({ cb, children }) => (
   <ButtonStyles onClick={cb}>{children}</ButtonStyles>
 );
 
-export const AddGroup = ({ cb, text }) => (
+export const AddGroupButton = ({ cb, text }) => (
   <AddGroupStyles onClick={cb}>{text}</AddGroupStyles>
 );
 
-export const DeleteGroup = ({ cb, text }) => (
+export const DeleteGroupButton = ({ cb, text }) => (
   <DeleteGroupStyles onClick={cb}>{text}</DeleteGroupStyles>
+);
+
+export const CloseButton = ({ cb, text }) => (
+  <CloseButtonStyles onClick={cb}>{text}</CloseButtonStyles>
+);
+
+export const ButtonWrapper = ({ children }) => (
+  <ButtonWrapperStyles>{children}</ButtonWrapperStyles>
 );
