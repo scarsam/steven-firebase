@@ -2,7 +2,6 @@ import React from "react";
 import Modal from "react-modal";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
 import {
   getJoinedGroups,
   getCreatedGroups,
@@ -21,10 +20,7 @@ import {
   ButtonWrapper
 } from "./styles/Buttons";
 import { GroupForm } from "./styles/Form";
-
-const Width100 = styled.div`
-  width: 100%;
-`;
+import { Width100 } from "./styles/Helpers";
 
 function Dashboard({
   user,
