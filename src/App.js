@@ -27,23 +27,6 @@ const GlobalStyle = createGlobalStyle`
   h1, h2, h3, h4, h5, h6 {
     font-weight: 500;
   }
-  .btn {
-    border: 0;
-    border-radius: 4px;
-    padding: 0px 15px;
-    font-size: 15px;
-    &:hover {
-      cursor: pointer;
-    }
-  }
-  .facebook {
-    color: white;
-    background-color: #3b5998;
-  }
-  .google {
-    color: white;
-    background-color: #dd4b39;
-  }
   .modal {
     .ReactModal__Overlay {
       background-color: rgba(80, 80, 80, 0.75) !important;

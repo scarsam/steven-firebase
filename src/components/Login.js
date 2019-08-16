@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { auth } from "../store/actions/userActions";
 import Container from "./styles/Container";
 import Box from "./styles/Box";
-import { Headline, SubHeadline } from "./styles/Text";
+import { H1, TextLarge } from "./styles/Text";
 import { LoginForm } from "./styles/Form";
 
 function Login(props) {
@@ -16,8 +16,8 @@ function Login(props) {
   return (
     <Container>
       <Box>
-        <Headline text={"Split expenses with friends"} />
-        <SubHeadline
+        <H1 text={"Split expenses with friends"} />
+        <TextLarge
           text={
             "Less stress when sharing expenses with your partner. Keep track of your shared expenses and balances with housemates, trips, groups, friends, and family."
           }

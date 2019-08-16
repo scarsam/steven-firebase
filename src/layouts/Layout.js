@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { logout } from "../store/actions/userActions";
 import Container from "../components/styles/Container";
 import Header from "../components/styles/Header";
-import Button from "../components/styles/Buttons";
+import { Button } from "../components/styles/Buttons";
 import Loading from "../components/styles/Loading";
 import Main from "../components/styles/Main";
 import Logo from "../components/styles/Logo";

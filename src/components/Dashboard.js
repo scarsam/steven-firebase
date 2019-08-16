@@ -12,30 +12,10 @@ import {
 } from "../store/actions/groupAction";
 import { slugify } from "../utils/slugify";
 import Box from "./styles/Box";
-
-const AddGroup = styled.button`
-  color: white;
-  border-radius: 50%;
-  background-color: #6dd5ed;
-  border: 2px solid white;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 1;
-  height: 45px;
-  width: 45px;
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
-const Group = styled.div`
-  border: 1px solid #2193b0;
-  padding: 10px 20px;
-  border-radius: 4px;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
-`;
+import { AddGroup } from "../components/styles/Buttons";
+import { H4 } from "./styles/Text";
+import Group from "./styles/Group";
+import { DeleteGroup } from "./styles/Buttons";
 
 const ButtonWrapper = styled.div`
   display: flex;
@@ -115,23 +95,24 @@ function Dashboard({
       <Box>
         {groups.createdGroups.length > 0 && (
           <>
-            <h4>Groups you've created</h4>
+            <H4 text={"Groups you've created"} />
             {groups.createdGroups.map(group => (
               <Group key={group.id}>
                 <Link to={`/group/${group.id}/${slugify(group.name)}`}>
                   {group.name}
                 </Link>
-                {group.users.length} members
-                <button onClick={() => onDeleteGroup(group.id)}>
-                  Delete group
-                </button>
+                <p>{group.users.length} members</p>
+                <DeleteGroup
+                  cb={() => onDeleteGroup(group.id)}
+                  text={"Delete"}
+                />
               </Group>
             ))}
           </>
         )}
         {groups.joinedGroups.length > 0 && (
           <>
-            <h4>Groups you've joined</h4>
+            <H4 text={"Groups you've joined"} />
             {groups.joinedGroups.map(group => (
               <Group key={group.id}>
                 <Link to={`/group/${group.id}/${slugify(group.name)}`}>
@@ -147,7 +128,7 @@ function Dashboard({
         )}
       </Box>
       <ButtonWrapper>
-        <AddGroup onClick={openModal}>+</AddGroup>
+        <AddGroup cb={openModal} text={"+"} />
       </ButtonWrapper>
       <Modal
         isOpen={modalIsOpen}
