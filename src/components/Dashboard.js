@@ -1,7 +1,5 @@
 import React from "react";
 import Modal from "react-modal";
-import Container from "./styles/Container";
-import { slugify } from "../utils/slugify";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -12,6 +10,8 @@ import {
   deleteGroup,
   leaveGroup
 } from "../store/actions/groupAction";
+import { slugify } from "../utils/slugify";
+import Box from "./styles/Box";
 
 const AddGroup = styled.button`
   color: white;
@@ -112,7 +112,7 @@ function Dashboard({
 
   return (
     <>
-      <Container>
+      <Box>
         {groups.createdGroups.length > 0 && (
           <>
             <h4>Groups you've created</h4>
@@ -145,7 +145,7 @@ function Dashboard({
             ))}
           </>
         )}
-      </Container>
+      </Box>
       <ButtonWrapper>
         <AddGroup onClick={openModal}>+</AddGroup>
       </ButtonWrapper>

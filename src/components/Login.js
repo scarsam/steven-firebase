@@ -1,10 +1,10 @@
 import React from "react";
 import { connect } from "react-redux";
-import styled from "styled-components";
 import { auth } from "../store/actions/userActions";
 import Container from "./styles/Container";
+import Box from "./styles/Box";
 import { Headline, SubHeadline } from "./styles/Text";
-import { LoginForm } from './styles/Form';
+import { LoginForm } from "./styles/Form";
 
 function Login(props) {
   const auth = event => {
@@ -15,10 +15,16 @@ function Login(props) {
 
   return (
     <Container>
-      <Headline text={"Split expenses with friends"} />
-      <SubHeadline text={"Less stress when sharing expenses with your partner. Keep track of your shared expenses and balances with housemates, trips, groups, friends, and family."} />
-      <LoginForm cb={auth} provider={"google"} />
-      <LoginForm cb={auth} provider={"facebook"} />
+      <Box>
+        <Headline text={"Split expenses with friends"} />
+        <SubHeadline
+          text={
+            "Less stress when sharing expenses with your partner. Keep track of your shared expenses and balances with housemates, trips, groups, friends, and family."
+          }
+        />
+        <LoginForm cb={auth} provider={"google"} />
+        <LoginForm cb={auth} provider={"facebook"} />
+      </Box>
     </Container>
   );
 }

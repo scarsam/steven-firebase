@@ -46,6 +46,7 @@ const GlobalStyle = createGlobalStyle`
   }
   .modal {
     .ReactModal__Overlay {
+      background-color: rgba(80, 80, 80, 0.75) !important;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -58,6 +59,10 @@ const GlobalStyle = createGlobalStyle`
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      top: unset !important;
+      bottom: unset !important;
+      left: unset !important;
+      right: unset !important;
     }
   }
 `;
