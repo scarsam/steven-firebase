@@ -36,7 +36,7 @@ const GlobalStyle = createGlobalStyle`
     }
     .ReactModal__Content {
       width: 300px;
-      height: 150px;
+      min-height: 150px;
       position: relative !important;
       display: flex;
       flex-direction: column;
