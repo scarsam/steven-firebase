@@ -46,11 +46,35 @@ function Group(props) {
   const [amount, setAmount] = React.useState("");
   const [radio, setRadio] = React.useState("");
   const [expenseUser, setexpenseUser] = React.useState("");
+  const [expenses, setExpenses] = React.useState([]);
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
   React.useEffect(() => {
     getGroup(groupId);
+    getExpenses();
   }, []);
+
+  const isEnabled =
+    description.length > 0 &&
+    amount.length > 0 &&
+    radio.length > 0 &&
+    expenseUser.label.length > 0;
+
+  const getExpenses = async () => {
+    if (!user) return;
+
+    await firebase
+      .firestore()
+      .collection("users")
+      .doc(`${user.uid}`)
+      .collection("expenses")
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          setExpenses([...doc.data().items]);
+        });
+      });
+  };
 
   const submit = async event => {
     console.log(radio);
@@ -72,12 +96,17 @@ function Group(props) {
       .doc(`${user.uid}`)
       .collection("expenses")
       .doc(`${groupId}`);
-    batch.update(userExpenseRef, {
-      items: firebase.firestore.FieldValue.arrayUnion({
-        description,
-        amount: `${plusOrMinus("you")}${amount}`
-      })
-    });
+    batch.set(
+      userExpenseRef,
+      {
+        items: firebase.firestore.FieldValue.arrayUnion({
+          description,
+          amount: `${plusOrMinus("you")}${amount}`,
+          from: expenseUser.label
+        })
+      },
+      { merge: true }
+    );
 
     var expenseUserExpenseRef = firebase
       .firestore()
@@ -85,16 +114,22 @@ function Group(props) {
       .doc(`${expenseUser.value}`)
       .collection("expenses")
       .doc(`${groupId}`);
-    batch.update(expenseUserExpenseRef, {
-      items: firebase.firestore.FieldValue.arrayUnion({
-        description,
-        amount: `${plusOrMinus("user")}${amount}`
-      })
-    });
+    batch.set(
+      expenseUserExpenseRef,
+      {
+        items: firebase.firestore.FieldValue.arrayUnion({
+          description,
+          amount: `${plusOrMinus("user")}${amount}`,
+          from: user.displayName
+        })
+      },
+      { merge: true }
+    );
 
     // Commit the batch
     batch.commit().then(function() {
       console.log("hi");
+      getExpenses();
     });
   };
 
@@ -124,6 +159,20 @@ function Group(props) {
     setModalIsOpen(false);
   };
 
+  const totalExpenses = () => {
+    if (expenses.length === 0) return 0;
+    const totalAmount = expenses.reduce((accumlator, currentValue) => {
+      if (currentValue.amount.includes("-")) {
+        const amount = parseFloat(currentValue.amount.split("-")[1]);
+        return accumlator - amount;
+      } else {
+        const amount = parseFloat(currentValue.amount.split("+")[1]);
+        return accumlator + amount;
+      }
+    }, 0);
+    return totalAmount;
+  };
+
   return (
     group && (
       <>
@@ -132,25 +181,18 @@ function Group(props) {
             <p>Group name: {group.name}</p>
           </TopBar>
           <Wrapper>
-            <p>You owe -$150</p>
+            <p>Your balance is: ${totalExpenses()}</p>
             <button>Get even</button>
           </Wrapper>
           <BorderBottom />
-          <GroupStyles>
-            <p>Sam Ojling</p>
-            <p>Wine</p>
-            <p>-$100</p>
-          </GroupStyles>
-          <GroupStyles>
-            <p>Max Moubabe</p>
-            <p>Taxi</p>
-            <p>+$100</p>
-          </GroupStyles>
-          <GroupStyles>
-            <p>King Gabbe</p>
-            <p>Water</p>
-            <p>-$150</p>
-          </GroupStyles>
+          {expenses.map((expense, index) => (
+            // Give each expense unique ID
+            <GroupStyles key={index}>
+              <p>{expense.from}</p>
+              <p>{expense.description}</p>
+              <p>{expense.amount}</p>
+            </GroupStyles>
+          ))}
         </Box>
         <CopyClipboard />
         <ButtonWrapper>
@@ -207,7 +249,9 @@ function Group(props) {
                   </label>
                 </>
               )}
-              <button type="submit">Submit</button>
+              <button disabled={!isEnabled} type="submit">
+                Submit
+              </button>
             </GroupForm>
           </Width100>
         </Modal>

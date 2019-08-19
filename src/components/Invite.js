@@ -14,7 +14,7 @@ function Invite(props) {
   const submit = event => {
     const provider = event.target.dataset.provider;
     event.preventDefault();
-    joinGroup(provider, user, groupId);
+    joinGroup(provider, user, groupId, group);
   };
 
   return !user && group ? (

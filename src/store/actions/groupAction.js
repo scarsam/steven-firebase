@@ -71,7 +71,7 @@ export const getGroup = id => async dispatch => {
   if (error) dispatch({ type: GET_GROUP_ERROR, payload: error });
 };
 
-export const joinGroup = (provider, user, id) => async dispatch => {
+export const joinGroup = (provider, user, id, group) => async dispatch => {
   if (!user) {
     dispatch({ type: USER_REQUEST });
     const { user, error } = await dbSocialAuth(provider);
@@ -85,7 +85,7 @@ export const joinGroup = (provider, user, id) => async dispatch => {
     dispatch({ type: JOIN_GROUP_ERROR, payload: error });
   } else {
     dispatch({ type: JOIN_GROUP_SUCCESS });
-    history.push(`/group/${id}`);
+    history.push(`/group/${id}/${group.name}`);
   }
 };
 
