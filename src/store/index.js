@@ -2,11 +2,13 @@ import { createStore, combineReducers, applyMiddleware, compose } from "redux";
 import thunk from "redux-thunk";
 import userReducer from "./reducers/userReducer";
 import groupReducer from "./reducers/groupReducer";
+import expenseReducer from "./reducers/expenseReducer";
 import { userListener } from "./actions/userActions";
 
 const reducers = combineReducers({
   userState: userReducer,
-  groupState: groupReducer
+  groupState: groupReducer,
+  expenseState: expenseReducer
 });
 
 const store = createStore(

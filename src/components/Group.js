@@ -4,7 +4,8 @@ import Select from "react-select";
 import Modal from "react-modal";
 import CopyClipboard from "./CopyClipboard";
 import { connect } from "react-redux";
-import { getGroup } from "../store/actions/groupAction";
+import { getGroup } from "../store/actions/groupActions";
+import { getExpenses, createExpenses } from "../store/actions/expenseActions";
 import Box from "./styles/Box";
 import { CloseButton, AddGroupButton, ButtonWrapper } from "./styles/Buttons";
 import { GroupForm } from "./styles/Form";
@@ -40,18 +41,25 @@ const Wrapper = styled.div`
 `;
 
 function Group(props) {
-  const { getGroup, group, user } = props;
+  const {
+    getGroup,
+    getExpenses,
+    createExpenses,
+    group,
+    user,
+    expenses,
+    expensesPending
+  } = props;
   const groupId = props.match.params.groupId;
   const [description, setDescription] = React.useState("");
   const [amount, setAmount] = React.useState("");
   const [radio, setRadio] = React.useState("");
   const [expenseUser, setexpenseUser] = React.useState("");
-  const [expenses, setExpenses] = React.useState([]);
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
   React.useEffect(() => {
     getGroup(groupId);
-    getExpenses();
+    getExpenses(user);
   }, []);
 
   const isEnabled =
@@ -60,24 +68,7 @@ function Group(props) {
     radio.length > 0 &&
     expenseUser.label.length > 0;
 
-  const getExpenses = async () => {
-    if (!user) return;
-
-    await firebase
-      .firestore()
-      .collection("users")
-      .doc(`${user.uid}`)
-      .collection("expenses")
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          setExpenses([...doc.data().items]);
-        });
-      });
-  };
-
   const submit = async event => {
-    console.log(radio);
     event.preventDefault();
     setAmount("");
     setDescription("");
@@ -85,52 +76,7 @@ function Group(props) {
     setRadio("");
     setModalIsOpen(false);
 
-    const plusOrMinus = user => (radio === user ? "+" : "-");
-
-    // Get a new write batch
-    const batch = firebase.firestore().batch();
-
-    const userExpenseRef = firebase
-      .firestore()
-      .collection("users")
-      .doc(`${user.uid}`)
-      .collection("expenses")
-      .doc(`${groupId}`);
-    batch.set(
-      userExpenseRef,
-      {
-        items: firebase.firestore.FieldValue.arrayUnion({
-          description,
-          amount: `${plusOrMinus("you")}${amount}`,
-          from: expenseUser.label
-        })
-      },
-      { merge: true }
-    );
-
-    var expenseUserExpenseRef = firebase
-      .firestore()
-      .collection("users")
-      .doc(`${expenseUser.value}`)
-      .collection("expenses")
-      .doc(`${groupId}`);
-    batch.set(
-      expenseUserExpenseRef,
-      {
-        items: firebase.firestore.FieldValue.arrayUnion({
-          description,
-          amount: `${plusOrMinus("user")}${amount}`,
-          from: user.displayName
-        })
-      },
-      { merge: true }
-    );
-
-    // Commit the batch
-    batch.commit().then(function() {
-      console.log("hi");
-      getExpenses();
-    });
+    createExpenses(radio, user, description, amount, expenseUser, groupId);
   };
 
   const users = currentUser => {
@@ -160,8 +106,9 @@ function Group(props) {
   };
 
   const totalExpenses = () => {
-    if (expenses.length === 0) return 0;
-    const totalAmount = expenses.reduce((accumlator, currentValue) => {
+    if (expensesPending) return true;
+    if (expenses.items.length === 0) return 0;
+    const totalAmount = expenses.items.reduce((accumlator, currentValue) => {
       if (currentValue.amount.includes("-")) {
         const amount = parseFloat(currentValue.amount.split("-")[1]);
         return accumlator - amount;
@@ -185,14 +132,14 @@ function Group(props) {
             <button>Get even</button>
           </Wrapper>
           <BorderBottom />
-          {expenses.map((expense, index) => (
-            // Give each expense unique ID
-            <GroupStyles key={index}>
-              <p>{expense.from}</p>
-              <p>{expense.description}</p>
-              <p>{expense.amount}</p>
-            </GroupStyles>
-          ))}
+          {expenses.items &&
+            expenses.items.map((expense, index) => (
+              <GroupStyles key={index}>
+                <p>{expense.from}</p>
+                <p>{expense.description}</p>
+                <p>{expense.amount}</p>
+              </GroupStyles>
+            ))}
         </Box>
         <CopyClipboard />
         <ButtonWrapper>
@@ -261,12 +208,19 @@ function Group(props) {
 }
 
 const mapDispatchToProps = dispatch => ({
-  getGroup: id => dispatch(getGroup(id))
+  getGroup: id => dispatch(getGroup(id)),
+  getExpenses: user => dispatch(getExpenses(user)),
+  createExpenses: (radio, user, description, amount, expenseUser, groupId) =>
+    dispatch(
+      createExpenses(radio, user, description, amount, expenseUser, groupId)
+    )
 });
 
 const mapStateToProps = state => ({
   user: state.userState.user,
-  group: state.groupState.group
+  group: state.groupState.group,
+  expenses: state.expenseState.expenses,
+  expensesPending: state.expenseState.pending
 });
 
 export default connect(

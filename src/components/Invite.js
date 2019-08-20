@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { getGroup, joinGroup } from "../store/actions/groupAction";
+import { getGroup, joinGroup } from "../store/actions/groupActions";
 import { auth } from "../store/actions/userActions";
 
 function Invite(props) {

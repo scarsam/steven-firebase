@@ -222,3 +222,87 @@ export const dbLogout = async () => {
   }
   return data;
 };
+
+export const dbGetExpenses = async user => {
+  const data = {};
+  try {
+    await firebase
+      .firestore()
+      .collection("users")
+      .doc(`${user.uid}`)
+      .collection("expenses")
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          data.expenses = doc.data();
+        });
+      });
+  } catch (err) {
+    data.error = err;
+  }
+  return data;
+};
+
+export const dbCreateExpenses = async (
+  radio,
+  user,
+  description,
+  amount,
+  expenseUser,
+  groupId
+) => {
+  const data = {};
+  const plusOrMinus = user => (radio === user ? "+" : "-");
+
+  // Get a new write batch
+  const batch = firebase.firestore().batch();
+
+  const userExpenseRef = firebase
+    .firestore()
+    .collection("users")
+    .doc(`${user.uid}`)
+    .collection("expenses")
+    .doc(`${groupId}`);
+  batch.set(
+    userExpenseRef,
+    {
+      items: firebase.firestore.FieldValue.arrayUnion({
+        amount: `${plusOrMinus("you")}${amount}`,
+        description,
+        from: expenseUser.label
+      })
+    },
+    { merge: true }
+  );
+
+  const expenseUserExpenseRef = firebase
+    .firestore()
+    .collection("users")
+    .doc(`${expenseUser.value}`)
+    .collection("expenses")
+    .doc(`${groupId}`);
+  batch.set(
+    expenseUserExpenseRef,
+    {
+      items: firebase.firestore.FieldValue.arrayUnion({
+        amount: `${plusOrMinus("user")}${amount}`,
+        description,
+        from: user.displayName
+      })
+    },
+    { merge: true }
+  );
+
+  // Commit the batch
+  try {
+    await batch.commit();
+    data.expenses = {
+      amount: `${plusOrMinus("you")}${amount}`,
+      description,
+      from: expenseUser.label
+    };
+  } catch (err) {
+    data.error = err;
+  }
+  return data;
+};

@@ -8,7 +8,7 @@ import {
   createGroup,
   deleteGroup,
   leaveGroup
-} from "../store/actions/groupAction";
+} from "../store/actions/groupActions";
 import { slugify } from "../utils/slugify";
 import Box from "./styles/Box";
 import { H4 } from "./styles/Text";
