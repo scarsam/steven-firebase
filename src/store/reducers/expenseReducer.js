@@ -29,6 +29,7 @@ function expenseReducer(state = initialState, action) {
     case EXPENSE_ERROR:
       return {
         ...state,
+        expenses: [],
         error: action.payload,
         pending: false
       };

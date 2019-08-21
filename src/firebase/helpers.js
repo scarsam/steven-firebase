@@ -222,7 +222,7 @@ export const dbLogout = async () => {
   return data;
 };
 
-export const dbGetExpenses = async user => {
+export const dbGetExpenses = async (user, groupId) => {
   const data = {};
   try {
     await firebase
@@ -230,11 +230,10 @@ export const dbGetExpenses = async user => {
       .collection("users")
       .doc(`${user.uid}`)
       .collection("expenses")
+      .doc(`${groupId}`)
       .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          data.expenses = doc.data().expenses;
-        });
+      .then(doc => {
+        data.expenses = doc.data().expenses;
       });
   } catch (err) {
     data.error = err;

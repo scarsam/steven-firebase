@@ -43,8 +43,7 @@ function Group(props) {
     createExpenses,
     group,
     user,
-    expenses,
-    pending
+    expenses
   } = props;
   const groupId = props.match.params.groupId;
   const [description, setDescription] = React.useState("");
@@ -55,7 +54,7 @@ function Group(props) {
 
   React.useEffect(() => {
     getGroup(groupId);
-    getExpenses(user);
+    getExpenses(user, groupId);
   }, []);
 
   const isEnabled =
@@ -197,7 +196,7 @@ function Group(props) {
 
 const mapDispatchToProps = dispatch => ({
   getGroup: id => dispatch(getGroup(id)),
-  getExpenses: user => dispatch(getExpenses(user)),
+  getExpenses: (user, groupId) => dispatch(getExpenses(user, groupId)),
   createExpenses: (payee, user, description, amount, friend, groupId) =>
     dispatch(createExpenses(payee, user, description, amount, friend, groupId))
 });
@@ -205,8 +204,7 @@ const mapDispatchToProps = dispatch => ({
 const mapStateToProps = state => ({
   user: state.userState.user,
   group: state.groupState.group,
-  expenses: state.expenseState.expenses,
-  pending: state.expenseState.pending
+  expenses: state.expenseState.expenses
 });
 
 export default connect(

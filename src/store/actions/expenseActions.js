@@ -8,9 +8,9 @@ import {
   CREATED_EXPENSE_ERROR
 } from "../types";
 
-export const getExpenses = user => async dispatch => {
+export const getExpenses = (user, groupId) => async dispatch => {
   dispatch({ type: EXPENSE_REQUEST });
-  const { expenses, error } = await dbGetExpenses(user);
+  const { expenses, error } = await dbGetExpenses(user, groupId);
   if (expenses) dispatch({ type: EXPENSE_SUCCESS, payload: expenses });
   if (error) dispatch({ type: EXPENSE_ERROR, payload: error });
 };
