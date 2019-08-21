@@ -16,20 +16,20 @@ export const getExpenses = user => async dispatch => {
 };
 
 export const createExpenses = (
-  radio,
+  payee,
   user,
   description,
   amount,
-  expenseUser,
+  friend,
   groupId
 ) => async dispatch => {
   dispatch({ type: CREATED_EXPENSE_REQUEST });
   const { expenses, error } = await dbCreateExpenses(
-    radio,
+    payee,
     user,
     description,
     amount,
-    expenseUser,
+    friend,
     groupId
   );
   if (expenses) dispatch({ type: CREATED_EXPENSE_SUCCESS, payload: expenses });

@@ -40,7 +40,7 @@ function expenseReducer(state = initialState, action) {
     case CREATED_EXPENSE_SUCCESS:
       return {
         ...state,
-        expenses: { items: [...state.expenses.items, action.payload] },
+        expenses: [...state.expenses, action.payload],
         pending: false
       };
     case CREATED_EXPENSE_ERROR:

@@ -6,7 +6,6 @@ import "firebase/firestore";
 
 export const dbLeaveGroup = async (user, id) => {
   const data = {};
-  debugger;
   try {
     await firebase
       .firestore()
@@ -234,7 +233,7 @@ export const dbGetExpenses = async user => {
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
-          data.expenses = doc.data();
+          data.expenses = doc.data().expenses;
         });
       });
   } catch (err) {
@@ -244,15 +243,17 @@ export const dbGetExpenses = async user => {
 };
 
 export const dbCreateExpenses = async (
-  radio,
+  payee,
   user,
   description,
   amount,
-  expenseUser,
+  friend,
   groupId
 ) => {
   const data = {};
-  const plusOrMinus = user => (radio === user ? "+" : "-");
+
+  const plusOrMinus = id =>
+    payee === id ? parseFloat(amount) : parseFloat(-amount);
 
   // Get a new write batch
   const batch = firebase.firestore().batch();
@@ -266,26 +267,26 @@ export const dbCreateExpenses = async (
   batch.set(
     userExpenseRef,
     {
-      items: firebase.firestore.FieldValue.arrayUnion({
-        amount: `${plusOrMinus("you")}${amount}`,
+      expenses: firebase.firestore.FieldValue.arrayUnion({
+        amount: plusOrMinus(user.uid),
         description,
-        from: expenseUser.label
+        from: friend.label
       })
     },
     { merge: true }
   );
 
-  const expenseUserExpenseRef = firebase
+  const friendExpenseRef = firebase
     .firestore()
     .collection("users")
-    .doc(`${expenseUser.value}`)
+    .doc(`${friend.value}`)
     .collection("expenses")
     .doc(`${groupId}`);
   batch.set(
-    expenseUserExpenseRef,
+    friendExpenseRef,
     {
-      items: firebase.firestore.FieldValue.arrayUnion({
-        amount: `${plusOrMinus("user")}${amount}`,
+      expenses: firebase.firestore.FieldValue.arrayUnion({
+        amount: plusOrMinus(friend.value),
         description,
         from: user.displayName
       })
@@ -297,9 +298,9 @@ export const dbCreateExpenses = async (
   try {
     await batch.commit();
     data.expenses = {
-      amount: `${plusOrMinus("you")}${amount}`,
+      amount: plusOrMinus(user.uid),
       description,
-      from: expenseUser.label
+      from: friend.label
     };
   } catch (err) {
     data.error = err;

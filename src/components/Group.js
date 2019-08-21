@@ -12,10 +12,6 @@ import { GroupForm } from "./styles/Form";
 import { Width100 } from "./styles/Helpers";
 import { H4 } from "./styles/Text";
 
-import firebase from "../firebase";
-import "firebase/auth";
-import "firebase/firestore";
-
 const GroupStyles = styled.div`
   display: flex;
   justify-content: space-between;
@@ -48,13 +44,13 @@ function Group(props) {
     group,
     user,
     expenses,
-    expensesPending
+    pending
   } = props;
   const groupId = props.match.params.groupId;
   const [description, setDescription] = React.useState("");
   const [amount, setAmount] = React.useState("");
-  const [radio, setRadio] = React.useState("");
-  const [expenseUser, setexpenseUser] = React.useState("");
+  const [payee, setPayee] = React.useState("");
+  const [friend, setFriend] = React.useState("");
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -65,18 +61,18 @@ function Group(props) {
   const isEnabled =
     description.length > 0 &&
     amount.length > 0 &&
-    radio.length > 0 &&
-    expenseUser.label.length > 0;
+    payee.length > 0 &&
+    friend.label.length > 0;
 
   const submit = async event => {
     event.preventDefault();
     setAmount("");
     setDescription("");
-    setexpenseUser("");
-    setRadio("");
+    setFriend("");
+    setPayee("");
     setModalIsOpen(false);
 
-    createExpenses(radio, user, description, amount, expenseUser, groupId);
+    createExpenses(payee, user, description, amount, friend, groupId);
   };
 
   const users = currentUser => {
@@ -106,16 +102,8 @@ function Group(props) {
   };
 
   const totalExpenses = () => {
-    if (expensesPending) return true;
-    if (expenses.items.length === 0) return 0;
-    const totalAmount = expenses.items.reduce((accumlator, currentValue) => {
-      if (currentValue.amount.includes("-")) {
-        const amount = parseFloat(currentValue.amount.split("-")[1]);
-        return accumlator - amount;
-      } else {
-        const amount = parseFloat(currentValue.amount.split("+")[1]);
-        return accumlator + amount;
-      }
+    const totalAmount = expenses.reduce((accumlator, currentValue) => {
+      return accumlator + currentValue.amount;
     }, 0);
     return totalAmount;
   };
@@ -132,12 +120,12 @@ function Group(props) {
             <button>Get even</button>
           </Wrapper>
           <BorderBottom />
-          {expenses.items &&
-            expenses.items.map((expense, index) => (
+          {expenses &&
+            expenses.map((expense, index) => (
               <GroupStyles key={index}>
                 <p>{expense.from}</p>
                 <p>{expense.description}</p>
-                <p>{expense.amount}</p>
+                <p>${expense.amount}</p>
               </GroupStyles>
             ))}
         </Box>
@@ -170,29 +158,29 @@ function Group(props) {
                 onChange={event => setDescription(event.target.value)}
               />
               <Select
-                value={expenseUser}
-                onChange={event => setexpenseUser(event)}
+                value={friend}
+                onChange={event => setFriend(event)}
                 options={users(user)}
               />
-              {expenseUser && (
+              {friend && (
                 <>
                   <label>
                     <input
                       type="radio"
-                      value="you"
-                      checked={radio === "you"}
-                      onChange={event => setRadio(event.target.value)}
+                      value={user.uid}
+                      checked={payee === user.uid}
+                      onChange={event => setPayee(event.target.value)}
                     />
                     You paid
                   </label>
                   <label>
                     <input
                       type="radio"
-                      value="user"
-                      checked={radio === "user"}
-                      onChange={event => setRadio(event.target.value)}
+                      value={friend.value}
+                      checked={payee === friend.value}
+                      onChange={event => setPayee(event.target.value)}
                     />
-                    {expenseUser.label} paid
+                    {friend.label} paid
                   </label>
                 </>
               )}
@@ -210,17 +198,15 @@ function Group(props) {
 const mapDispatchToProps = dispatch => ({
   getGroup: id => dispatch(getGroup(id)),
   getExpenses: user => dispatch(getExpenses(user)),
-  createExpenses: (radio, user, description, amount, expenseUser, groupId) =>
-    dispatch(
-      createExpenses(radio, user, description, amount, expenseUser, groupId)
-    )
+  createExpenses: (payee, user, description, amount, friend, groupId) =>
+    dispatch(createExpenses(payee, user, description, amount, friend, groupId))
 });
 
 const mapStateToProps = state => ({
   user: state.userState.user,
   group: state.groupState.group,
   expenses: state.expenseState.expenses,
-  expensesPending: state.expenseState.pending
+  pending: state.expenseState.pending
 });
 
 export default connect(
