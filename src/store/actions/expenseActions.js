@@ -1,4 +1,5 @@
-import { dbGetExpenses, dbCreateExpenses } from "../../firebase/helpers";
+import firebase from "../../firebase";
+import "firebase/firestore";
 import {
   EXPENSE_REQUEST,
   EXPENSE_SUCCESS,
@@ -8,14 +9,27 @@ import {
   CREATED_EXPENSE_ERROR
 } from "../types";
 
-export const getExpenses = (user, groupId) => async dispatch => {
+export const fetchExpenses = (user, groupId) => async dispatch => {
   dispatch({ type: EXPENSE_REQUEST });
-  const { expenses, error } = await dbGetExpenses(user, groupId);
-  if (expenses) dispatch({ type: EXPENSE_SUCCESS, payload: expenses });
-  if (error) dispatch({ type: EXPENSE_ERROR, payload: error });
+
+  try {
+    await firebase
+      .firestore()
+      .collection("users")
+      .doc(`${user.uid}`)
+      .collection("expenses")
+      .doc(`${groupId}`)
+      .get()
+      .then(doc => {
+        const expenses = doc.data().expenses;
+        dispatch({ type: EXPENSE_SUCCESS, payload: expenses });
+      });
+  } catch (error) {
+    dispatch({ type: EXPENSE_ERROR, payload: error });
+  }
 };
 
-export const createExpenses = (
+export const createExpense = (
   payee,
   user,
   description,
@@ -24,14 +38,58 @@ export const createExpenses = (
   groupId
 ) => async dispatch => {
   dispatch({ type: CREATED_EXPENSE_REQUEST });
-  const { expenses, error } = await dbCreateExpenses(
-    payee,
-    user,
-    description,
-    amount,
-    friend,
-    groupId
+  const plusOrMinus = id =>
+    payee === id ? parseFloat(amount) : parseFloat(-amount);
+
+  // Get a new write batch
+  const batch = firebase.firestore().batch();
+
+  const userExpenseRef = firebase
+    .firestore()
+    .collection("users")
+    .doc(`${user.uid}`)
+    .collection("expenses")
+    .doc(`${groupId}`);
+  batch.set(
+    userExpenseRef,
+    {
+      expenses: firebase.firestore.FieldValue.arrayUnion({
+        amount: plusOrMinus(user.uid),
+        description,
+        from: friend.label
+      })
+    },
+    { merge: true }
   );
-  if (expenses) dispatch({ type: CREATED_EXPENSE_SUCCESS, payload: expenses });
-  if (error) dispatch({ type: CREATED_EXPENSE_ERROR, payload: error });
+
+  const friendExpenseRef = firebase
+    .firestore()
+    .collection("users")
+    .doc(`${friend.value}`)
+    .collection("expenses")
+    .doc(`${groupId}`);
+  batch.set(
+    friendExpenseRef,
+    {
+      expenses: firebase.firestore.FieldValue.arrayUnion({
+        amount: plusOrMinus(friend.value),
+        description,
+        from: user.displayName
+      })
+    },
+    { merge: true }
+  );
+
+  // Commit the batch
+  try {
+    await batch.commit();
+    const expense = {
+      amount: plusOrMinus(user.uid),
+      description,
+      from: friend.label
+    };
+    dispatch({ type: CREATED_EXPENSE_SUCCESS, payload: expense });
+  } catch (error) {
+    dispatch({ type: CREATED_EXPENSE_ERROR, payload: error });
+  }
 };

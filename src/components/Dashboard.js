@@ -3,8 +3,8 @@ import Modal from "react-modal";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import {
-  getJoinedGroups,
-  getCreatedGroups,
+  fetchJoinedGroups,
+  fetchCreatedGroups,
   createGroup,
   deleteGroup,
   leaveGroup
@@ -25,8 +25,8 @@ import { Width100 } from "./styles/Helpers";
 function Dashboard({
   user,
   groups,
-  getCreatedGroups,
-  getJoinedGroups,
+  fetchCreatedGroups,
+  fetchJoinedGroups,
   createGroup,
   deleteGroup,
   leaveGroup
@@ -35,8 +35,8 @@ function Dashboard({
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
   React.useEffect(() => {
-    getCreatedGroups(user);
-    getJoinedGroups(user);
+    fetchCreatedGroups(user);
+    fetchJoinedGroups(user);
   }, []);
 
   const submit = event => {
@@ -128,8 +128,8 @@ function Dashboard({
 }
 
 const mapDispatchToProps = dispatch => ({
-  getJoinedGroups: user => dispatch(getJoinedGroups(user)),
-  getCreatedGroups: user => dispatch(getCreatedGroups(user)),
+  fetchJoinedGroups: user => dispatch(fetchJoinedGroups(user)),
+  fetchCreatedGroups: user => dispatch(fetchCreatedGroups(user)),
   createGroup: (user, name) => dispatch(createGroup(user, name)),
   deleteGroup: id => dispatch(deleteGroup(id)),
   leaveGroup: (user, id) => dispatch(leaveGroup(user, id))

@@ -22,6 +22,3 @@ const store = createStore(
 store.dispatch(userListener);
 
 export default store;
-
-// TODO:
-// Leave group

@@ -1,14 +1,13 @@
 import React from "react";
 import { connect } from "react-redux";
-import { getGroup, joinGroup } from "../store/actions/groupActions";
-import { auth } from "../store/actions/userActions";
+import { fetchGroup, joinGroup } from "../store/actions/groupActions";
+import { userAuth } from "../store/actions/userActions";
 
-function Invite(props) {
-  const { user, getGroup, joinGroup, group } = props;
-  const groupId = props.match.params.groupId;
+function Invite({ user, fetchGroup, joinGroup, group, ...rest }) {
+  const groupId = rest.match.params.groupId;
 
   React.useEffect(() => {
-    getGroup(groupId);
+    fetchGroup(groupId);
   }, []);
 
   const submit = event => {
@@ -39,9 +38,9 @@ function Invite(props) {
 }
 
 const mapDispatchToProps = dispatch => ({
-  getGroup: id => dispatch(getGroup(id)),
+  fetchGroup: id => dispatch(fetchGroup(id)),
   joinGroup: (provider, user, id) => dispatch(joinGroup(provider, user, id)),
-  auth: provider => dispatch(auth(provider))
+  userAuth: provider => dispatch(userAuth(provider))
 });
 
 const mapStateToProps = state => ({

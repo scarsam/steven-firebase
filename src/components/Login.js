@@ -1,16 +1,16 @@
 import React from "react";
 import { connect } from "react-redux";
-import { auth } from "../store/actions/userActions";
+import { userAuth } from "../store/actions/userActions";
 import Container from "./styles/Container";
 import Box from "./styles/Box";
 import { H1, TextLarge } from "./styles/Text";
 import { LoginForm } from "./styles/Form";
 
-function Login(props) {
+function Login({ userAuth }) {
   const auth = event => {
     const provider = event.target.dataset.provider;
     event.preventDefault();
-    props.auth(provider);
+    userAuth(provider);
   };
 
   return (
@@ -30,7 +30,7 @@ function Login(props) {
 }
 
 const mapDispatchToProps = dispatch => ({
-  auth: provider => dispatch(auth(provider))
+  userAuth: provider => dispatch(userAuth(provider))
 });
 
 export default connect(

@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { logout } from "../store/actions/userActions";
+import { userLogout } from "../store/actions/userActions";
 import Container from "../components/styles/Container";
 import Header from "../components/styles/Header";
 import { Button } from "../components/styles/Buttons";
@@ -16,7 +16,7 @@ function Layout({ pending, user, logout, children }) {
         <Container>
           <Logo text={"Steven"} />
           {user && (
-            <Button cb={() => logout()}>Logout {user.displayName}</Button>
+            <Button cb={() => userLogout()}>Logout {user.displayName}</Button>
           )}
         </Container>
       </Header>
@@ -33,7 +33,7 @@ function Layout({ pending, user, logout, children }) {
 }
 
 const mapDispatchToProps = dispatch => ({
-  logout: () => dispatch(logout)
+  userLogout: () => dispatch(userLogout)
 });
 
 const mapStateToProps = state => ({

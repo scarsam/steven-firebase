@@ -4,8 +4,8 @@ import Select from "react-select";
 import Modal from "react-modal";
 import CopyClipboard from "./CopyClipboard";
 import { connect } from "react-redux";
-import { getGroup } from "../store/actions/groupActions";
-import { getExpenses, createExpenses } from "../store/actions/expenseActions";
+import { fetchGroup } from "../store/actions/groupActions";
+import { fetchExpenses, createExpense } from "../store/actions/expenseActions";
 import Box from "./styles/Box";
 import { CloseButton, AddGroupButton, ButtonWrapper } from "./styles/Buttons";
 import { GroupForm } from "./styles/Form";
@@ -36,16 +36,16 @@ const Wrapper = styled.div`
   display: flex;
 `;
 
-function Group(props) {
-  const {
-    getGroup,
-    getExpenses,
-    createExpenses,
-    group,
-    user,
-    expenses
-  } = props;
-  const groupId = props.match.params.groupId;
+function Group({
+  fetchGroup,
+  fetchExpenses,
+  createExpense,
+  group,
+  user,
+  expenses,
+  ...rest
+}) {
+  const groupId = rest.match.params.groupId;
   const [description, setDescription] = React.useState("");
   const [amount, setAmount] = React.useState("");
   const [payee, setPayee] = React.useState("");
@@ -53,8 +53,8 @@ function Group(props) {
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
   React.useEffect(() => {
-    getGroup(groupId);
-    getExpenses(user, groupId);
+    fetchGroup(groupId);
+    fetchExpenses(user, groupId);
   }, []);
 
   const isEnabled =
@@ -71,7 +71,7 @@ function Group(props) {
     setPayee("");
     setModalIsOpen(false);
 
-    createExpenses(payee, user, description, amount, friend, groupId);
+    createExpense(payee, user, description, amount, friend, groupId);
   };
 
   const users = currentUser => {
@@ -195,10 +195,10 @@ function Group(props) {
 }
 
 const mapDispatchToProps = dispatch => ({
-  getGroup: id => dispatch(getGroup(id)),
-  getExpenses: (user, groupId) => dispatch(getExpenses(user, groupId)),
-  createExpenses: (payee, user, description, amount, friend, groupId) =>
-    dispatch(createExpenses(payee, user, description, amount, friend, groupId))
+  fetchGroup: id => dispatch(fetchGroup(id)),
+  fetchExpenses: (user, groupId) => dispatch(fetchExpenses(user, groupId)),
+  createExpense: (payee, user, description, amount, friend, groupId) =>
+    dispatch(createExpense(payee, user, description, amount, friend, groupId))
 });
 
 const mapStateToProps = state => ({

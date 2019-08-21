@@ -1,4 +1,6 @@
-import { dbLogout, dbSocialAuth, dbUserListener } from "../../firebase/helpers";
+import firebase from "../../firebase";
+import "firebase/auth";
+import "firebase/firestore";
 import history from "../../routes/History";
 import {
   USER_REQUEST,
@@ -9,17 +11,37 @@ import {
   NO_CURRENT_USER
 } from "../types";
 
-export const auth = provider => async dispatch => {
+export const userAuth = provider => async dispatch => {
   dispatch({ type: USER_REQUEST });
-  const { user, error } = await dbSocialAuth(provider);
-  if (user) dispatch({ type: USER_SUCCESS, payload: user });
-  if (error) dispatch({ type: USER_ERROR, payload: error });
+  try {
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    const facebookProvider = new firebase.auth.FacebookAuthProvider();
+    const response =
+      provider === "google"
+        ? await firebase.auth().signInWithPopup(googleProvider)
+        : await firebase.auth().signInWithPopup(facebookProvider);
+    await firebase
+      .firestore()
+      .collection("users")
+      .doc(response.user.uid);
+    dispatch({ type: USER_SUCCESS, payload: response.user });
+  } catch (err) {
+    dispatch({ type: USER_ERROR, payload: err });
+  }
   history.push("/dashboard");
 };
 
 export const userListener = async dispatch => {
   dispatch({ type: USER_REQUEST });
-  const user = await dbUserListener();
+  const user = await new Promise((resolve, reject) => {
+    try {
+      firebase.auth().onAuthStateChanged(user => {
+        resolve(user);
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
   if (user) dispatch({ type: CURRENT_USER, payload: user });
   if (!user) {
     dispatch({ type: NO_CURRENT_USER, payload: null });
@@ -32,13 +54,13 @@ export const userListener = async dispatch => {
   }
 };
 
-export const logout = async dispatch => {
+export const userLogout = async dispatch => {
   dispatch({ type: USER_REQUEST });
-  const { error } = await dbLogout();
-  if (error) {
-    dispatch({ type: USER_ERROR, payload: error });
-  } else {
-    dispatch({ type: USER_LOGOUT });
-    history.push("/");
+  try {
+    await firebase.auth().signOut();
+  } catch (err) {
+    dispatch({ type: USER_ERROR, payload: err });
   }
+  dispatch({ type: USER_LOGOUT });
+  history.push("/");
 };
