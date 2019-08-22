@@ -58,9 +58,9 @@ export const userLogout = async dispatch => {
   dispatch({ type: USER_REQUEST });
   try {
     await firebase.auth().signOut();
+    dispatch({ type: USER_LOGOUT });
   } catch (err) {
     dispatch({ type: USER_ERROR, payload: err });
   }
-  dispatch({ type: USER_LOGOUT });
   history.push("/");
 };

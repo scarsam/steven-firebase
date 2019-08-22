@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import Select from "react-select";
 import Modal from "react-modal";
 import CopyClipboard from "./CopyClipboard";
 import { connect } from "react-redux";
@@ -47,49 +46,31 @@ function Group({
 }) {
   const groupId = rest.match.params.groupId;
   const [description, setDescription] = React.useState("");
-  const [amount, setAmount] = React.useState("");
-  const [payee, setPayee] = React.useState("");
-  const [friend, setFriend] = React.useState("");
+  const [splitAmount, setSplitAmount] = React.useState([]);
+  const [equalAmount, setEqualAmount] = React.useState("");
+  const [friends, setFriends] = React.useState("");
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
+  const [split, setSplit] = React.useState("equal");
 
   React.useEffect(() => {
     fetchGroup(groupId);
     fetchExpenses(user, groupId);
-  }, []);
+    setDefaultProps(user);
+  }, [JSON.stringify(group)]); // Hack to deep compare the object inside the comparission array.
 
   const isEnabled =
-    description.length > 0 &&
-    amount.length > 0 &&
-    payee.length > 0 &&
-    friend.label.length > 0;
+    description.length > 0 && equalAmount.length > 0 && friends.length > 0;
 
   const submit = async event => {
+    debugger;
     event.preventDefault();
-    setAmount("");
+    setSplitAmount("");
+    setEqualAmount("");
     setDescription("");
-    setFriend("");
-    setPayee("");
+    setFriends("");
     setModalIsOpen(false);
 
-    createExpense(payee, user, description, amount, friend, groupId);
-  };
-
-  const users = currentUser => {
-    const usersArray = group.users.map(user => ({
-      label: user.name,
-      value: user.id
-    }));
-    const ownersArray = [
-      {
-        label: group.owner.name,
-        value: group.owner.id
-      }
-    ];
-    const selectDropdown = [...usersArray, ...ownersArray];
-    const filteredDropdown = selectDropdown.filter(
-      dropdDownUser => dropdDownUser.value !== currentUser.uid
-    );
-    return filteredDropdown;
+    createExpense("split", user, description, equalAmount, friends, groupId);
   };
 
   const openModal = () => {
@@ -105,6 +86,38 @@ function Group({
       return accumlator + currentValue.amount;
     }, 0);
     return totalAmount;
+  };
+
+  const friendsList = currentUser => {
+    const usersAndOwners = [...group.users, group.owner];
+    const withOutCurrentUser = usersAndOwners.filter(
+      user => user.id !== currentUser.uid
+    );
+    return withOutCurrentUser;
+  };
+
+  const setDefaultProps = currentUser => {
+    if (group) {
+      const usersAndOwners = [...group.users, group.owner];
+      const friends = usersAndOwners.filter(
+        user => user.id !== currentUser.uid
+      );
+      const amountFriends = friends.map(friend => {
+        return {
+          id: friend.id,
+          name: friend.name,
+          amount: ""
+        };
+      });
+      setSplitAmount([...amountFriends]);
+    }
+  };
+
+  const setFriend = (event, friend) => {
+    const amount = event.target.value;
+    setSplitAmount(
+      splitAmount.map(obj => (obj.id === friend.id ? { ...obj, amount } : obj))
+    );
   };
 
   return (
@@ -142,13 +155,52 @@ function Group({
           <Width100>
             <H4 marginTop={false} text={"Add an expense"} />
             <GroupForm cb={submit}>
-              <input
-                type="number"
-                name="amount"
-                placeholder="Amount"
-                value={amount}
-                onChange={event => setAmount(event.target.value)}
-              />
+              <label>
+                <input
+                  type="radio"
+                  value="equal"
+                  checked={split === "equal"}
+                  onChange={event => setSplit(event.target.value)}
+                />
+                Split equally between everyone
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="unEqual"
+                  checked={split === "unEqual"}
+                  onChange={event => setSplit(event.target.value)}
+                />
+                Split differently
+              </label>
+              {split === "equal" ? (
+                <label>
+                  <input
+                    type="number"
+                    name="amount"
+                    placeholder="Amount"
+                    value={equalAmount}
+                    onChange={event => setEqualAmount(event.target.value)}
+                  />
+                </label>
+              ) : (
+                friendsList(user).map(friend => (
+                  <label>
+                    {friend.name}
+                    <input
+                      type="number"
+                      name="amount"
+                      placeholder="Amount"
+                      value={
+                        splitAmount.find(amount => amount.id === friend.id)
+                          .amount
+                      }
+                      onChange={event => setFriend(event, friend)}
+                    />
+                  </label>
+                ))
+              )}
+
               <input
                 type="text"
                 name="description"
@@ -156,36 +208,8 @@ function Group({
                 value={description}
                 onChange={event => setDescription(event.target.value)}
               />
-              <Select
-                value={friend}
-                onChange={event => setFriend(event)}
-                options={users(user)}
-              />
-              {friend && (
-                <>
-                  <label>
-                    <input
-                      type="radio"
-                      value={user.uid}
-                      checked={payee === user.uid}
-                      onChange={event => setPayee(event.target.value)}
-                    />
-                    You paid
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      value={friend.value}
-                      checked={payee === friend.value}
-                      onChange={event => setPayee(event.target.value)}
-                    />
-                    {friend.label} paid
-                  </label>
-                </>
-              )}
-              <button disabled={!isEnabled} type="submit">
-                Submit
-              </button>
+
+              <button type="submit">Submit</button>
             </GroupForm>
           </Width100>
         </Modal>
@@ -197,8 +221,8 @@ function Group({
 const mapDispatchToProps = dispatch => ({
   fetchGroup: id => dispatch(fetchGroup(id)),
   fetchExpenses: (user, groupId) => dispatch(fetchExpenses(user, groupId)),
-  createExpense: (payee, user, description, amount, friend, groupId) =>
-    dispatch(createExpense(payee, user, description, amount, friend, groupId))
+  createExpense: (split, user, description, amount, friend, groupId) =>
+    dispatch(createExpense(split, user, description, amount, friend, groupId))
 });
 
 const mapStateToProps = state => ({

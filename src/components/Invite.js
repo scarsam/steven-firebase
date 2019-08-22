@@ -39,7 +39,8 @@ function Invite({ user, fetchGroup, joinGroup, group, ...rest }) {
 
 const mapDispatchToProps = dispatch => ({
   fetchGroup: id => dispatch(fetchGroup(id)),
-  joinGroup: (provider, user, id) => dispatch(joinGroup(provider, user, id)),
+  joinGroup: (provider, user, id, group) =>
+    dispatch(joinGroup(provider, user, id, group)),
   userAuth: provider => dispatch(userAuth(provider))
 });
 

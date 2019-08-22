@@ -9,7 +9,7 @@ import Main from "../components/styles/Main";
 import Logo from "../components/styles/Logo";
 import Footer from "../components/styles/Footer";
 
-function Layout({ pending, user, logout, children }) {
+function Layout({ pending, user, userLogout, children }) {
   return (
     <>
       <Header loggedIn={!!user}>

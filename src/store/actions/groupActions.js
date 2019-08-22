@@ -2,6 +2,8 @@ import firebase from "../../firebase";
 import "firebase/auth";
 import "firebase/firestore";
 import history from "../../routes/History";
+import { slugify } from "../../utils/slugify";
+
 import {
   JOINED_GROUPS_REQUEST,
   JOINED_GROUPS_SUCCESS,
@@ -173,11 +175,11 @@ export const joinGroup = (provider, user, id, group) => async dispatch => {
           });
         });
       });
+    dispatch({ type: JOIN_GROUP_SUCCESS });
   } catch (error) {
     dispatch({ type: JOIN_GROUP_ERROR, payload: error });
   }
-  dispatch({ type: JOIN_GROUP_SUCCESS });
-  history.push(`/group/${id}/${group.name}`);
+  history.push(`/group/${id}/${slugify(group.name)}`);
 };
 
 export const createGroup = (user, name) => async dispatch => {
