@@ -83,7 +83,7 @@ function Group(props) {
       }
       return totalAccumlator + expenseTotal;
     }, 0);
-    return total;
+    return parseFloat(parseFloat(total).toFixed(2));
   };
 
   const totalLentOrBorrowed = ({ amounts, total, payerId }) => {
@@ -104,9 +104,13 @@ function Group(props) {
     return friends;
   };
 
-  // const expenseList = () => {
-  //   expenses.filter(expense => expense.)
-  // }
+  const expenseList = () => {
+    return expenses.filter(expense => {
+      return expense.amounts.some(
+        expense => expense.amount !== 0 && expense.id === user.uid
+      );
+    });
+  };
 
   const renderTotal = ({ amounts, total, payerId }) => {
     const payer = amounts.find(payer => payer.id === payerId);
@@ -133,8 +137,6 @@ function Group(props) {
     setAmountDefaultProps();
   };
 
-  console.log({ group });
-  console.log({ expenseGroup });
   return (
     group &&
     expenseGroup.length >= 1 && (
@@ -149,7 +151,7 @@ function Group(props) {
           </Wrapper>
           <BorderBottom />
           {expenses &&
-            expenses.map((expense, index) => (
+            expenseList().map((expense, index) => (
               <GroupStyles key={index}>
                 <p>{renderTotal(expense)}</p>
                 <p>{expense.description}</p>
