@@ -137,7 +137,13 @@ export const fetchGroup = id => async dispatch => {
   }
 };
 
-export const joinGroup = (provider, user, id, group) => async dispatch => {
+export const joinGroup = (
+  provider,
+  existingUser,
+  id,
+  group
+) => async dispatch => {
+  let user = existingUser;
   if (!user) {
     dispatch({ type: USER_REQUEST });
     try {
@@ -152,10 +158,10 @@ export const joinGroup = (provider, user, id, group) => async dispatch => {
         .collection("users")
         .doc(response.user.uid);
       dispatch({ type: USER_SUCCESS, payload: response.user });
+      user = response.user;
     } catch (err) {
       dispatch({ type: USER_ERROR, payload: err });
     }
-    history.push("/dashboard");
   }
 
   dispatch({ type: JOIN_GROUP_REQUEST });
@@ -214,7 +220,7 @@ export const createGroup = (user, name) => async dispatch => {
       name,
       created: Date.now()
     };
-    newGroupRef.set(newGroup);
+    newGroupRef.set(newGroup, { merge: true });
     dispatch({ type: CREATE_GROUP_SUCCESS, payload: newGroup });
   } catch (error) {
     dispatch({ type: CREATE_GROUP_ERROR, payload: error });

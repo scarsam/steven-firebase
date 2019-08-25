@@ -9,94 +9,95 @@ import {
   CREATED_EXPENSE_ERROR
 } from "../types";
 
-export const fetchExpenses = (user, groupId) => async dispatch => {
+export const fetchExpenses = (groupId, user) => async dispatch => {
   dispatch({ type: EXPENSE_REQUEST });
 
   try {
     await firebase
       .firestore()
-      .collection("users")
-      .doc(`${user.uid}`)
-      .collection("expenses")
+      .collection("groupExpenses")
       .doc(`${groupId}`)
       .get()
       .then(doc => {
-        const expenses = doc.data().expenses;
-        dispatch({ type: EXPENSE_SUCCESS, payload: expenses });
+        const filteredData = doc.data().expenses.filter(expense => {
+          return expense.amounts.some(amount => amount.id === user.uid);
+        });
+        dispatch({ type: EXPENSE_SUCCESS, payload: filteredData });
       });
   } catch (error) {
+    console.log(error);
     dispatch({ type: EXPENSE_ERROR, payload: error });
   }
 };
 
 export const createExpense = (
-  payee,
+  split,
   user,
   description,
-  amount,
-  friends,
+  expenseGroup,
   groupId
 ) => async dispatch => {
-  let decimalAmount;
+  let group = expenseGroup.map(expense => ({
+    ...expense,
+    amount: expense.amount === "" ? "0" : expense.amount
+  }));
+
+  const isCurrentUser = user => {
+    return currentUser().id === user.id;
+  };
+  const currentUser = () =>
+    group.find(currentUser => currentUser.id === user.uid);
+
+  const totalAmount = () => {
+    const totalAmount = group.reduce((accumlator, currentValue) => {
+      return accumlator + parseFloat(currentValue.amount);
+    }, 0);
+    return split === "equal" ? totalAmount / group.length : totalAmount;
+  };
+
+  const payees = () => {
+    if (split === "equal") {
+      return group.map(expense => ({
+        ...expense,
+        amount: isCurrentUser(expense)
+          ? parseFloat(parseFloat(expense.amount / group.length).toFixed(2))
+          : -parseFloat(parseFloat(expense.amount / group.length).toFixed(2))
+      }));
+    } else {
+      return group.map(expense => ({
+        ...expense,
+        amount: isCurrentUser(expense)
+          ? parseFloat(parseFloat(expense.amount).toFixed(2))
+          : -parseFloat(parseFloat(expense.amount).toFixed(2))
+      }));
+    }
+  };
+
+  const payer = currentUser();
+  const newExpense = {
+    description,
+    total: totalAmount(),
+    payerId: payer.id,
+    amounts: payees()
+  };
+
   dispatch({ type: CREATED_EXPENSE_REQUEST });
 
-  if (payee === "split") {
-    // Check how many friends selected + the current user therefor (+1)
-    decimalAmount = parseFloat(amount / (friends.length + 1)).toFixed(2);
-  } else {
-    decimalAmount = parseFloat(amount).toFixed(2);
-  }
-
-  // Get a new write batch
-  const batch = firebase.firestore().batch();
-
-  const userExpenseRef = firebase
-    .firestore()
-    .collection("users")
-    .doc(`${user.uid}`)
-    .collection("expenses")
-    .doc(`${groupId}`);
-  batch.set(
-    userExpenseRef,
-    {
-      expenses: firebase.firestore.FieldValue.arrayUnion({
-        amount: decimalAmount,
-        description,
-        from: friends.map(friend => friend.label)
-      })
-    },
-    { merge: true }
-  );
-
-  friends.forEach(friend => {
-    const friendExpenseRef = firebase
-      .firestore()
-      .collection("users")
-      .doc(`${friend.value}`)
-      .collection("expenses")
-      .doc(`${groupId}`);
-    batch.set(
-      friendExpenseRef,
-      {
-        expenses: firebase.firestore.FieldValue.arrayUnion({
-          amount: -decimalAmount,
-          description,
-          from: user.displayName
-        })
-      },
-      { merge: true }
-    );
-  });
-
-  // Commit the batch
   try {
-    await batch.commit();
-    const expense = {
-      amount: decimalAmount,
-      description,
-      from: friends.map(friend => friend.label)
-    };
-    dispatch({ type: CREATED_EXPENSE_SUCCESS, payload: expense });
+    await firebase
+      .firestore()
+      .collection("groupExpenses")
+      .doc(`${groupId}`)
+      .get()
+      .then(doc => {
+        doc.ref.set(
+          {
+            expenses: firebase.firestore.FieldValue.arrayUnion(newExpense)
+          },
+          { merge: true }
+        );
+      });
+    dispatch({ type: CREATED_EXPENSE_SUCCESS, payload: newExpense });
   } catch (error) {
     dispatch({ type: CREATED_EXPENSE_ERROR, payload: error });
   }

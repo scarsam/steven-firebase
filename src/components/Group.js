@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import Modal from "react-modal";
 import CopyClipboard from "./CopyClipboard";
-import { connect } from "react-redux";
 import { fetchGroup } from "../store/actions/groupActions";
 import { fetchExpenses, createExpense } from "../store/actions/expenseActions";
 import Box from "./styles/Box";
@@ -35,123 +35,139 @@ const Wrapper = styled.div`
   display: flex;
 `;
 
-function Group({
-  fetchGroup,
-  fetchExpenses,
-  createExpense,
-  group,
-  user,
-  expenses,
-  ...rest
-}) {
-  const groupId = rest.match.params.groupId;
-  const [description, setDescription] = React.useState("");
-  const [splitAmount, setSplitAmount] = React.useState([]);
-  const [equalAmount, setEqualAmount] = React.useState("");
-  const [friends, setFriends] = React.useState("");
-  const [modalIsOpen, setModalIsOpen] = React.useState(false);
-  const [split, setSplit] = React.useState("equal");
+function Group(props) {
+  const groupId = props.match.params.groupId;
+  const [description, setDescription] = useState("");
+  const [expenseGroup, setExpenseGroup] = useState([]);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [split, setSplit] = useState("equal");
+  const user = useSelector(store => store.userState.user);
+  const group = useSelector(store => store.groupState.group);
+  const expenses = useSelector(store => store.expenseState.expenses);
+  const dispatch = useDispatch();
 
-  React.useEffect(() => {
-    fetchGroup(groupId);
-    fetchExpenses(user, groupId);
-    setDefaultProps(user);
+  useEffect(() => {
+    dispatch(fetchGroup(groupId));
+    dispatch(fetchExpenses(groupId, user));
+    setAmountDefaultProps(user);
   }, [JSON.stringify(group)]); // Hack to deep compare the object inside the comparission array.
 
-  const isEnabled =
-    description.length > 0 && equalAmount.length > 0 && friends.length > 0;
+  // const isEnabled =
+  //   description.length > 0 && equalAmount.length > 0 && friends.length > 0;
 
   const submit = async event => {
-    debugger;
     event.preventDefault();
-    setSplitAmount("");
-    setEqualAmount("");
+    dispatch(createExpense(split, user, description, expenseGroup, groupId));
     setDescription("");
-    setFriends("");
     setModalIsOpen(false);
-
-    createExpense("split", user, description, equalAmount, friends, groupId);
+    setAmountDefaultProps();
   };
 
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
+  const toggleModal = () => setModalIsOpen(toggleModal => !toggleModal);
 
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
-
-  const totalExpenses = () => {
-    const totalAmount = expenses.reduce((accumlator, currentValue) => {
-      return accumlator + currentValue.amount;
+  const totalBalance = () => {
+    let expenseTotal;
+    const total = expenses.reduce((totalAccumlator, group) => {
+      if (group.payerId === user.uid) {
+        expenseTotal = group.amounts.reduce((expenseAccumlator, expense) => {
+          return expense.id !== user.uid
+            ? expenseAccumlator - expense.amount
+            : expenseAccumlator;
+        }, 0);
+      } else {
+        expenseTotal = group.amounts.reduce((expenseAccumlator, expense) => {
+          return expense.id === user.uid
+            ? expenseAccumlator + expense.amount
+            : expenseAccumlator;
+        }, 0);
+      }
+      return totalAccumlator + expenseTotal;
     }, 0);
-    return totalAmount;
+    return total;
   };
 
-  const friendsList = currentUser => {
-    const usersAndOwners = [...group.users, group.owner];
-    const withOutCurrentUser = usersAndOwners.filter(
-      user => user.id !== currentUser.uid
-    );
-    return withOutCurrentUser;
+  const totalLentOrBorrowed = ({ amounts, total, payerId }) => {
+    const payer = amounts.find(payer => payer.id === user.uid);
+    if (!payer) return;
+    if (payer.id === payerId) {
+      return renderExpense(true, total - payer.amount);
+    } else {
+      return renderExpense(false, payer.amount);
+    }
   };
 
-  const setDefaultProps = currentUser => {
+  const renderExpense = (lent, amount) =>
+    lent ? `You lent ${amount}` : `You borrowed ${amount}`;
+
+  const friendsList = () => {
+    const friends = [group.owner, ...group.users];
+    return friends;
+  };
+
+  // const expenseList = () => {
+  //   expenses.filter(expense => expense.)
+  // }
+
+  const renderTotal = ({ amounts, total, payerId }) => {
+    const payer = amounts.find(payer => payer.id === payerId);
+    return user.uid === payerId
+      ? `You paid ${total}`
+      : `${payer.name} paid ${total}`;
+  };
+
+  const setAmountDefaultProps = () => {
     if (group) {
-      const usersAndOwners = [...group.users, group.owner];
-      const friends = usersAndOwners.filter(
-        user => user.id !== currentUser.uid
-      );
-      const amountFriends = friends.map(friend => {
+      const amountInputProps = friendsList().map(friend => {
         return {
           id: friend.id,
           name: friend.name,
           amount: ""
         };
       });
-      setSplitAmount([...amountFriends]);
+      setExpenseGroup([...amountInputProps]);
     }
   };
 
-  const setFriend = (event, friend) => {
-    const amount = event.target.value;
-    setSplitAmount(
-      splitAmount.map(obj => (obj.id === friend.id ? { ...obj, amount } : obj))
-    );
+  const resetAmount = event => {
+    setSplit(event.target.value);
+    setAmountDefaultProps();
   };
 
+  console.log({ group });
+  console.log({ expenseGroup });
   return (
-    group && (
+    group &&
+    expenseGroup.length >= 1 && (
       <>
         <Box>
           <TopBar>
             <p>Group name: {group.name}</p>
           </TopBar>
           <Wrapper>
-            <p>Your balance is: ${totalExpenses()}</p>
+            <p>Your balance is: ${totalBalance()}</p>
             <button>Get even</button>
           </Wrapper>
           <BorderBottom />
           {expenses &&
             expenses.map((expense, index) => (
               <GroupStyles key={index}>
-                <p>{expense.from}</p>
+                <p>{renderTotal(expense)}</p>
                 <p>{expense.description}</p>
-                <p>${expense.amount}</p>
+                <p>{totalLentOrBorrowed(expense)}</p>
               </GroupStyles>
             ))}
         </Box>
         <CopyClipboard />
         <ButtonWrapper>
-          <AddGroupButton cb={openModal} text={"+"} />
+          <AddGroupButton cb={toggleModal} text={"+"} />
         </ButtonWrapper>
         <Modal
           isOpen={modalIsOpen}
-          onRequestClose={closeModal}
+          onRequestClose={toggleModal}
           contentLabel="Example Modal"
           portalClassName="modal"
         >
-          <CloseButton cb={closeModal} text={"x"} />
+          <CloseButton cb={toggleModal} text={"x"} />
           <Width100>
             <H4 marginTop={false} text={"Add an expense"} />
             <GroupForm cb={submit}>
@@ -160,7 +176,7 @@ function Group({
                   type="radio"
                   value="equal"
                   checked={split === "equal"}
-                  onChange={event => setSplit(event.target.value)}
+                  onChange={event => resetAmount(event)}
                 />
                 Split equally between everyone
               </label>
@@ -179,12 +195,23 @@ function Group({
                     type="number"
                     name="amount"
                     placeholder="Amount"
-                    value={equalAmount}
-                    onChange={event => setEqualAmount(event.target.value)}
+                    value={
+                      expenseGroup.find(
+                        expenseUser => expenseUser.id === group.owner.id
+                      ).amount
+                    }
+                    onChange={event =>
+                      setExpenseGroup(
+                        expenseGroup.map(obj => ({
+                          ...obj,
+                          amount: event.target.value
+                        }))
+                      )
+                    }
                   />
                 </label>
               ) : (
-                friendsList(user).map(friend => (
+                friendsList().map(friend => (
                   <label>
                     {friend.name}
                     <input
@@ -192,10 +219,19 @@ function Group({
                       name="amount"
                       placeholder="Amount"
                       value={
-                        splitAmount.find(amount => amount.id === friend.id)
-                          .amount
+                        expenseGroup.find(
+                          expenseUser => expenseUser.id === friend.id
+                        ).amount
                       }
-                      onChange={event => setFriend(event, friend)}
+                      onChange={event =>
+                        setExpenseGroup(
+                          expenseGroup.map(obj =>
+                            obj.id === friend.id
+                              ? { ...obj, amount: event.target.value }
+                              : obj
+                          )
+                        )
+                      }
                     />
                   </label>
                 ))
@@ -218,20 +254,4 @@ function Group({
   );
 }
 
-const mapDispatchToProps = dispatch => ({
-  fetchGroup: id => dispatch(fetchGroup(id)),
-  fetchExpenses: (user, groupId) => dispatch(fetchExpenses(user, groupId)),
-  createExpense: (split, user, description, amount, friend, groupId) =>
-    dispatch(createExpense(split, user, description, amount, friend, groupId))
-});
-
-const mapStateToProps = state => ({
-  user: state.userState.user,
-  group: state.groupState.group,
-  expenses: state.expenseState.expenses
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Group);
+export default Group;
