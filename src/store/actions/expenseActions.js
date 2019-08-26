@@ -30,6 +30,14 @@ export const fetchExpenses = (groupId, user) => async dispatch => {
   }
 };
 
+// Test strucutre expenses like this groupId > userId
+// groupId > userId: {
+//   id,
+//   description,
+//   total,
+//   expenses: []
+// }
+
 export const createExpense = (
   split,
   user,
