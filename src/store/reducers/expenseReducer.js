@@ -9,6 +9,7 @@ import {
 
 const initialState = {
   expenses: [],
+  total: 0,
   error: null,
   pending: false
 };
@@ -23,7 +24,8 @@ function expenseReducer(state = initialState, action) {
     case EXPENSE_SUCCESS:
       return {
         ...state,
-        expenses: action.payload,
+        expenses: [...state.expenses, ...action.payload],
+        total: action.total,
         pending: false
       };
     case EXPENSE_ERROR:
@@ -41,7 +43,7 @@ function expenseReducer(state = initialState, action) {
     case CREATED_EXPENSE_SUCCESS:
       return {
         ...state,
-        expenses: [...state.expenses, action.payload],
+        total: action.payload,
         pending: false
       };
     case CREATED_EXPENSE_ERROR:

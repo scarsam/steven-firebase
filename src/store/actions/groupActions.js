@@ -176,7 +176,8 @@ export const joinGroup = (
           doc.ref.update({
             users: firebase.firestore.FieldValue.arrayUnion({
               id: user.uid,
-              name: user.displayName
+              name: user.displayName,
+              amount: ""
             })
           });
         });
@@ -216,7 +217,7 @@ export const createGroup = (user, name) => async dispatch => {
         id: user.uid,
         name: user.displayName
       },
-      users: [],
+      users: [{ id: user.uid, name: user.displayName, amount: "" }],
       name,
       created: Date.now()
     };

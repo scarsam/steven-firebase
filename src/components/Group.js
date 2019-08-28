@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Formik, Form, Field, FieldArray } from "formik";
 import styled from "styled-components";
 import Modal from "react-modal";
 import CopyClipboard from "./CopyClipboard";
@@ -37,91 +38,50 @@ const Wrapper = styled.div`
 
 function Group(props) {
   const groupId = props.match.params.groupId;
+  const user = useSelector(store => store.userState.user);
+  const group = useSelector(store => store.groupState.group);
+  const expenses = useSelector(store => store.expenseState.expenses);
+  const total = useSelector(store => store.expenseState.total);
+  const dispatch = useDispatch();
   const [description, setDescription] = useState("");
   const [expenseGroup, setExpenseGroup] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [split, setSplit] = useState("equal");
-  const user = useSelector(store => store.userState.user);
-  const group = useSelector(store => store.groupState.group);
-  const expenses = useSelector(store => store.expenseState.expenses);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchGroup(groupId));
     dispatch(fetchExpenses(groupId, user));
-    setAmountDefaultProps(user);
+    setExpenseProps(group);
   }, [JSON.stringify(group)]); // Hack to deep compare the object inside the comparission array.
 
   // const isEnabled =
   //   description.length > 0 && equalAmount.length > 0 && friends.length > 0;
+
+  const setExpenseProps = () => {
+    if (group) {
+      setExpenseGroup(group.users);
+    }
+  };
 
   const submit = async event => {
     event.preventDefault();
     dispatch(createExpense(split, user, description, expenseGroup, groupId));
     setDescription("");
     setModalIsOpen(false);
-    setAmountDefaultProps();
+    dispatch(fetchExpenses(groupId, user));
   };
 
   const toggleModal = () => setModalIsOpen(toggleModal => !toggleModal);
 
-  const totalBalance = () => {
-    let expenseTotal;
-    const total = expenses.reduce((totalAccumlator, group) => {
-      if (group.payerId === user.uid) {
-        expenseTotal = group.amounts.reduce((expenseAccumlator, expense) => {
-          return expense.id !== user.uid
-            ? expenseAccumlator - expense.amount
-            : expenseAccumlator;
-        }, 0);
-      } else {
-        expenseTotal = group.amounts.reduce((expenseAccumlator, expense) => {
-          return expense.id === user.uid
-            ? expenseAccumlator + expense.amount
-            : expenseAccumlator;
-        }, 0);
-      }
-      return totalAccumlator + expenseTotal;
-    }, 0);
-    return parseFloat(parseFloat(total).toFixed(2));
-  };
-
-  const totalLentOrBorrowed = ({ amounts, total, payerId }) => {
-    const payer = amounts.find(payer => payer.id === user.uid);
-    if (!payer) return;
-    if (payer.id === payerId) {
-      return renderExpense(true, total - payer.amount);
-    } else {
-      return renderExpense(false, payer.amount);
-    }
-  };
-
-  const renderExpense = (lent, amount) =>
-    lent ? `You lent ${amount}` : `You borrowed ${amount}`;
-
-  const friendsList = () => {
-    const friends = [group.owner, ...group.users];
-    return friends;
-  };
-
-  const expenseList = () => {
-    return expenses.filter(expense => {
-      return expense.amounts.some(
-        expense => expense.amount !== 0 && expense.id === user.uid
-      );
-    });
-  };
-
-  const renderTotal = ({ amounts, total, payerId }) => {
-    const payer = amounts.find(payer => payer.id === payerId);
-    return user.uid === payerId
-      ? `You paid ${total}`
-      : `${payer.name} paid ${total}`;
+  const renderExpense = ({ payerId, amount }) => {
+    return payerId === user.uid
+      ? `You lent ${amount}`
+      : `You borrowed ${amount}`;
   };
 
   const setAmountDefaultProps = () => {
     if (group) {
-      const amountInputProps = friendsList().map(friend => {
+      const amountInputProps = group.users.map(friend => {
         return {
           id: friend.id,
           name: friend.name,
@@ -137,25 +97,36 @@ function Group(props) {
     setAmountDefaultProps();
   };
 
+  const radioButtons = [
+    {
+      label: "Split evenly",
+      value: "true"
+    },
+    {
+      label: "Don't split",
+      value: "false"
+    }
+  ];
+
   return (
     group &&
-    expenseGroup.length >= 1 && (
+    expenseGroup.length > 1 && (
       <>
         <Box>
           <TopBar>
             <p>Group name: {group.name}</p>
           </TopBar>
           <Wrapper>
-            <p>Your balance is: ${totalBalance()}</p>
+            <p>Your balance is: ${total}</p>
             <button>Get even</button>
           </Wrapper>
           <BorderBottom />
           {expenses &&
-            expenseList().map((expense, index) => (
+            expenses.map((expense, index) => (
               <GroupStyles key={index}>
-                <p>{renderTotal(expense)}</p>
+                <p>{renderExpense(expense)}</p>
                 <p>{expense.description}</p>
-                <p>{totalLentOrBorrowed(expense)}</p>
+                {/* <p>{totalLentOrBorrowed(expense)}</p> */}
               </GroupStyles>
             ))}
         </Box>
@@ -171,8 +142,64 @@ function Group(props) {
         >
           <CloseButton cb={toggleModal} text={"x"} />
           <Width100>
-            <H4 marginTop={false} text={"Add an expense"} />
-            <GroupForm cb={submit}>
+            {/* <H4 marginTop={false} text={"Add an expense"} /> */}
+            <Formik
+              initialValues={{
+                split: "true",
+                amount: "",
+                users: [...group.users]
+              }}
+              onSubmit={values => {
+                // same shape as initial values
+                console.log(values);
+              }}
+              render={({ values }) => (
+                <Form name="test">
+                  {radioButtons.map((button, index) => (
+                    <label key={index}>
+                      <Field name="split">
+                        {({ field }) => (
+                          <>
+                            <input
+                              {...field}
+                              type="radio"
+                              value={button.value}
+                              checked={button.value === values.split}
+                            />
+                          </>
+                        )}
+                      </Field>
+                      <span>{button.label}</span>
+                    </label>
+                  ))}
+                  {values.split === "true" ? (
+                    <Field placeholder="amount" type="number" name="amount" />
+                  ) : (
+                    <FieldArray
+                      name="users"
+                      render={() => (
+                        <div>
+                          {values.users.map((user, index) => (
+                            <div key={index}>
+                              {user.name}
+                              <Field
+                                placeholder="amount"
+                                type="number"
+                                name={`users[${index}].amount`}
+                              />
+                            </div>
+                          ))}
+                          <div>
+                            <button type="submit">Submit</button>
+                          </div>
+                        </div>
+                      )}
+                    />
+                  )}
+                </Form>
+              )}
+            />
+            {/* <GroupForm cb={submit}>
               <label>
                 <input
                   type="radio"
@@ -213,22 +240,22 @@ function Group(props) {
                   />
                 </label>
               ) : (
-                friendsList().map(friend => (
+                group.users.map(user => (
                   <label>
-                    {friend.name}
+                    {user.name}
                     <input
                       type="number"
                       name="amount"
                       placeholder="Amount"
                       value={
                         expenseGroup.find(
-                          expenseUser => expenseUser.id === friend.id
+                          expenseUser => expenseUser.id === user.id
                         ).amount
                       }
                       onChange={event =>
                         setExpenseGroup(
                           expenseGroup.map(obj =>
-                            obj.id === friend.id
+                            obj.id === user.id
                               ? { ...obj, amount: event.target.value }
                               : obj
                           )
@@ -248,7 +275,7 @@ function Group(props) {
               />
 
               <button type="submit">Submit</button>
-            </GroupForm>
+            </GroupForm> */}
           </Width100>
         </Modal>
       </>

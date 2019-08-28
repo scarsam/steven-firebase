@@ -11,102 +11,105 @@ import {
 
 export const fetchExpenses = (groupId, user) => async dispatch => {
   dispatch({ type: EXPENSE_REQUEST });
-
   try {
-    await firebase
+    let expenses;
+    let total;
+    let baseRef = firebase
       .firestore()
-      .collection("groupExpenses")
+      .collection("groups")
       .doc(`${groupId}`)
+      .collection("users")
+      .doc(`${user.uid}`)
+      .collection("expenses");
+    await baseRef.get().then(querySnapshot => {
+      expenses = querySnapshot.docs
+        .map(doc => {
+          return { ...doc.data(), id: doc.id };
+        })
+        .filter(doc => doc.id !== "--stats--");
+    });
+    await baseRef
+      .doc("--stats--")
       .get()
       .then(doc => {
-        const filteredData = doc.data().expenses.filter(expense => {
-          return expense.amounts.some(amount => amount.id === user.uid);
-        });
-        dispatch({ type: EXPENSE_SUCCESS, payload: filteredData });
+        total = doc.data().total;
       });
+    dispatch({ type: EXPENSE_SUCCESS, payload: expenses, total });
   } catch (error) {
-    console.log(error);
     dispatch({ type: EXPENSE_ERROR, payload: error });
   }
 };
 
-// Test strucutre expenses like this groupId > userId
-// groupId > userId: {
-//   id,
-//   description,
-//   total,
-//   expenses: []
-// }
-
 export const createExpense = (
   split,
-  user,
+  currentUser,
   description,
   expenseGroup,
   groupId
 ) => async dispatch => {
-  let group = expenseGroup.map(expense => ({
-    ...expense,
-    amount: expense.amount === "" ? "0" : expense.amount
-  }));
-
-  const isCurrentUser = user => {
-    return currentUser().id === user.id;
-  };
-  const currentUser = () =>
-    group.find(currentUser => currentUser.id === user.uid);
-
-  const totalAmount = () => {
-    const totalAmount = group.reduce((accumlator, currentValue) => {
-      return accumlator + parseFloat(currentValue.amount);
+  const totalAmount = payerId => {
+    if (payerId !== currentUser.uid) return 0;
+    return expenseGroup.reduce((accumlator, currentValue) => {
+      return split === "equal"
+        ? accumlator + parseFloat(currentValue.amount / expenseGroup.length)
+        : accumlator + parseFloat(currentValue.amount);
     }, 0);
-    return split === "equal" ? totalAmount / group.length : totalAmount;
   };
 
-  const payees = () => {
+  const userAmount = (userId, amount) => {
     if (split === "equal") {
-      return group.map(expense => ({
-        ...expense,
-        amount: isCurrentUser(expense)
-          ? parseFloat(parseFloat(expense.amount / group.length).toFixed(2))
-          : -parseFloat(parseFloat(expense.amount / group.length).toFixed(2))
-      }));
+      return userId === currentUser.uid
+        ? parseFloat(parseFloat(amount / expenseGroup.length).toFixed(2))
+        : -parseFloat(parseFloat(amount / expenseGroup.length).toFixed(2));
     } else {
-      return group.map(expense => ({
-        ...expense,
-        amount: isCurrentUser(expense)
-          ? parseFloat(parseFloat(expense.amount).toFixed(2))
-          : -parseFloat(parseFloat(expense.amount).toFixed(2))
-      }));
+      return userId === currentUser.uid
+        ? parseFloat(parseFloat(expenseGroup.amount).toFixed(2))
+        : -parseFloat(parseFloat(expenseGroup.amount).toFixed(2));
     }
   };
 
-  const payer = currentUser();
-  const newExpense = {
-    description,
-    total: totalAmount(),
-    payerId: payer.id,
-    amounts: payees()
-  };
-
   dispatch({ type: CREATED_EXPENSE_REQUEST });
-
   try {
-    await firebase
-      .firestore()
-      .collection("groupExpenses")
-      .doc(`${groupId}`)
-      .get()
-      .then(doc => {
-        doc.ref.set(
-          {
-            expenses: firebase.firestore.FieldValue.arrayUnion(newExpense)
-          },
-          { merge: true }
+    let newExpense;
+    let newExpenseRef;
+    let increment;
+    let totalRef;
+    let total;
+
+    const batch = firebase.firestore().batch();
+    expenseGroup
+      .filter(user => user.amount !== "")
+      .forEach(async user => {
+        let baseRef = firebase
+          .firestore()
+          .collection("groups")
+          .doc(`${groupId}`)
+          .collection("users")
+          .doc(`${user.id}`)
+          .collection("expenses");
+        increment = firebase.firestore.FieldValue.increment(
+          userAmount(user.id, user.amount)
         );
+        totalRef = baseRef.doc("--stats--");
+        newExpenseRef = baseRef.doc();
+        newExpense = {
+          description,
+          payerId: currentUser.uid,
+          paid: totalAmount(user.id),
+          amount: userAmount(user.id, user.amount)
+        };
+        batch.set(newExpenseRef, { ...newExpense });
+        await totalRef.set({ total: increment }, { merge: true });
       });
-    dispatch({ type: CREATED_EXPENSE_SUCCESS, payload: newExpense });
+
+    await totalRef.get().then(doc => {
+      total = doc.data().total;
+    });
+
+    await batch.commit();
+    dispatch({ type: CREATED_EXPENSE_SUCCESS, payload: total });
   } catch (error) {
+    console.log(error);
     dispatch({ type: CREATED_EXPENSE_ERROR, payload: error });
   }
 };
