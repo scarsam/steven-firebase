@@ -21,13 +21,16 @@ export const fetchExpenses = (groupId, user) => async dispatch => {
       .collection("users")
       .doc(`${user.uid}`)
       .collection("expenses");
-    await baseRef.get().then(querySnapshot => {
-      expenses = querySnapshot.docs
-        .map(doc => {
-          return { ...doc.data(), id: doc.id };
-        })
-        .filter(doc => doc.id !== "--stats--");
-    });
+    await baseRef
+      .orderBy("created", "desc")
+      .get()
+      .then(querySnapshot => {
+        expenses = querySnapshot.docs
+          .map(doc => {
+            return { ...doc.data(), id: doc.id };
+          })
+          .filter(doc => doc.id !== "--stats--");
+      });
     await baseRef
       .doc("--stats--")
       .get()
@@ -36,36 +39,22 @@ export const fetchExpenses = (groupId, user) => async dispatch => {
       });
     dispatch({ type: EXPENSE_SUCCESS, payload: expenses, total });
   } catch (error) {
+    console.log(error);
     dispatch({ type: EXPENSE_ERROR, payload: error });
   }
 };
 
 export const createExpense = (
-  split,
-  currentUser,
+  paid,
   description,
   expenseGroup,
+  currentUser,
   groupId
 ) => async dispatch => {
-  const totalAmount = payerId => {
-    if (payerId !== currentUser.uid) return 0;
-    return expenseGroup.reduce((accumlator, currentValue) => {
-      return split === "equal"
-        ? accumlator + parseFloat(currentValue.amount / expenseGroup.length)
-        : accumlator + parseFloat(currentValue.amount);
-    }, 0);
-  };
-
   const userAmount = (userId, amount) => {
-    if (split === "equal") {
-      return userId === currentUser.uid
-        ? parseFloat(parseFloat(amount / expenseGroup.length).toFixed(2))
-        : -parseFloat(parseFloat(amount / expenseGroup.length).toFixed(2));
-    } else {
-      return userId === currentUser.uid
-        ? parseFloat(parseFloat(expenseGroup.amount).toFixed(2))
-        : -parseFloat(parseFloat(expenseGroup.amount).toFixed(2));
-    }
+    return userId === currentUser.uid
+      ? parseFloat(parseFloat(amount).toFixed(2))
+      : -parseFloat(parseFloat(amount).toFixed(2));
   };
 
   dispatch({ type: CREATED_EXPENSE_REQUEST });
@@ -95,8 +84,9 @@ export const createExpense = (
         newExpense = {
           description,
           payerId: currentUser.uid,
-          paid: totalAmount(user.id),
-          amount: userAmount(user.id, user.amount)
+          paid: user.id === currentUser.uid ? paid : 0,
+          amount: userAmount(user.id, user.amount),
+          created: Date.now()
         };
         batch.set(newExpenseRef, { ...newExpense });
         await totalRef.set({ total: increment }, { merge: true });

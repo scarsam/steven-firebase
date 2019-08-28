@@ -8,7 +8,6 @@ import { fetchGroup } from "../store/actions/groupActions";
 import { fetchExpenses, createExpense } from "../store/actions/expenseActions";
 import Box from "./styles/Box";
 import { CloseButton, AddGroupButton, ButtonWrapper } from "./styles/Buttons";
-import { GroupForm } from "./styles/Form";
 import { Width100 } from "./styles/Helpers";
 import { H4 } from "./styles/Text";
 
@@ -36,6 +35,17 @@ const Wrapper = styled.div`
   display: flex;
 `;
 
+const radioButtons = [
+  {
+    label: "Split evenly",
+    value: "true"
+  },
+  {
+    label: "Don't split",
+    value: "false"
+  }
+];
+
 function Group(props) {
   const groupId = props.match.params.groupId;
   const user = useSelector(store => store.userState.user);
@@ -43,33 +53,12 @@ function Group(props) {
   const expenses = useSelector(store => store.expenseState.expenses);
   const total = useSelector(store => store.expenseState.total);
   const dispatch = useDispatch();
-  const [description, setDescription] = useState("");
-  const [expenseGroup, setExpenseGroup] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [split, setSplit] = useState("equal");
 
   useEffect(() => {
     dispatch(fetchGroup(groupId));
     dispatch(fetchExpenses(groupId, user));
-    setExpenseProps(group);
-  }, [JSON.stringify(group)]); // Hack to deep compare the object inside the comparission array.
-
-  // const isEnabled =
-  //   description.length > 0 && equalAmount.length > 0 && friends.length > 0;
-
-  const setExpenseProps = () => {
-    if (group) {
-      setExpenseGroup(group.users);
-    }
-  };
-
-  const submit = async event => {
-    event.preventDefault();
-    dispatch(createExpense(split, user, description, expenseGroup, groupId));
-    setDescription("");
-    setModalIsOpen(false);
-    dispatch(fetchExpenses(groupId, user));
-  };
+  }, []);
 
   const toggleModal = () => setModalIsOpen(toggleModal => !toggleModal);
 
@@ -79,38 +68,8 @@ function Group(props) {
       : `You borrowed ${amount}`;
   };
 
-  const setAmountDefaultProps = () => {
-    if (group) {
-      const amountInputProps = group.users.map(friend => {
-        return {
-          id: friend.id,
-          name: friend.name,
-          amount: ""
-        };
-      });
-      setExpenseGroup([...amountInputProps]);
-    }
-  };
-
-  const resetAmount = event => {
-    setSplit(event.target.value);
-    setAmountDefaultProps();
-  };
-
-  const radioButtons = [
-    {
-      label: "Split evenly",
-      value: "true"
-    },
-    {
-      label: "Don't split",
-      value: "false"
-    }
-  ];
-
   return (
-    group &&
-    expenseGroup.length > 1 && (
+    group && (
       <>
         <Box>
           <TopBar>
@@ -126,7 +85,7 @@ function Group(props) {
               <GroupStyles key={index}>
                 <p>{renderExpense(expense)}</p>
                 <p>{expense.description}</p>
-                {/* <p>{totalLentOrBorrowed(expense)}</p> */}
+                <p>{expense.paid}</p>
               </GroupStyles>
             ))}
         </Box>
@@ -142,14 +101,34 @@ function Group(props) {
         >
           <CloseButton cb={toggleModal} text={"x"} />
           <Width100>
-            {/* <H4 marginTop={false} text={"Add an expense"} /> */}
+            <H4 marginTop={false} text={"Add an expense"} />
             <Formik
+              enableReinitialize={true}
               initialValues={{
+                description: "",
                 split: "true",
-                amount: "",
+                paid: "",
                 users: [...group.users]
               }}
-              onSubmit={values => {
+              onSubmit={async (values, { resetForm }) => {
+                const { split, description, paid, users } = values;
+                if (split === "true") {
+                  const numberOfUsers = values.users.length;
+                  const expenses = values.users.map(user => ({
+                    ...user,
+                    amount: paid / numberOfUsers
+                  }));
+                  await dispatch(
+                    createExpense(paid, description, expenses, user, groupId)
+                  );
+                } else {
+                  await dispatch(
+                    createExpense(paid, description, users, user, groupId)
+                  );
+                }
+                setModalIsOpen(false);
+                dispatch(fetchExpenses(groupId, user));
+                resetForm();
                 // same shape as initial values
                 console.log(values);
               }}
@@ -172,8 +151,18 @@ function Group(props) {
                       <span>{button.label}</span>
                     </label>
                   ))}
+                  <Field
+                    placeholder="Description"
+                    type="text"
+                    name="description"
+                  />
                   {values.split === "true" ? (
-                    <Field placeholder="amount" type="number" name="amount" />
+                    <>
+                      <Field placeholder="Amount" type="number" name="paid" />
+                      <div>
+                        <button type="submit">Submit</button>
+                      </div>
+                    </>
                   ) : (
                     <FieldArray
                       name="users"
@@ -199,83 +188,6 @@ function Group(props) {
                 </Form>
               )}
             />
-            {/* <GroupForm cb={submit}>
-              <label>
-                <input
-                  type="radio"
-                  value="equal"
-                  checked={split === "equal"}
-                  onChange={event => resetAmount(event)}
-                />
-                Split equally between everyone
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  value="unEqual"
-                  checked={split === "unEqual"}
-                  onChange={event => setSplit(event.target.value)}
-                />
-                Split differently
-              </label>
-              {split === "equal" ? (
-                <label>
-                  <input
-                    type="number"
-                    name="amount"
-                    placeholder="Amount"
-                    value={
-                      expenseGroup.find(
-                        expenseUser => expenseUser.id === group.owner.id
-                      ).amount
-                    }
-                    onChange={event =>
-                      setExpenseGroup(
-                        expenseGroup.map(obj => ({
-                          ...obj,
-                          amount: event.target.value
-                        }))
-                      )
-                    }
-                  />
-                </label>
-              ) : (
-                group.users.map(user => (
-                  <label>
-                    {user.name}
-                    <input
-                      type="number"
-                      name="amount"
-                      placeholder="Amount"
-                      value={
-                        expenseGroup.find(
-                          expenseUser => expenseUser.id === user.id
-                        ).amount
-                      }
-                      onChange={event =>
-                        setExpenseGroup(
-                          expenseGroup.map(obj =>
-                            obj.id === user.id
-                              ? { ...obj, amount: event.target.value }
-                              : obj
-                          )
-                        )
-                      }
-                    />
-                  </label>
-                ))
-              )}
-
-              <input
-                type="text"
-                name="description"
-                placeholder="Description"
-                value={description}
-                onChange={event => setDescription(event.target.value)}
-              />
-
-              <button type="submit">Submit</button>
-            </GroupForm> */}
           </Width100>
         </Modal>
       </>

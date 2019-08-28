@@ -24,7 +24,7 @@ function expenseReducer(state = initialState, action) {
     case EXPENSE_SUCCESS:
       return {
         ...state,
-        expenses: [...state.expenses, ...action.payload],
+        expenses: [...action.payload],
         total: action.total,
         pending: false
       };
