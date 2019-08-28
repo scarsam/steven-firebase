@@ -51,6 +51,7 @@ function Group(props) {
   const user = useSelector(store => store.userState.user);
   const group = useSelector(store => store.groupState.group);
   const expenses = useSelector(store => store.expenseState.expenses);
+  const pending = useSelector(store => store.expenseState.pending);
   const total = useSelector(store => store.expenseState.total);
   const dispatch = useDispatch();
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -72,22 +73,28 @@ function Group(props) {
     group && (
       <>
         <Box>
-          <TopBar>
-            <p>Group name: {group.name}</p>
-          </TopBar>
-          <Wrapper>
-            <p>Your balance is: ${total}</p>
-            <button>Get even</button>
-          </Wrapper>
-          <BorderBottom />
-          {expenses &&
-            expenses.map((expense, index) => (
-              <GroupStyles key={index}>
-                <p>{renderExpense(expense)}</p>
-                <p>{expense.description}</p>
-                <p>{expense.paid}</p>
-              </GroupStyles>
-            ))}
+          {pending ? (
+            <p>Loading</p>
+          ) : (
+            <>
+              <TopBar>
+                <p>Group name: {group.name}</p>
+              </TopBar>
+              <Wrapper>
+                <p>Your balance is: ${total}</p>
+                <button>Get even</button>
+              </Wrapper>
+              <BorderBottom />
+              {expenses &&
+                expenses.map((expense, index) => (
+                  <GroupStyles key={index}>
+                    <p>{renderExpense(expense)}</p>
+                    <p>{expense.description}</p>
+                    <p>{expense.paid}</p>
+                  </GroupStyles>
+                ))}
+            </>
+          )}
         </Box>
         <CopyClipboard />
         <ButtonWrapper>
@@ -126,8 +133,8 @@ function Group(props) {
                     createExpense(paid, description, users, user, groupId)
                   );
                 }
+                await dispatch(fetchExpenses(groupId, user));
                 setModalIsOpen(false);
-                dispatch(fetchExpenses(groupId, user));
                 resetForm();
                 // same shape as initial values
                 console.log(values);
