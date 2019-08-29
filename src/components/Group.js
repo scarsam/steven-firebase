@@ -69,6 +69,12 @@ function Group(props) {
       : `You borrowed ${amount}`;
   };
 
+  // Fika
+  // Nils paid $50 - you borrowed $16
+
+  // Mat
+  // You paid $100 - you lent $60
+
   return (
     group && (
       <>
@@ -88,9 +94,9 @@ function Group(props) {
               {expenses &&
                 expenses.map((expense, index) => (
                   <GroupStyles key={index}>
-                    <p>{renderExpense(expense)}</p>
                     <p>{expense.description}</p>
-                    <p>{expense.paid}</p>
+                    {expense.paid === 0 ? null : <p>{expense.paid}</p>}
+                    <p>{renderExpense(expense)}</p>
                   </GroupStyles>
                 ))}
             </>

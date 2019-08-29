@@ -26,9 +26,7 @@ export const fetchExpenses = (groupId, user) => async dispatch => {
       .get()
       .then(querySnapshot => {
         expenses = querySnapshot.docs
-          .map(doc => {
-            return { ...doc.data(), id: doc.id };
-          })
+          .map(doc => ({ ...doc.data() }))
           .filter(doc => doc.id !== "--stats--");
       });
     await baseRef
@@ -77,7 +75,7 @@ export const createExpense = (
           .doc(`${user.id}`)
           .collection("expenses");
         increment = firebase.firestore.FieldValue.increment(
-          userAmount(user.id, user.amount)
+          parseFloat(parseFloat(userAmount(user.id, user.amount)).toFixed(2))
         );
         totalRef = baseRef.doc("--stats--");
         newExpenseRef = baseRef.doc();
@@ -86,6 +84,9 @@ export const createExpense = (
           payerId: currentUser.uid,
           paid: user.id === currentUser.uid ? paid : 0,
           amount: userAmount(user.id, user.amount),
+          who: expenseGroup
+            .filter(user => user.id !== currentUser.uid)
+            .map(user => user.name),
           created: Date.now()
         };
         batch.set(newExpenseRef, { ...newExpense });

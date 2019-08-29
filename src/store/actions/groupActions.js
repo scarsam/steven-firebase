@@ -81,6 +81,7 @@ export const fetchJoinedGroups = user => async dispatch => {
       .firestore()
       .collectionGroup("groups")
       .where("users", "array-contains", {
+        amount: "",
         id: user.uid,
         name: user.displayName
       })
