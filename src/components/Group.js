@@ -69,11 +69,12 @@ function Group(props) {
       : `You borrowed ${amount}`;
   };
 
-  // Fika
-  // Nils paid $50 - you borrowed $16
-
-  // Mat
-  // You paid $100 - you lent $60
+  const renderPaid = ({ payerId, totalAmount }) => {
+    const payer = group.users.find(user => user.id === payerId);
+    return payer.id === user.uid
+      ? `You paid ${totalAmount}`
+      : `${payer.name} paid ${totalAmount}`;
+  };
 
   return (
     group && (
@@ -95,7 +96,7 @@ function Group(props) {
                 expenses.map((expense, index) => (
                   <GroupStyles key={index}>
                     <p>{expense.description}</p>
-                    {expense.paid === 0 ? null : <p>{expense.paid}</p>}
+                    <p>{renderPaid(expense)}</p>
                     <p>{renderExpense(expense)}</p>
                   </GroupStyles>
                 ))}
@@ -121,29 +122,19 @@ function Group(props) {
                 description: "",
                 split: "true",
                 paid: "",
-                users: [...group.users]
+                users: group.users.map(user => ({
+                  amount: "",
+                  ...user
+                }))
               }}
               onSubmit={async (values, { resetForm }) => {
                 const { split, description, paid, users } = values;
-                if (split === "true") {
-                  const numberOfUsers = values.users.length;
-                  const expenses = values.users.map(user => ({
-                    ...user,
-                    amount: paid / numberOfUsers
-                  }));
-                  await dispatch(
-                    createExpense(paid, description, expenses, user, groupId)
-                  );
-                } else {
-                  await dispatch(
-                    createExpense(paid, description, users, user, groupId)
-                  );
-                }
+                await dispatch(
+                  createExpense(split, paid, description, users, user, groupId)
+                );
                 await dispatch(fetchExpenses(groupId, user));
                 setModalIsOpen(false);
                 resetForm();
-                // same shape as initial values
-                console.log(values);
               }}
               render={({ values }) => (
                 <Form name="test">

@@ -43,18 +43,36 @@ export const fetchExpenses = (groupId, user) => async dispatch => {
 };
 
 export const createExpense = (
+  split,
   paid,
   description,
-  expenseGroup,
+  users,
   currentUser,
   groupId
 ) => async dispatch => {
+  let userAmounts;
+  let totalAmount;
+
+  if (split === "true") {
+    totalAmount = paid;
+    userAmounts = users.map(user => ({
+      ...user,
+      amount: paid / users.length
+    }));
+  } else {
+    totalAmount = users.reduce((total, user) => total + user.amount, 0);
+    userAmounts = users.map(user => ({
+      ...user,
+      amount:
+        user.id === currentUser.uid ? totalAmount - user.amount : user.amount
+    }));
+  }
+
   const userAmount = (userId, amount) => {
     return userId === currentUser.uid
       ? parseFloat(parseFloat(amount).toFixed(2))
       : -parseFloat(parseFloat(amount).toFixed(2));
   };
-
   dispatch({ type: CREATED_EXPENSE_REQUEST });
   try {
     let newExpense;
@@ -64,7 +82,7 @@ export const createExpense = (
     let total;
 
     const batch = firebase.firestore().batch();
-    expenseGroup
+    userAmounts
       .filter(user => user.amount !== "")
       .forEach(async user => {
         let baseRef = firebase
@@ -75,18 +93,15 @@ export const createExpense = (
           .doc(`${user.id}`)
           .collection("expenses");
         increment = firebase.firestore.FieldValue.increment(
-          parseFloat(parseFloat(userAmount(user.id, user.amount)).toFixed(2))
+          userAmount(user.id, user.amount)
         );
         totalRef = baseRef.doc("--stats--");
         newExpenseRef = baseRef.doc();
         newExpense = {
           description,
           payerId: currentUser.uid,
-          paid: user.id === currentUser.uid ? paid : 0,
+          totalAmount,
           amount: userAmount(user.id, user.amount),
-          who: expenseGroup
-            .filter(user => user.id !== currentUser.uid)
-            .map(user => user.name),
           created: Date.now()
         };
         batch.set(newExpenseRef, { ...newExpense });

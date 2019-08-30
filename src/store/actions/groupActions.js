@@ -81,7 +81,6 @@ export const fetchJoinedGroups = user => async dispatch => {
       .firestore()
       .collectionGroup("groups")
       .where("users", "array-contains", {
-        amount: "",
         id: user.uid,
         name: user.displayName
       })
@@ -178,7 +177,6 @@ export const joinGroup = (
             users: firebase.firestore.FieldValue.arrayUnion({
               id: user.uid,
               name: user.displayName,
-              amount: ""
             })
           });
         });
@@ -218,7 +216,7 @@ export const createGroup = (user, name) => async dispatch => {
         id: user.uid,
         name: user.displayName
       },
-      users: [{ id: user.uid, name: user.displayName, amount: "" }],
+      users: [{ id: user.uid, name: user.displayName }],
       name,
       created: Date.now()
     };
