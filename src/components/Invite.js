@@ -1,55 +1,41 @@
-import React from "react";
-import { connect } from "react-redux";
-import { fetchGroup, joinGroup } from "../store/actions/groupActions";
-import { userAuth } from "../store/actions/userActions";
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchGroup, joinGroup } from '../store/actions/groupActions';
+import { InviteForm, LoginForm } from './styles/Form';
+import Box from './styles/Box';
+import { H1 } from './styles/Text';
 
-function Invite({ user, fetchGroup, joinGroup, group, ...rest }) {
-  const groupId = rest.match.params.groupId;
+function Invite(props) {
+  const groupId = props.match.params.groupId;
+  const group = useSelector(store => store.groupState.group);
+  const user = useSelector(store => store.userState.user);
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
-    fetchGroup(groupId);
-  }, []);
+    dispatch(fetchGroup(groupId));
+  }, [dispatch, groupId]);
 
   const submit = event => {
     const provider = event.target.dataset.provider;
     event.preventDefault();
-    joinGroup(provider, user, groupId, group);
+    dispatch(joinGroup(provider, user, groupId, group));
   };
 
   return !user && group ? (
-    <>
-      <p>Join {group.name}</p>
-      <form onSubmit={submit} data-provider={"google"}>
-        <button type="submit">Login with Google</button>
-      </form>
-      <form onSubmit={submit} data-provider={"facebook"}>
-        <button type="submit">Login with Facebook</button>
-      </form>
-    </>
+    <Box>
+      <H1 text={`Join ${group.name}`} />
+      <LoginForm cb={submit} provider={'google'} />
+      <LoginForm cb={submit} provider={'facebook'} />
+    </Box>
   ) : (
     group && (
-      <>
-        <form onSubmit={submit}>
-          <button type="submit">Join {group.name}</button>
-        </form>
-      </>
+      <Box>
+        <InviteForm cb={submit}>
+          <button type='submit'>Join {group.name}</button>
+        </InviteForm>
+      </Box>
     )
   );
 }
 
-const mapDispatchToProps = dispatch => ({
-  fetchGroup: id => dispatch(fetchGroup(id)),
-  joinGroup: (provider, user, id, group) =>
-    dispatch(joinGroup(provider, user, id, group)),
-  userAuth: provider => dispatch(userAuth(provider))
-});
-
-const mapStateToProps = state => ({
-  user: state.userState.user,
-  group: state.groupState.group
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Invite);
+export default Invite;

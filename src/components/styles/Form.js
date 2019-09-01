@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
 const Form = styled.form`
   width: 100%;
@@ -13,7 +13,7 @@ const Form = styled.form`
 
 const ButtonStyles = styled.button`
   background-color: ${props =>
-    props.provider === "facebook" ? "#3C5A99" : "#DB4437"};
+    props.provider === 'facebook' ? '#3C5A99' : '#DB4437'};
   border: 0;
   border-radius: 4px;
   color: white;
@@ -47,14 +47,29 @@ const AddGroupFormStyles = styled.form`
   }
 `;
 
+const InviteFormStyles = styled.form`
+  display: flex;
+  flex-direction: column;
+  button {
+    border: 0;
+    border-radius: 4px;
+    background-color: #6dd5ed;
+    padding: 10px 15px !important;
+  }
+`;
+
 export const LoginForm = ({ provider, cb }) => (
   <Form onSubmit={cb} data-provider={provider}>
-    <ButtonStyles provider={provider} type="submit">
-      Continue with <span className="provider">{provider}</span>
+    <ButtonStyles provider={provider} type='submit'>
+      Continue with <span className='provider'>{provider}</span>
     </ButtonStyles>
   </Form>
 );
 
 export const GroupForm = ({ cb, children }) => (
   <AddGroupFormStyles onSubmit={cb}>{children}</AddGroupFormStyles>
+);
+
+export const InviteForm = ({ cb, children }) => (
+  <InviteFormStyles onSubmit={cb}>{children}</InviteFormStyles>
 );

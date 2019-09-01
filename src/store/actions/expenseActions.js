@@ -1,5 +1,5 @@
-import firebase from "../../firebase";
-import "firebase/firestore";
+import firebase from '../../firebase';
+import 'firebase/firestore';
 import {
   EXPENSE_REQUEST,
   EXPENSE_SUCCESS,
@@ -7,7 +7,7 @@ import {
   CREATED_EXPENSE_REQUEST,
   CREATED_EXPENSE_SUCCESS,
   CREATED_EXPENSE_ERROR
-} from "../types";
+} from '../types';
 
 export const fetchExpenses = (groupId, user) => async dispatch => {
   dispatch({ type: EXPENSE_REQUEST });
@@ -16,24 +16,28 @@ export const fetchExpenses = (groupId, user) => async dispatch => {
     let total;
     let baseRef = firebase
       .firestore()
-      .collection("groups")
+      .collection('groups')
       .doc(`${groupId}`)
-      .collection("users")
+      .collection('users')
       .doc(`${user.uid}`)
-      .collection("expenses");
+      .collection('expenses');
     await baseRef
-      .orderBy("created", "desc")
+      .orderBy('created', 'desc')
       .get()
       .then(querySnapshot => {
         expenses = querySnapshot.docs
           .map(doc => ({ ...doc.data() }))
-          .filter(doc => doc.id !== "--stats--");
+          .filter(doc => doc.id !== '--stats--');
       });
     await baseRef
-      .doc("--stats--")
+      .doc('--stats--')
       .get()
       .then(doc => {
-        total = doc.data().total;
+        if (doc.exists) {
+          total = doc.data().total;
+        } else {
+          total = 0;
+        }
       });
     dispatch({ type: EXPENSE_SUCCESS, payload: expenses, total });
   } catch (error) {
@@ -53,7 +57,7 @@ export const createExpense = (
   let userAmounts;
   let totalAmount;
 
-  if (split === "true") {
+  if (split === 'true') {
     totalAmount = paid;
     userAmounts = users.map(user => ({
       ...user,
@@ -83,19 +87,19 @@ export const createExpense = (
 
     const batch = firebase.firestore().batch();
     userAmounts
-      .filter(user => user.amount !== "")
+      .filter(user => user.amount !== '')
       .forEach(async user => {
         let baseRef = firebase
           .firestore()
-          .collection("groups")
+          .collection('groups')
           .doc(`${groupId}`)
-          .collection("users")
+          .collection('users')
           .doc(`${user.id}`)
-          .collection("expenses");
+          .collection('expenses');
         increment = firebase.firestore.FieldValue.increment(
           userAmount(user.id, user.amount)
         );
-        totalRef = baseRef.doc("--stats--");
+        totalRef = baseRef.doc('--stats--');
         newExpenseRef = baseRef.doc();
         newExpense = {
           description,
@@ -115,7 +119,6 @@ export const createExpense = (
     await batch.commit();
     dispatch({ type: CREATED_EXPENSE_SUCCESS, payload: total });
   } catch (error) {
-    console.log(error);
     dispatch({ type: CREATED_EXPENSE_ERROR, payload: error });
   }
 };

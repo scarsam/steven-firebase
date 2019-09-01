@@ -1,8 +1,9 @@
-import React from "react";
-import { connect } from "react-redux";
-import { Route } from "react-router-dom";
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { Route } from 'react-router-dom';
 
-const PrivateRoute = ({ component: Component, user, location, ...rest }) => {
+const PrivateRoute = ({ component: Component, ...rest }) => {
+  const user = useSelector(store => store.userState.user);
   return (
     // Show the component only when the user is logged in
     // Otherwise, redirect the user to /signin page
@@ -10,8 +11,4 @@ const PrivateRoute = ({ component: Component, user, location, ...rest }) => {
   );
 };
 
-const mapStateToProps = state => ({
-  user: state.userState.user
-});
-
-export default connect(mapStateToProps)(PrivateRoute);
+export default PrivateRoute;

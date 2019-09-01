@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Formik, Form, Field, FieldArray } from "formik";
-import styled from "styled-components";
-import Modal from "react-modal";
-import CopyClipboard from "./CopyClipboard";
-import { fetchGroup } from "../store/actions/groupActions";
-import { fetchExpenses, createExpense } from "../store/actions/expenseActions";
-import Box from "./styles/Box";
-import { CloseButton, AddGroupButton, ButtonWrapper } from "./styles/Buttons";
-import { Width100 } from "./styles/Helpers";
-import { H4 } from "./styles/Text";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Formik, Form, Field, FieldArray } from 'formik';
+import styled from 'styled-components';
+import Modal from 'react-modal';
+import CopyClipboard from './CopyClipboard';
+import { fetchGroup } from '../store/actions/groupActions';
+import { fetchExpenses, createExpense } from '../store/actions/expenseActions';
+import Box from './styles/Box';
+import { CloseButton, AddGroupButton, ButtonWrapper } from './styles/Buttons';
+import { Width100 } from './styles/Helpers';
+import { H4 } from './styles/Text';
 
 const GroupStyles = styled.div`
   display: flex;
@@ -37,16 +37,17 @@ const Wrapper = styled.div`
 
 const radioButtons = [
   {
-    label: "Split evenly",
-    value: "true"
+    label: 'Split evenly',
+    value: 'true'
   },
   {
     label: "Don't split",
-    value: "false"
+    value: 'false'
   }
 ];
 
 function Group(props) {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const groupId = props.match.params.groupId;
   const user = useSelector(store => store.userState.user);
   const group = useSelector(store => store.groupState.group);
@@ -54,12 +55,11 @@ function Group(props) {
   const pending = useSelector(store => store.expenseState.pending);
   const total = useSelector(store => store.expenseState.total);
   const dispatch = useDispatch();
-  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchGroup(groupId));
     dispatch(fetchExpenses(groupId, user));
-  }, []);
+  }, [groupId, dispatch, user]);
 
   const toggleModal = () => setModalIsOpen(toggleModal => !toggleModal);
 
@@ -105,25 +105,25 @@ function Group(props) {
         </Box>
         <CopyClipboard />
         <ButtonWrapper>
-          <AddGroupButton cb={toggleModal} text={"+"} />
+          <AddGroupButton cb={toggleModal} text={'+'} />
         </ButtonWrapper>
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={toggleModal}
-          contentLabel="Example Modal"
-          portalClassName="modal"
+          contentLabel='Example Modal'
+          portalClassName='modal'
         >
-          <CloseButton cb={toggleModal} text={"x"} />
+          <CloseButton cb={toggleModal} text={'x'} />
           <Width100>
-            <H4 marginTop={false} text={"Add an expense"} />
+            <H4 marginTop={false} text={'Add an expense'} />
             <Formik
               enableReinitialize={true}
               initialValues={{
-                description: "",
-                split: "true",
-                paid: "",
+                description: '',
+                split: 'true',
+                paid: '',
                 users: group.users.map(user => ({
-                  amount: "",
+                  amount: '',
                   ...user
                 }))
               }}
@@ -137,15 +137,15 @@ function Group(props) {
                 resetForm();
               }}
               render={({ values }) => (
-                <Form name="test">
+                <Form name='test'>
                   {radioButtons.map((button, index) => (
                     <label key={index}>
-                      <Field name="split">
+                      <Field name='split'>
                         {({ field }) => (
                           <>
                             <input
                               {...field}
-                              type="radio"
+                              type='radio'
                               value={button.value}
                               checked={button.value === values.split}
                             />
@@ -156,34 +156,34 @@ function Group(props) {
                     </label>
                   ))}
                   <Field
-                    placeholder="Description"
-                    type="text"
-                    name="description"
+                    placeholder='Description'
+                    type='text'
+                    name='description'
                   />
-                  {values.split === "true" ? (
+                  {values.split === 'true' ? (
                     <>
-                      <Field placeholder="Amount" type="number" name="paid" />
+                      <Field placeholder='Amount' type='number' name='paid' />
                       <div>
-                        <button type="submit">Submit</button>
+                        <button type='submit'>Submit</button>
                       </div>
                     </>
                   ) : (
                     <FieldArray
-                      name="users"
+                      name='users'
                       render={() => (
                         <div>
                           {values.users.map((user, index) => (
                             <div key={index}>
                               {user.name}
                               <Field
-                                placeholder="amount"
-                                type="number"
+                                placeholder='amount'
+                                type='number'
                                 name={`users[${index}].amount`}
                               />
                             </div>
                           ))}
                           <div>
-                            <button type="submit">Submit</button>
+                            <button type='submit'>Submit</button>
                           </div>
                         </div>
                       )}

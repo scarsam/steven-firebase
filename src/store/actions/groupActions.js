@@ -1,8 +1,8 @@
-import firebase from "../../firebase";
-import "firebase/auth";
-import "firebase/firestore";
-import history from "../../routes/History";
-import { slugify } from "../../utils/slugify";
+import firebase from '../../firebase';
+import 'firebase/auth';
+import 'firebase/firestore';
+import history from '../../routes/History';
+import { slugify } from '../../utils/slugify';
 
 import {
   JOINED_GROUPS_REQUEST,
@@ -29,15 +29,15 @@ import {
   LEAVE_GROUP_REQUEST,
   LEAVE_GROUP_SUCCESS,
   LEAVE_GROUP_ERROR
-} from "../types";
+} from '../types';
 
 export const leaveGroup = (user, id) => async dispatch => {
   dispatch({ type: LEAVE_GROUP_REQUEST });
   try {
     await firebase
       .firestore()
-      .collectionGroup("groups")
-      .where("id", "==", id)
+      .collectionGroup('groups')
+      .where('id', '==', id)
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
@@ -60,8 +60,8 @@ export const deleteGroup = id => async dispatch => {
   try {
     await firebase
       .firestore()
-      .collectionGroup("groups")
-      .where("id", "==", id)
+      .collectionGroup('groups')
+      .where('id', '==', id)
       .get()
       .then(snapshot => {
         snapshot.forEach(doc => {
@@ -79,20 +79,23 @@ export const fetchJoinedGroups = user => async dispatch => {
   try {
     await firebase
       .firestore()
-      .collectionGroup("groups")
-      .where("users", "array-contains", {
+      .collectionGroup('groups')
+      .where('users', 'array-contains', {
         id: user.uid,
         name: user.displayName
       })
       .get()
       .then(snapshot => {
-        const groups = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const groups = snapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }))
+          .filter(group => group.owner.id !== user.uid);
         dispatch({ type: JOINED_GROUPS_SUCCESS, payload: groups });
       });
   } catch (error) {
+    console.log(error);
     dispatch({ type: JOINED_GROUPS_ERROR, payload: error });
   }
 };
@@ -102,9 +105,9 @@ export const fetchCreatedGroups = user => async dispatch => {
   try {
     await firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(user.uid)
-      .collection("groups")
+      .collection('groups')
       .get()
       .then(snapshot => {
         const groups = snapshot.docs.map(doc => ({
@@ -123,8 +126,8 @@ export const fetchGroup = id => async dispatch => {
   try {
     await firebase
       .firestore()
-      .collectionGroup("groups")
-      .where("id", "==", id)
+      .collectionGroup('groups')
+      .where('id', '==', id)
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
@@ -150,12 +153,12 @@ export const joinGroup = (
       const googleProvider = new firebase.auth.GoogleAuthProvider();
       const facebookProvider = new firebase.auth.FacebookAuthProvider();
       const response =
-        provider === "google"
+        provider === 'google'
           ? await firebase.auth().signInWithPopup(googleProvider)
           : await firebase.auth().signInWithPopup(facebookProvider);
       await firebase
         .firestore()
-        .collection("users")
+        .collection('users')
         .doc(response.user.uid);
       dispatch({ type: USER_SUCCESS, payload: response.user });
       user = response.user;
@@ -168,15 +171,15 @@ export const joinGroup = (
   try {
     await firebase
       .firestore()
-      .collectionGroup("groups")
-      .where("id", "==", id)
+      .collectionGroup('groups')
+      .where('id', '==', id)
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
           doc.ref.update({
             users: firebase.firestore.FieldValue.arrayUnion({
               id: user.uid,
-              name: user.displayName,
+              name: user.displayName
             })
           });
         });
@@ -196,8 +199,8 @@ export const createGroup = (user, name) => async dispatch => {
 
     const statsRef = await firebase
       .firestore()
-      .collection("users")
-      .doc("--stats--");
+      .collection('users')
+      .doc('--stats--');
 
     await statsRef.set({ index: increment }, { merge: true });
     await statsRef.get().then(doc => {
@@ -206,9 +209,9 @@ export const createGroup = (user, name) => async dispatch => {
 
     const newGroupRef = await firebase
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(user.uid)
-      .collection("groups")
+      .collection('groups')
       .doc(`${groupIndex}`);
     const newGroup = {
       id: newGroupRef.id,

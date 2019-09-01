@@ -1,13 +1,13 @@
-import React from "react";
-import { Router, Switch, Route } from "react-router-dom";
-import login from "./components/Login";
-import Layout from "./layouts/Layout";
-import dashboard from "./components/Dashboard";
-import group from "./components/Group";
-import invite from "./components/Invite";
-import history from "./routes/History";
-import PrivateRouter from "./routes/PrivateRoute";
-import { createGlobalStyle } from "styled-components";
+import React from 'react';
+import { Router, Switch, Route } from 'react-router-dom';
+import login from './components/Login';
+import Layout from './layouts/Layout';
+import dashboard from './components/Dashboard';
+import group from './components/Group';
+import invite from './components/Invite';
+import history from './routes/History';
+import PrivateRouter from './routes/PrivateRoute';
+import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Asap:400,500&display=swap');
@@ -56,12 +56,12 @@ function App() {
       <GlobalStyle />
       <Switch>
         <Layout>
-          <Route exact path="/" component={login} />
-          <Route path="/group/:groupId/:groupName/invite" component={invite} />
-          <PrivateRouter path="/dashboard" component={dashboard} />
+          <Route exact path='/' component={login} />
+          <Route path='/group/:groupId/:groupName/invite' component={invite} />
+          <PrivateRouter path='/dashboard' component={dashboard} />
           <PrivateRouter
             exact
-            path="/group/:groupId/:groupName"
+            path='/group/:groupId/:groupName'
             component={group}
           />
         </Layout>
