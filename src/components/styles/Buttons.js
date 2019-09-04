@@ -1,9 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-// Primary
-// Secondary button
-// Render base on props
 const ButtonStyles = styled.button`
   background-color: white;
   border: 0;
@@ -17,7 +14,7 @@ const ButtonStyles = styled.button`
   }
 `;
 
-const AddGroupStyles = styled.button`
+const RoundButtonStyles = styled.button`
   color: white;
   border-radius: 50%;
   background-color: #6dd5ed;
@@ -53,28 +50,18 @@ const CloseButtonStyles = styled.button`
   }
 `;
 
-const ButtonWrapperStyles = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-`;
-
 export const Button = ({ cb, children }) => (
   <ButtonStyles onClick={cb}>{children}</ButtonStyles>
 );
 
-export const AddGroupButton = ({ cb, text }) => (
-  <AddGroupStyles onClick={cb}>{text}</AddGroupStyles>
+export const RoundButton = ({ cb, children }) => (
+  <RoundButtonStyles onClick={cb}>{children}</RoundButtonStyles>
 );
 
 export const DeleteGroupButton = ({ cb, text }) => (
   <DeleteGroupStyles onClick={cb}>{text}</DeleteGroupStyles>
 );
 
-export const CloseButton = ({ cb, text }) => (
-  <CloseButtonStyles onClick={cb}>{text}</CloseButtonStyles>
-);
-
-export const ButtonWrapper = ({ children }) => (
-  <ButtonWrapperStyles>{children}</ButtonWrapperStyles>
+export const CloseButton = ({ cb, children }) => (
+  <CloseButtonStyles onClick={cb}>{children}</CloseButtonStyles>
 );

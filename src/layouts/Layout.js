@@ -21,7 +21,7 @@ function Layout({ children }) {
           </Button>
         )}
       </Header>
-      {pending ? <Loading>Loading...</Loading> : <Main>{children}</Main>}
+      <Main>{pending ? <Loading>Loading...</Loading> : children}</Main>}
       <Footer text={'Made with ❤️ by ️1325 Mason'} />
     </>
   );
