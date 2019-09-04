@@ -1,5 +1,6 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
+import Container from './Container';
 
 const MainStyles = styled.main`
   display: flex;
@@ -12,7 +13,11 @@ const MainStyles = styled.main`
 `;
 
 function Main({ children }) {
-  return <MainStyles>{children}</MainStyles>;
+  return (
+    <MainStyles>
+      <Container>{children}</Container>
+    </MainStyles>
+  );
 }
 
 export default Main;

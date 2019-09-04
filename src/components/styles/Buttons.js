@@ -1,6 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
+// Primary
+// Secondary button
+// Render base on props
 const ButtonStyles = styled.button`
   background-color: white;
   border: 0;

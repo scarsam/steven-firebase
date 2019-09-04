@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
+// Move all forms to Formik
 const Form = styled.form`
   width: 100%;
   button {
