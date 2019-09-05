@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux';
 import { userAuth } from '../store/actions/userActions';
 import Container from './styles/Container';
 import Box from './styles/Box';
-import { H1, TextLarge } from './styles/Text';
 import { LoginForm } from './styles/Form';
 
 function Login(props) {
@@ -17,13 +16,13 @@ function Login(props) {
 
   return (
     <Container>
-      <Box>
-        <H1 text={'Split expenses with friends'} />
-        <TextLarge
-          text={
-            'Less stress when sharing expenses with your partner. Keep track of your shared expenses and balances with housemates, trips, groups, friends, and family.'
-          }
-        />
+      <Box center='true'>
+        <h1>Split expenses with friends</h1>
+        <p>
+          Less stress when sharing expenses with your partner. Keep track of
+          your shared expenses and balances with housemates, trips, groups,
+          friends, and family.
+        </p>
         <LoginForm cb={auth} provider={'google'} />
         <LoginForm cb={auth} provider={'facebook'} />
       </Box>

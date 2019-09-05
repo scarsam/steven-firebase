@@ -1,4 +1,4 @@
-@import '~bootstrap/scss/bootstrap-grid';
+@import '~bootstrap/scss/bootstrap';
 @import '~bootstrap/scss/bootstrap-reboot';
 @import url('https://fonts.googleapis.com/css?family=Asap:400,500&display=swap');
 
@@ -14,13 +14,28 @@ body {
   color: #222525;
   padding: 0;
   margin: 0;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 400;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
 
-.modal {
+a {
+  color: #2193b0;
+  &:hover {
+    color: #6dd5ed;
+  }
+}
+
+h1 {
+  font-size: 25px;
+}
+
+h2 {
+  font-size: 18px;
+}
+
+.Modal {
   .ReactModal__Overlay {
     background-color: rgba(80, 80, 80, 0.75) !important;
     display: flex;

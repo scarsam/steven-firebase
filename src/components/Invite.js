@@ -1,9 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchGroup, joinGroup } from '../store/actions/groupActions';
-import { InviteForm, LoginForm } from './styles/Form';
 import Box from './styles/Box';
-import { H1 } from './styles/Text';
 
 function Invite(props) {
   const groupId = props.match.params.groupId;
@@ -23,16 +21,34 @@ function Invite(props) {
 
   return !user && group ? (
     <Box>
-      <H1 text={`Join ${group.name}`} />
-      <LoginForm cb={submit} provider={'google'} />
-      <LoginForm cb={submit} provider={'facebook'} />
+      <h1>Join ${group.name}</h1>
+      <form
+        className='d-flex flex-column'
+        provider={'google'}
+        onSubmit={submit}
+      >
+        <button className='btn btn-primary' type='submit'>
+          Join {group.name}
+        </button>
+      </form>
+      <form
+        className='d-flex flex-column'
+        provider={'facebook'}
+        onSubmit={submit}
+      >
+        <button className='btn btn-primary' type='submit'>
+          Join {group.name}
+        </button>
+      </form>
     </Box>
   ) : (
     group && (
       <Box>
-        <InviteForm cb={submit}>
-          <button type='submit'>Join {group.name}</button>
-        </InviteForm>
+        <form className='d-flex flex-column' onSubmit={submit}>
+          <button className='btn btn-primary' type='submit'>
+            Join {group.name}
+          </button>
+        </form>
       </Box>
     )
   );

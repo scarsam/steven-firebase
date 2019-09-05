@@ -8,9 +8,8 @@ import {
   createGroup
 } from '../store/actions/groupActions';
 import GroupList from './GroupList';
-import { H4 } from './styles/Text';
 import Box from './styles/Box';
-import { Button, CloseButton, RoundButton } from './styles/Buttons';
+import { CloseButton, RoundButton } from './styles/Buttons';
 
 function Dashboard(props) {
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
@@ -40,15 +39,17 @@ function Dashboard(props) {
           <GroupList created={false} groups={joinedGroups} user={user} />
         </>
       </Box>
-      <RoundButton cb={openModal}>+</RoundButton>
+      <div className='d-flex justify-content-center mt-2'>
+        <RoundButton cb={openModal}>+</RoundButton>
+      </div>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel='Example Modal'
-        portalClassName='modal'
+        portalClassName='Modal'
       >
         <CloseButton cb={closeModal}>x</CloseButton>
-        <H4 marginTop={false} text={'Create a new group'} />
+        <h2 className='pb-2'>Create a new group</h2>
         <Formik
           initialValues={{ name: '' }}
           onSubmit={async (values, { resetForm }) => {
@@ -59,9 +60,18 @@ function Dashboard(props) {
             resetForm();
           }}
           render={() => (
-            <Form>
-              <Field placeholder='Group name' type='text' name='name' />
-              <Button type='submit'>Submit</Button>
+            <Form className='form-inline'>
+              <div class='form-group'>
+                <Field
+                  className='pl-1 mr-2 form-control'
+                  placeholder='Group name'
+                  type='text'
+                  name='name'
+                />
+                <button type='submit' class='btn btn-primary'>
+                  Submit
+                </button>
+              </div>
             </Form>
           )}
         />

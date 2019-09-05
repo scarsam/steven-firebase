@@ -1,22 +1,25 @@
-import React from "react";
+import React from 'react';
 
 function CopyClipboard() {
   const inputEl = React.useRef(null);
 
   function copyText() {
     inputEl.current.select();
-    document.execCommand("copy");
+    document.execCommand('copy');
     return false;
   }
 
   const url = `${window.location.href}/invite`;
   return (
     <>
-      <button onClick={() => copyText()}>Copy invite link</button>
+      <button className='btn btn-secondary btn-sm' onClick={() => copyText()}>
+        Copy invite link
+      </button>
       <input
-        style={{ opacity: "0" }}
+        className='position-absolute'
+        style={{ opacity: '0' }}
         ref={inputEl}
-        type="text"
+        type='text'
         defaultValue={url}
       />
     </>

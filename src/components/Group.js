@@ -1,38 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field, FieldArray } from 'formik';
-import styled from 'styled-components';
 import Modal from 'react-modal';
 import CopyClipboard from './CopyClipboard';
 import { fetchGroup } from '../store/actions/groupActions';
 import { fetchExpenses, createExpense } from '../store/actions/expenseActions';
 import Box from './styles/Box';
 import { CloseButton, RoundButton } from './styles/Buttons';
-import { H4 } from './styles/Text';
-
-const GroupStyles = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const TopBar = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  input {
-    position: absolute;
-  }
-`;
-
-const BorderBottom = styled.div`
-  border-bottom: 1px solid black;
-`;
-
-const Wrapper = styled.div`
-  align-items: center;
-  justify-content: space-between;
-  display: flex;
-`;
 
 const radioButtons = [
   {
@@ -79,34 +53,38 @@ function Group(props) {
       <>
         <Box>
           <>
-            <TopBar>
-              <p>Group name: {group.name}</p>
+            <div className='d-flex align-items-center justify-content-between pb-3'>
+              <p className='mb-0'>Group name: {group.name}</p>
               <CopyClipboard />
-            </TopBar>
-            <Wrapper>
-              <p>Your balance is: ${total}</p>
-              <button>Get even</button>
-            </Wrapper>
-            <BorderBottom />
+            </div>
+            <div className='d-flex align-items-center justify-content-between border-bottom pb-3'>
+              <p className='mb-0'>Your balance is: ${total}</p>
+              <button className='btn btn-primary btn-sm'>Get even</button>
+            </div>
             {expenses &&
               expenses.map((expense, index) => (
-                <GroupStyles key={index}>
+                <div
+                  className='d-flex justify-content-between pt-3'
+                  key={index}
+                >
                   <p>{expense.description}</p>
                   <p>{renderPaid(expense)}</p>
                   <p>{renderExpense(expense)}</p>
-                </GroupStyles>
+                </div>
               ))}
           </>
         </Box>
-        <RoundButton cb={toggleModal}>+</RoundButton>
+        <div className='d-flex justify-content-center mt-2'>
+          <RoundButton cb={toggleModal}>+</RoundButton>
+        </div>
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={toggleModal}
           contentLabel='Example Modal'
-          portalClassName='modal'
+          portalClassName='Modal'
         >
           <CloseButton cb={toggleModal}>x</CloseButton>
-          <H4 marginTop={false} text={'Add an expense'} />
+          <h4 className='pb-3p'>Add an expense</h4>
           <Formik
             enableReinitialize={true}
             initialValues={{
@@ -129,48 +107,83 @@ function Group(props) {
             }}
             render={({ values }) => (
               <Form>
-                {radioButtons.map((button, index) => (
-                  <label key={index}>
-                    <Field name='split'>
-                      {({ field }) => (
-                        <input
-                          {...field}
-                          type='radio'
-                          value={button.value}
-                          checked={button.value === values.split}
-                        />
-                      )}
-                    </Field>
-                    {button.label}
-                  </label>
-                ))}
+                <div class='form-group'>
+                  {radioButtons.map((button, index) => (
+                    <div class='form-check'>
+                      <Field name='split'>
+                        {({ field }) => (
+                          <input
+                            {...field}
+                            type='radio'
+                            id={index}
+                            value={button.value}
+                            className='form-check-input'
+                            checked={button.value === values.split}
+                          />
+                        )}
+                      </Field>
+                      <label
+                        className='class="form-check-label'
+                        for={index}
+                        key={index}
+                      >
+                        {button.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
                 <Field
                   placeholder='Description'
+                  className='form-control mb-3'
                   type='text'
                   name='description'
                 />
                 {values.split === 'true' ? (
                   <>
-                    <Field placeholder='Amount' type='number' name='paid' />
-                    <button type='submit'>Submit</button>
+                    <div class='form-group'>
+                      <div class='input-group mb-3'>
+                        <div class='input-group-prepend'>
+                          <span class='input-group-text'>$</span>
+                        </div>
+                        <Field
+                          className='form-control'
+                          placeholder='Amount'
+                          type='number'
+                          name='paid'
+                        />
+                      </div>
+                    </div>
+                    <button type='submit' class='btn btn-block btn-primary'>
+                      Submit
+                    </button>
                   </>
                 ) : (
                   <FieldArray
                     name='users'
                     render={() => (
-                      <div>
+                      <>
                         {values.users.map((user, index) => (
-                          <div key={index}>
-                            {user.name}
-                            <Field
-                              placeholder='amount'
-                              type='number'
-                              name={`users[${index}].amount`}
-                            />
+                          <div class='form-group'>
+                            <div class='input-group mb-3'>
+                              <div class='input-group-prepend'>
+                                <span class='input-group-text'>
+                                  {user.name}
+                                </span>
+                                <span class='input-group-text'>$</span>
+                              </div>
+                              <Field
+                                placeholder='amount'
+                                className='form-control'
+                                type='number'
+                                name={`users[${index}].amount`}
+                              />
+                            </div>
                           </div>
                         ))}
-                        <button type='submit'>Submit</button>
-                      </div>
+                        <button type='submit' class='btn btn-block btn-primary'>
+                          Submit
+                        </button>
+                      </>
                     )}
                   />
                 )}

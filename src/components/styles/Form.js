@@ -48,17 +48,6 @@ const AddGroupFormStyles = styled.form`
   }
 `;
 
-const InviteFormStyles = styled.form`
-  display: flex;
-  flex-direction: column;
-  button {
-    border: 0;
-    border-radius: 4px;
-    background-color: #6dd5ed;
-    padding: 10px 15px !important;
-  }
-`;
-
 export const LoginForm = ({ provider, cb }) => (
   <Form onSubmit={cb} data-provider={provider}>
     <ButtonStyles provider={provider} type='submit'>
@@ -69,8 +58,4 @@ export const LoginForm = ({ provider, cb }) => (
 
 export const GroupForm = ({ cb, children }) => (
   <AddGroupFormStyles onSubmit={cb}>{children}</AddGroupFormStyles>
-);
-
-export const InviteForm = ({ cb, children }) => (
-  <InviteFormStyles onSubmit={cb}>{children}</InviteFormStyles>
 );

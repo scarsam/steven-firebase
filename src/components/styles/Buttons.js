@@ -29,16 +29,6 @@ const RoundButtonStyles = styled.button`
   }
 `;
 
-const DeleteGroupStyles = styled.button`
-  border: 0;
-  border-radius: 4px;
-  background-color: #f44336;
-  color: white;
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
 const CloseButtonStyles = styled.button`
   border: 0;
   position: absolute;
@@ -56,10 +46,6 @@ export const Button = ({ cb, children }) => (
 
 export const RoundButton = ({ cb, children }) => (
   <RoundButtonStyles onClick={cb}>{children}</RoundButtonStyles>
-);
-
-export const DeleteGroupButton = ({ cb, text }) => (
-  <DeleteGroupStyles onClick={cb}>{text}</DeleteGroupStyles>
 );
 
 export const CloseButton = ({ cb, children }) => (
