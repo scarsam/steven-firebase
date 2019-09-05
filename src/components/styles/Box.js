@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Loading from './Loading';
 
 const BoxStyles = styled.div`
   background-color: white;
@@ -12,8 +13,12 @@ const BoxStyles = styled.div`
   justify-content: ${props => (props.halign ? 'center' : 'start')};
 `;
 
-function Box({ center = false, children }) {
-  return (
+function Box({ isLoading = false, center = false, children }) {
+  return isLoading ? (
+    <BoxStyles halign={true} className='p-4'>
+      <Loading dark={true}>Loading...</Loading>
+    </BoxStyles>
+  ) : (
     <BoxStyles halign={center} className='p-4'>
       {children}
     </BoxStyles>

@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux';
 import { userAuth } from '../store/actions/userActions';
 import Container from './styles/Container';
 import Box from './styles/Box';
-import { LoginForm } from './styles/Form';
 
 function Login(props) {
   const dispatch = useDispatch();
@@ -23,8 +22,28 @@ function Login(props) {
           your shared expenses and balances with housemates, trips, groups,
           friends, and family.
         </p>
-        <LoginForm cb={auth} provider={'google'} />
-        <LoginForm cb={auth} provider={'facebook'} />
+        <form onSubmit={auth}>
+          <div class='form-group'>
+            <button
+              provider={'facebook'}
+              type='submit'
+              class='btn btn-block btn-facebook'
+            >
+              Continue with Facebook
+            </button>
+          </div>
+        </form>
+        <form onSubmit={auth}>
+          <div class='form-group'>
+            <button
+              provider={'google'}
+              type='submit'
+              class='btn btn-block btn-google'
+            >
+              Continue with Google
+            </button>
+          </div>
+        </form>
       </Box>
     </Container>
   );

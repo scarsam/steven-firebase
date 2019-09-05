@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const LoadingStyles = styled.p`
-  color: white;
+  color: ${props => (props.dark ? 'black' : 'white')};
   display: flex;
   font-weight: 500;
   align-items: center;
@@ -10,8 +10,8 @@ const LoadingStyles = styled.p`
   margin: 0;
 `;
 
-function Loading({ children }) {
-  return <LoadingStyles>{children}</LoadingStyles>;
+function Loading({ dark = false, children }) {
+  return <LoadingStyles dark={dark}>{children}</LoadingStyles>;
 }
 
 export default Loading;

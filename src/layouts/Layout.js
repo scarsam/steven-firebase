@@ -2,7 +2,6 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { userLogout } from '../store/actions/userActions';
 import Header from '../components/styles/Header';
-import { Button } from '../components/styles/Buttons';
 import Loading from '../components/styles/Loading';
 import Main from '../components/styles/Main';
 import Footer from '../components/styles/Footer';
@@ -16,9 +15,12 @@ function Layout({ children }) {
     <>
       <Header loggedIn={!!user}>
         {user && (
-          <Button cb={() => dispatch(userLogout())}>
+          <button
+            className='btn btn-light'
+            onClick={() => dispatch(userLogout)}
+          >
             Logout {user.displayName}
-          </Button>
+          </button>
         )}
       </Header>
       <Main>{pending ? <Loading>Loading...</Loading> : children}</Main>

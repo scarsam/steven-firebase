@@ -34,10 +34,12 @@ function Dashboard(props) {
   return (
     <>
       <Box>
-        <>
-          <GroupList created={true} groups={createdGroups} user={user} />
-          <GroupList created={false} groups={joinedGroups} user={user} />
-        </>
+        <GroupList
+          created={true}
+          joinedGroups={joinedGroups}
+          createdGroups={createdGroups}
+          user={user}
+        />
       </Box>
       <div className='d-flex justify-content-center mt-2'>
         <RoundButton cb={openModal}>+</RoundButton>

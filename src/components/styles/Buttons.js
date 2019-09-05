@@ -1,19 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const ButtonStyles = styled.button`
-  background-color: white;
-  border: 0;
-  border-radius: 4px;
-  padding: 10px 15px;
-  font-size: 15px;
-  font-weight: 500;
-  &:hover {
-    opacity: 0.9;
-    cursor: pointer;
-  }
-`;
-
 const RoundButtonStyles = styled.button`
   color: white;
   border-radius: 50%;
@@ -39,10 +26,6 @@ const CloseButtonStyles = styled.button`
     cursor: pointer;
   }
 `;
-
-export const Button = ({ cb, children }) => (
-  <ButtonStyles onClick={cb}>{children}</ButtonStyles>
-);
 
 export const RoundButton = ({ cb, children }) => (
   <RoundButtonStyles onClick={cb}>{children}</RoundButtonStyles>

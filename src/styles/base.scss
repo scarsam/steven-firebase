@@ -35,6 +35,22 @@ h2 {
   font-size: 18px;
 }
 
+.btn-facebook {
+  color: white;
+  background-color: #3c5a99;
+  &:hover {
+    color: white;
+  }
+}
+
+.btn-google {
+  color: white;
+  background-color: #db4437;
+  &:hover {
+    color: white;
+  }
+}
+
 .Modal {
   .ReactModal__Overlay {
     background-color: rgba(80, 80, 80, 0.75) !important;

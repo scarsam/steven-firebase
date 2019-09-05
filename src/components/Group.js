@@ -25,6 +25,7 @@ function Group(props) {
   const user = useSelector(store => store.userState.user);
   const group = useSelector(store => store.groupState.group);
   const expenses = useSelector(store => store.expenseState.expenses);
+  const pending = useSelector(store => store.expenseState.pending);
   const total = useSelector(store => store.expenseState.total);
   const dispatch = useDispatch();
 
@@ -51,7 +52,7 @@ function Group(props) {
   return (
     group && (
       <>
-        <Box>
+        <Box isLoading={pending}>
           <>
             <div className='d-flex align-items-center justify-content-between pb-3'>
               <p className='mb-0'>Group name: {group.name}</p>
@@ -74,9 +75,11 @@ function Group(props) {
               ))}
           </>
         </Box>
-        <div className='d-flex justify-content-center mt-2'>
-          <RoundButton cb={toggleModal}>+</RoundButton>
-        </div>
+        {group.users.length > 1 && (
+          <div className='d-flex justify-content-center mt-2'>
+            <RoundButton cb={toggleModal}>+</RoundButton>
+          </div>
+        )}
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={toggleModal}
