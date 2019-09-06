@@ -1,18 +1,11 @@
 import React from 'react';
-import styled from 'styled-components';
-
-const FooterStyles = styled.footer`
-  color: white;
-  align-items: center;
-  font-size: 12px;
-  display: flex;
-  height: 10vh;
-  justify-content: center;
-  margin: 0;
-`;
 
 function Footer({ text }) {
-  return <FooterStyles>{text}</FooterStyles>;
+  return (
+    <footer className='text-white text-small align-items-center d-flex height-vh10 justify-content-center m-0'>
+      {text}
+    </footer>
+  );
 }
 
 export default Footer;

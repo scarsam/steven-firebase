@@ -1,25 +1,17 @@
 import React from 'react';
-import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-const MainStyles = styled.main`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-`;
-
 function Main({ children }) {
   return (
-    <MainStyles>
+    <main className='height-min-vh-80 justify-content-center align-items-center d-flex'>
       <Container>
         <Row className='justify-content-center'>
           <Col xs={6}>{children}</Col>
         </Row>
       </Container>
-    </MainStyles>
+    </main>
   );
 }
 

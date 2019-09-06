@@ -29,3 +29,9 @@ function App() {
 }
 
 export default App;
+
+// TODO
+// - Firebase security rules
+// - Look over component names
+// - Move form into component
+// - Added calculate expense code

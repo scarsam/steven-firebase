@@ -2,6 +2,18 @@
 @import '~bootstrap/scss/bootstrap-reboot';
 @import url('https://fonts.googleapis.com/css?family=Asap:400,500&display=swap');
 
+.height-vh10 {
+  height: 10vh;
+}
+
+.height-min-vh-80 {
+  min-height: 80vh;
+}
+
+.text-small {
+  font-size: 12px;
+}
+
 body {
   font-family: 'Asap', sans-serif;
   background: #2193b0; /* fallback for old browsers */
