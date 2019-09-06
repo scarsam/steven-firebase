@@ -1,8 +1,11 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Spinner from 'react-bootstrap/Spinner';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
 import { userLogout } from '../store/actions/userActions';
 import Header from '../components/styles/Header';
-import Loading from '../components/styles/Loading';
 import Main from '../components/styles/Main';
 import Footer from '../components/styles/Footer';
 
@@ -13,17 +16,24 @@ function Layout({ children }) {
 
   return (
     <>
-      <Header loggedIn={!!user}>
+      <Header>
         {user && (
-          <button
-            className='btn btn-light'
-            onClick={() => dispatch(userLogout)}
-          >
+          <Button variant='light' onClick={() => dispatch(userLogout)}>
             Logout {user.displayName}
-          </button>
+          </Button>
         )}
       </Header>
-      <Main>{pending ? <Loading>Loading...</Loading> : children}</Main>
+      <Main>
+        {pending ? (
+          <Row className='justify-content-center'>
+            <Col sm='auto'>
+              <Spinner animation='grow' variant='light' />
+            </Col>
+          </Row>
+        ) : (
+          children
+        )}
+      </Main>
       <Footer text={'Made with ❤️ by ️1325 Mason'} />
     </>
   );

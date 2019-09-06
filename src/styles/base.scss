@@ -50,25 +50,3 @@ h2 {
     color: white;
   }
 }
-
-.Modal {
-  .ReactModal__Overlay {
-    background-color: rgba(80, 80, 80, 0.75) !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .ReactModal__Content {
-    width: 300px;
-    min-height: 150px;
-    position: relative !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    top: unset !important;
-    bottom: unset !important;
-    left: unset !important;
-    right: unset !important;
-  }
-}

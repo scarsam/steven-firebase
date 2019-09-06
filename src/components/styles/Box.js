@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import Loading from './Loading';
+import Spinner from 'react-bootstrap/Spinner';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 const BoxStyles = styled.div`
   background-color: white;
@@ -16,7 +18,11 @@ const BoxStyles = styled.div`
 function Box({ isLoading = false, center = false, children }) {
   return isLoading ? (
     <BoxStyles halign={true} className='p-4'>
-      <Loading dark={true}>Loading...</Loading>
+      <Row className='justify-content-center'>
+        <Col sm='auto'>
+          <Spinner animation='grow' />
+        </Col>
+      </Row>
     </BoxStyles>
   ) : (
     <BoxStyles halign={center} className='p-4'>

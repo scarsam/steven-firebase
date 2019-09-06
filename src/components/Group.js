@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field, FieldArray } from 'formik';
-import Modal from 'react-modal';
+import { Group as FormGroup } from 'react-bootstrap/Form';
+import Container from 'react-bootstrap/Container';
+import InputGroup from 'react-bootstrap/InputGroup';
+import Button from 'react-bootstrap/Button';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Modal from 'react-bootstrap/Modal';
 import CopyClipboard from './CopyClipboard';
 import { fetchGroup } from '../store/actions/groupActions';
 import { fetchExpenses, createExpense } from '../store/actions/expenseActions';
 import Box from './styles/Box';
-import { CloseButton, RoundButton } from './styles/Buttons';
 
 const radioButtons = [
   {
@@ -14,13 +19,13 @@ const radioButtons = [
     value: 'true'
   },
   {
-    label: "Don't split",
+    label: 'Specific amount',
     value: 'false'
   }
 ];
 
 function Group(props) {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [show, setShow] = useState(false);
   const groupId = props.match.params.groupId;
   const user = useSelector(store => store.userState.user);
   const group = useSelector(store => store.groupState.group);
@@ -33,8 +38,6 @@ function Group(props) {
     dispatch(fetchGroup(groupId));
     dispatch(fetchExpenses(groupId, user));
   }, [groupId, dispatch, user]);
-
-  const toggleModal = () => setModalIsOpen(toggleModal => !toggleModal);
 
   const renderExpense = ({ payerId, amount }) => {
     return payerId === user.uid
@@ -49,151 +52,178 @@ function Group(props) {
       : `${payer.name} paid ${totalAmount}`;
   };
 
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   return (
     group && (
       <>
         <Box isLoading={pending}>
           <>
-            <div className='d-flex align-items-center justify-content-between pb-3'>
-              <p className='mb-0'>Group name: {group.name}</p>
-              <CopyClipboard />
-            </div>
-            <div className='d-flex align-items-center justify-content-between border-bottom pb-3'>
-              <p className='mb-0'>Your balance is: ${total}</p>
-              <button className='btn btn-primary btn-sm'>Get even</button>
-            </div>
+            <Row>
+              <Col className='align-self-center'>Group name: {group.name}</Col>
+              <Col className='text-right'>
+                <CopyClipboard />
+              </Col>
+            </Row>
+            <Row className='mt-2 mb-3 pb-3 border-bottom'>
+              <Col className='align-self-center'>Your balance is: ${total}</Col>
+              <Col className='text-right'>
+                <Button variant='primary' size='sm'>
+                  Get even
+                </Button>
+              </Col>
+            </Row>
             {expenses &&
               expenses.map((expense, index) => (
-                <div
-                  className='d-flex justify-content-between pt-3'
-                  key={index}
-                >
-                  <p>{expense.description}</p>
-                  <p>{renderPaid(expense)}</p>
-                  <p>{renderExpense(expense)}</p>
-                </div>
+                <Row key={index}>
+                  <Col>
+                    <p>{expense.description}</p>
+                  </Col>
+                  <Col>
+                    <p>{renderPaid(expense)}</p>
+                  </Col>
+                  <Col>
+                    <p>{renderExpense(expense)}</p>
+                  </Col>
+                </Row>
               ))}
           </>
         </Box>
-        {group.users.length > 1 && (
-          <div className='d-flex justify-content-center mt-2'>
-            <RoundButton cb={toggleModal}>+</RoundButton>
-          </div>
+        {group.users.length && (
+          <Row className='mt-4 text-center'>
+            <Col>
+              <Button variant='primary' onClick={handleShow}>
+                Add expense
+              </Button>
+            </Col>
+          </Row>
         )}
-        <Modal
-          isOpen={modalIsOpen}
-          onRequestClose={toggleModal}
-          contentLabel='Example Modal'
-          portalClassName='Modal'
-        >
-          <CloseButton cb={toggleModal}>x</CloseButton>
-          <h4 className='pb-3p'>Add an expense</h4>
-          <Formik
-            enableReinitialize={true}
-            initialValues={{
-              description: '',
-              split: 'true',
-              paid: '',
-              users: group.users.map(user => ({
-                amount: '',
-                ...user
-              }))
-            }}
-            onSubmit={async (values, { resetForm }) => {
-              const { split, description, paid, users } = values;
-              await dispatch(
-                createExpense(split, paid, description, users, user, groupId)
-              );
-              await dispatch(fetchExpenses(groupId, user));
-              setModalIsOpen(false);
-              resetForm();
-            }}
-            render={({ values }) => (
-              <Form>
-                <div class='form-group'>
-                  {radioButtons.map((button, index) => (
-                    <div class='form-check'>
-                      <Field name='split'>
-                        {({ field }) => (
-                          <input
-                            {...field}
-                            type='radio'
-                            id={index}
-                            value={button.value}
-                            className='form-check-input'
-                            checked={button.value === values.split}
+        <>
+          <Modal show={show} size='sm' onHide={handleClose} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Add an expense</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Container>
+                <Row>
+                  <Formik
+                    enableReinitialize={true}
+                    initialValues={{
+                      description: '',
+                      split: 'true',
+                      paid: '',
+                      users: group.users.map(user => ({
+                        amount: '',
+                        ...user
+                      }))
+                    }}
+                    onSubmit={async (values, { resetForm }) => {
+                      const { split, description, paid, users } = values;
+                      await dispatch(
+                        createExpense(
+                          split,
+                          paid,
+                          description,
+                          users,
+                          user,
+                          groupId
+                        )
+                      );
+                      await dispatch(fetchExpenses(groupId, user));
+                      setShow(false);
+                      resetForm();
+                    }}
+                    render={({ values }) => (
+                      <Form className='col'>
+                        <FormGroup>
+                          {radioButtons.map((button, index) => (
+                            <div className='form-check' key={index}>
+                              <Field name='split'>
+                                {({ field }) => (
+                                  <input
+                                    {...field}
+                                    type='radio'
+                                    id={index}
+                                    value={button.value}
+                                    className='form-check-input'
+                                    checked={button.value === values.split}
+                                  />
+                                )}
+                              </Field>
+                              <label
+                                className='class="form-check-label'
+                                htmlFor={index}
+                                key={index}
+                              >
+                                {button.label}
+                              </label>
+                            </div>
+                          ))}
+                        </FormGroup>
+                        <Field
+                          placeholder='Description'
+                          className='form-control mb-3'
+                          type='text'
+                          name='description'
+                        />
+                        {values.split === 'true' ? (
+                          <>
+                            <FormGroup>
+                              <InputGroup className='mb-3'>
+                                <InputGroup.Prepend>
+                                  <InputGroup.Text>$</InputGroup.Text>
+                                </InputGroup.Prepend>
+                                <Field
+                                  className='form-control'
+                                  placeholder='Amount'
+                                  type='number'
+                                  name='paid'
+                                />
+                              </InputGroup>
+                            </FormGroup>
+                            <Button type='submit' variant='primary' block>
+                              Submit Expense
+                            </Button>
+                          </>
+                        ) : (
+                          <FieldArray
+                            name='users'
+                            render={() => (
+                              <>
+                                {values.users.map((user, index) => (
+                                  <FormGroup key={index}>
+                                    <InputGroup>
+                                      <InputGroup.Prepend>
+                                        <InputGroup.Text>
+                                          {user.name}
+                                        </InputGroup.Text>
+                                        <InputGroup.Text>$</InputGroup.Text>
+                                      </InputGroup.Prepend>
+                                      <Field
+                                        placeholder='amount'
+                                        className='form-control'
+                                        type='number'
+                                        name={`users[${index}].amount`}
+                                      />
+                                    </InputGroup>
+                                  </FormGroup>
+                                ))}
+                                <Button type='submit' variant='primary' block>
+                                  Submit Expense
+                                </Button>
+                              </>
+                            )}
                           />
                         )}
-                      </Field>
-                      <label
-                        className='class="form-check-label'
-                        for={index}
-                        key={index}
-                      >
-                        {button.label}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                <Field
-                  placeholder='Description'
-                  className='form-control mb-3'
-                  type='text'
-                  name='description'
-                />
-                {values.split === 'true' ? (
-                  <>
-                    <div class='form-group'>
-                      <div class='input-group mb-3'>
-                        <div class='input-group-prepend'>
-                          <span class='input-group-text'>$</span>
-                        </div>
-                        <Field
-                          className='form-control'
-                          placeholder='Amount'
-                          type='number'
-                          name='paid'
-                        />
-                      </div>
-                    </div>
-                    <button type='submit' class='btn btn-block btn-primary'>
-                      Submit
-                    </button>
-                  </>
-                ) : (
-                  <FieldArray
-                    name='users'
-                    render={() => (
-                      <>
-                        {values.users.map((user, index) => (
-                          <div class='form-group'>
-                            <div class='input-group mb-3'>
-                              <div class='input-group-prepend'>
-                                <span class='input-group-text'>
-                                  {user.name}
-                                </span>
-                                <span class='input-group-text'>$</span>
-                              </div>
-                              <Field
-                                placeholder='amount'
-                                className='form-control'
-                                type='number'
-                                name={`users[${index}].amount`}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                        <button type='submit' class='btn btn-block btn-primary'>
-                          Submit
-                        </button>
-                      </>
+                      </Form>
                     )}
                   />
-                )}
-              </Form>
-            )}
-          />
-        </Modal>
+                </Row>
+              </Container>
+            </Modal.Body>
+          </Modal>
+        </>
       </>
     )
   );

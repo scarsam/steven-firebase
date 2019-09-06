@@ -1,7 +1,10 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-
+import ListGroup from 'react-bootstrap/ListGroup';
+import Badge from 'react-bootstrap/Badge';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import { slugify } from '../utils/slugify';
 import { deleteGroup, leaveGroup } from '../store/actions/groupActions';
 
@@ -17,28 +20,28 @@ function GroupList({ joinedGroups, createdGroups, user }) {
       <h2 className='pb-2'>
         {created ? "Groups you've created" : "Groups you've joined"}
       </h2>
-      <ul class='list-group'>
+      <ListGroup variant='flush'>
         {groupArray.map(group => (
-          <li
-            key={group.id}
-            class='list-group-item d-flex justify-content-between align-items-center'
-          >
-            <Link to={`/group/${group.id}/${slugify(group.name)}`}>
-              {group.name}
-            </Link>
-            <span class='badge badge-primary badge-pill'>
-              {group.users.length} members
-            </span>
-            <button
-              type='button'
-              onClick={() => onSubmit(created, group.id)}
-              className='badge badge-danger border-0'
-            >
-              {created ? 'Delete' : 'Leave'}
-            </button>
-          </li>
+          <ListGroup.Item key={group.id}>
+            <Row>
+              <Col>
+                <Link to={`/group/${group.id}/${slugify(group.name)}`}>
+                  {group.name}
+                </Link>
+              </Col>
+              <Col>{group.users.length} members</Col>
+              <Col md='auto'>
+                <Badge
+                  onClick={() => onSubmit(created, group.id)}
+                  variant='danger'
+                >
+                  {created ? 'Delete' : 'Leave'}
+                </Badge>
+              </Col>
+            </Row>
+          </ListGroup.Item>
         ))}
-      </ul>
+      </ListGroup>
     </>
   );
 

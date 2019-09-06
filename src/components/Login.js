@@ -1,7 +1,8 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 import { userAuth } from '../store/actions/userActions';
-import Container from './styles/Container';
 import Box from './styles/Box';
 
 function Login(props) {
@@ -14,38 +15,34 @@ function Login(props) {
   };
 
   return (
-    <Container>
-      <Box center='true'>
-        <h1>Split expenses with friends</h1>
-        <p>
-          Less stress when sharing expenses with your partner. Keep track of
-          your shared expenses and balances with housemates, trips, groups,
-          friends, and family.
-        </p>
-        <form onSubmit={auth}>
-          <div class='form-group'>
-            <button
-              provider={'facebook'}
-              type='submit'
-              class='btn btn-block btn-facebook'
-            >
-              Continue with Facebook
-            </button>
-          </div>
-        </form>
-        <form onSubmit={auth}>
-          <div class='form-group'>
-            <button
-              provider={'google'}
-              type='submit'
-              class='btn btn-block btn-google'
-            >
-              Continue with Google
-            </button>
-          </div>
-        </form>
-      </Box>
-    </Container>
+    <Box center='true'>
+      <h1>Split expenses with friends</h1>
+      <p>
+        Less stress when sharing expenses with your partner. Keep track of your
+        shared expenses and balances with housemates, trips, groups, friends,
+        and family.
+      </p>
+      <Form onSubmit={auth}>
+        <Form.Group>
+          <Button
+            variant='btn btn-facebook'
+            type='submit'
+            provider='facebook'
+            block
+          >
+            Continue with Facebook
+          </Button>
+          <Button
+            variant='btn btn-google'
+            type='submit'
+            provider='google'
+            block
+          >
+            Continue with Google
+          </Button>
+        </Form.Group>
+      </Form>
+    </Box>
   );
 }
 

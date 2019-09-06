@@ -1,5 +1,10 @@
-import React from 'react';
-import Modal from 'react-modal';
+import React, { useState } from 'react';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { Group } from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import {
@@ -9,10 +14,9 @@ import {
 } from '../store/actions/groupActions';
 import GroupList from './GroupList';
 import Box from './styles/Box';
-import { CloseButton, RoundButton } from './styles/Buttons';
 
 function Dashboard(props) {
-  const [modalIsOpen, setModalIsOpen] = React.useState(false);
+  const [show, setShow] = useState(false);
   const createdGroups = useSelector(store => store.groupState.createdGroups);
   const joinedGroups = useSelector(store => store.groupState.joinedGroups);
   const user = useSelector(store => store.userState.user);
@@ -23,61 +27,62 @@ function Dashboard(props) {
     dispatch(fetchJoinedGroups(user));
   }, [user, dispatch]);
 
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   return (
     <>
       <Box>
         <GroupList
-          created={true}
           joinedGroups={joinedGroups}
           createdGroups={createdGroups}
           user={user}
         />
       </Box>
-      <div className='d-flex justify-content-center mt-2'>
-        <RoundButton cb={openModal}>+</RoundButton>
-      </div>
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        contentLabel='Example Modal'
-        portalClassName='Modal'
-      >
-        <CloseButton cb={closeModal}>x</CloseButton>
-        <h2 className='pb-2'>Create a new group</h2>
-        <Formik
-          initialValues={{ name: '' }}
-          onSubmit={async (values, { resetForm }) => {
-            const { name } = values;
+      <>
+        <Row className='mt-4 text-center'>
+          <Col>
+            <Button variant='primary' onClick={handleShow}>
+              Create a new group
+            </Button>
+          </Col>
+        </Row>
 
-            setModalIsOpen(false);
-            await dispatch(createGroup(user, name));
-            resetForm();
-          }}
-          render={() => (
-            <Form className='form-inline'>
-              <div class='form-group'>
-                <Field
-                  className='pl-1 mr-2 form-control'
-                  placeholder='Group name'
-                  type='text'
-                  name='name'
+        <Modal show={show} size='sm' onHide={handleClose} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Create a new group</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Container>
+              <Row>
+                <Formik
+                  initialValues={{ name: '' }}
+                  onSubmit={async (values, { resetForm }) => {
+                    const { name } = values;
+
+                    setShow(false);
+                    await dispatch(createGroup(user, name));
+                    resetForm();
+                  }}
+                  render={() => (
+                    <Form className='form-inline'>
+                      <Group>
+                        <Field
+                          className='pl-1 mr-2 form-control'
+                          placeholder='Group name'
+                          type='text'
+                          name='name'
+                        />
+                        <Button variant='primary'>Submit</Button>
+                      </Group>
+                    </Form>
+                  )}
                 />
-                <button type='submit' class='btn btn-primary'>
-                  Submit
-                </button>
-              </div>
-            </Form>
-          )}
-        />
-      </Modal>
+              </Row>
+            </Container>
+          </Modal.Body>
+        </Modal>
+      </>
     </>
   );
 }
