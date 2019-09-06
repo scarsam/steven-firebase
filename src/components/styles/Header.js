@@ -8,26 +8,15 @@ const HeaderStyles = styled.header`
   align-items: center;
   display: flex;
   height: 10vh;
-  width: 100%;
-  justify-content: center;
-  margin: 0 auto;
 `;
 
-const LogoStyles = styled.h1`
-  color: white;
-  font-weight: bold;
-  margin: 0;
-`;
-
-function Header({ loggedIn, children }) {
+function Header({ children }) {
   return (
     <HeaderStyles>
       <Container>
         <Row className='justify-content-center'>
-          <Col xs={2}>
-            <LogoStyles>Steven</LogoStyles>
-          </Col>
-          <Col className='text-right' xs={3}>
+          <Col className='d-flex justify-content-between' xs={6}>
+            <h1 className='text-white font-weight-bold m-0'>Steven</h1>
             {children}
           </Col>
         </Row>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field, FieldArray } from 'formik';
+import Table from 'react-bootstrap/Table';
 import { Group as FormGroup } from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -41,15 +42,15 @@ function Group(props) {
 
   const renderExpense = ({ payerId, amount }) => {
     return payerId === user.uid
-      ? `You lent ${amount}`
-      : `You borrowed ${amount}`;
+      ? `You lent $${amount}`
+      : `You borrowed $${amount}`;
   };
 
   const renderPaid = ({ payerId, totalAmount }) => {
     const payer = group.users.find(user => user.id === payerId);
     return payer.id === user.uid
-      ? `You paid ${totalAmount}`
-      : `${payer.name} paid ${totalAmount}`;
+      ? `You paid $${totalAmount}`
+      : `${payer.name} paid $${totalAmount}`;
   };
 
   const handleClose = () => setShow(false);
@@ -66,7 +67,7 @@ function Group(props) {
                 <CopyClipboard />
               </Col>
             </Row>
-            <Row className='mt-2 mb-3 pb-3 border-bottom'>
+            <Row className='mt-2 mb-3 pb-3'>
               <Col className='align-self-center'>Your balance is: ${total}</Col>
               <Col className='text-right'>
                 <Button variant='primary' size='sm'>
@@ -74,20 +75,25 @@ function Group(props) {
                 </Button>
               </Col>
             </Row>
-            {expenses &&
-              expenses.map((expense, index) => (
-                <Row key={index}>
-                  <Col>
-                    <p>{expense.description}</p>
-                  </Col>
-                  <Col>
-                    <p>{renderPaid(expense)}</p>
-                  </Col>
-                  <Col>
-                    <p>{renderExpense(expense)}</p>
-                  </Col>
-                </Row>
-              ))}
+            <Table responsive>
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Paid</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {expenses &&
+                  expenses.map((expense, index) => (
+                    <tr key={index}>
+                      <td>{expense.description}</td>
+                      <td>{renderPaid(expense)}</td>
+                      <td>{renderExpense(expense)}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </Table>
           </>
         </Box>
         {group.users.length && (

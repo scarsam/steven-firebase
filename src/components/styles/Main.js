@@ -9,9 +9,6 @@ const MainStyles = styled.main`
   align-items: center;
   justify-content: center;
   min-height: 80vh;
-  & > div {
-    flex-direction: column;
-  }
 `;
 
 function Main({ children }) {
@@ -19,7 +16,7 @@ function Main({ children }) {
     <MainStyles>
       <Container>
         <Row className='justify-content-center'>
-          <Col xs={5}>{children}</Col>
+          <Col xs={6}>{children}</Col>
         </Row>
       </Container>
     </MainStyles>
