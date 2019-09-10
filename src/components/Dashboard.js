@@ -12,7 +12,7 @@ import {
   fetchCreatedGroups,
   createGroup
 } from '../store/actions/groupActions';
-import GroupList from './GroupList';
+import Groups from './Groups';
 import Box from './styles/Box';
 
 function Dashboard(props) {
@@ -33,7 +33,7 @@ function Dashboard(props) {
   return (
     <>
       <Box>
-        <GroupList
+        <Groups
           joinedGroups={joinedGroups}
           createdGroups={createdGroups}
           user={user}

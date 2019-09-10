@@ -8,7 +8,7 @@ import Col from 'react-bootstrap/Col';
 import { slugify } from '../utils/slugify';
 import { deleteGroup, leaveGroup } from '../store/actions/groupActions';
 
-function GroupList({ joinedGroups, createdGroups, user }) {
+function Groups({ joinedGroups, createdGroups, user }) {
   const dispatch = useDispatch();
 
   const onSubmit = (created, id) => {
@@ -53,4 +53,4 @@ function GroupList({ joinedGroups, createdGroups, user }) {
   );
 }
 
-export default GroupList;
+export default Groups;
