@@ -1,10 +1,11 @@
 import React from 'react';
-import { Field, Group } from 'formik';
+import { Field } from 'formik';
+import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 
 function GroupAmount() {
   return (
-    <Group>
+    <Form.Group>
       <InputGroup className='mb-3'>
         <InputGroup.Prepend>
           <InputGroup.Text>$</InputGroup.Text>
@@ -16,7 +17,7 @@ function GroupAmount() {
           name='paid'
         />
       </InputGroup>
-    </Group>
+    </Form.Group>
   );
 }
 

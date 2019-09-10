@@ -1,10 +1,11 @@
 import React from 'react';
-import { Field, Group } from 'formik';
+import { Field } from 'formik';
 import InputGroup from 'react-bootstrap/InputGroup';
+import Form from 'react-bootstrap/Form';
 
 function GroupAmounts({ user, index }) {
   return (
-    <Group key={index}>
+    <Form.Group key={index}>
       <InputGroup>
         <InputGroup.Prepend>
           <InputGroup.Text>{user.name}</InputGroup.Text>
@@ -17,7 +18,7 @@ function GroupAmounts({ user, index }) {
           name={`users[${index}].amount`}
         />
       </InputGroup>
-    </Group>
+    </Form.Group>
   );
 }
 

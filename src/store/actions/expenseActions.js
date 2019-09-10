@@ -4,10 +4,37 @@ import {
   EXPENSE_REQUEST,
   EXPENSE_SUCCESS,
   EXPENSE_ERROR,
+  EXPENSES_SUCCESS,
   CREATED_EXPENSE_REQUEST,
   CREATED_EXPENSE_SUCCESS,
   CREATED_EXPENSE_ERROR
 } from '../types';
+
+export const fetchAllExpenses = (groupId, groupUsers) => async dispatch => {
+  let total;
+  dispatch({ type: EXPENSE_REQUEST });
+  try {
+    const users = groupUsers.map(async user => {
+      let baseRef = firebase
+        .firestore()
+        .collection('groups')
+        .doc(`${groupId}`)
+        .collection('users')
+        .doc(`${user.id}`)
+        .collection('expenses')
+        .doc('--stats--');
+      await baseRef.get().then(querySnapshot => {
+        total = querySnapshot.data().total;
+      });
+      return { id: user.id, name: user.name, total };
+    });
+    const totalExpenses = await Promise.all(users);
+    dispatch({ type: EXPENSES_SUCCESS, payload: totalExpenses });
+  } catch (error) {
+    console.log(error);
+    dispatch({ type: EXPENSE_ERROR, payload: error });
+  }
+};
 
 export const fetchExpenses = (groupId, user) => async dispatch => {
   dispatch({ type: EXPENSE_REQUEST });

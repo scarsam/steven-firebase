@@ -1,14 +1,16 @@
 import {
   EXPENSE_REQUEST,
   EXPENSE_SUCCESS,
+  EXPENSES_SUCCESS,
   EXPENSE_ERROR,
   CREATED_EXPENSE_REQUEST,
   CREATED_EXPENSE_SUCCESS,
   CREATED_EXPENSE_ERROR
-} from "../types";
+} from '../types';
 
 const initialState = {
   expenses: [],
+  totalExpenses: [],
   total: 0,
   error: null,
   pending: false
@@ -26,6 +28,12 @@ function expenseReducer(state = initialState, action) {
         ...state,
         expenses: [...action.payload],
         total: action.total,
+        pending: false
+      };
+    case EXPENSES_SUCCESS:
+      return {
+        ...state,
+        totalExpenses: [...action.payload],
         pending: false
       };
     case EXPENSE_ERROR:
