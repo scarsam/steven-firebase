@@ -10,7 +10,7 @@ import {
 
 const initialState = {
   expenses: [],
-  totalExpenses: [],
+  totalExpenses: null,
   total: 0,
   error: null,
   pending: false
@@ -33,7 +33,7 @@ function expenseReducer(state = initialState, action) {
     case EXPENSES_SUCCESS:
       return {
         ...state,
-        totalExpenses: [...action.payload],
+        totalExpenses: action.payload,
         pending: false
       };
     case EXPENSE_ERROR:

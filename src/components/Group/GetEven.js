@@ -1,14 +1,9 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
-import { fetchAllExpenses } from '../../store/actions/expenseActions';
 
-function GetEven({ groupId, group }) {
-  const dispatch = useDispatch();
-  const totalExpenses = useSelector(store => store.expenseState.totalExpenses);
-
+function GetEven({ totalExpenses }) {
   const splitPayments = payments => {
     const people = Object.keys(payments);
     const valuesPaid = Object.values(payments);
@@ -44,10 +39,6 @@ function GetEven({ groupId, group }) {
     }
   };
 
-  useEffect(() => {
-    dispatch(fetchAllExpenses(groupId, group.users));
-  }, [groupId, group.users, dispatch]);
-
   return (
     <>
       <Modal.Header closeButton>
@@ -56,6 +47,7 @@ function GetEven({ groupId, group }) {
       <Modal.Body>
         <Container>
           <Row>{splitPayments(totalExpenses)}</Row>
+          <Row>hi</Row>
         </Container>
       </Modal.Body>
     </>

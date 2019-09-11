@@ -10,11 +10,10 @@ import {
   CREATED_EXPENSE_ERROR
 } from '../types';
 
-export const fetchAllExpenses = (groupId, groupUsers) => async dispatch => {
-  let total;
+export const fetchAllExpenses = (groupId, group) => dispatch => {
   dispatch({ type: EXPENSE_REQUEST });
   try {
-    const users = groupUsers.map(async user => {
+    const users = group.users.reduce((obj, user) => {
       let baseRef = firebase
         .firestore()
         .collection('groups')
@@ -23,13 +22,13 @@ export const fetchAllExpenses = (groupId, groupUsers) => async dispatch => {
         .doc(`${user.id}`)
         .collection('expenses')
         .doc('--stats--');
-      await baseRef.get().then(querySnapshot => {
-        total = querySnapshot.data().total;
+      baseRef.get().then(querySnapshot => {
+        const total = querySnapshot.data().total;
+        obj[user.name] = total;
       });
-      return { id: user.id, name: user.name, total };
-    });
-    const totalExpenses = await Promise.all(users);
-    dispatch({ type: EXPENSES_SUCCESS, payload: totalExpenses });
+      return obj;
+    }, {});
+    dispatch({ type: EXPENSES_SUCCESS, payload: users });
   } catch (error) {
     console.log(error);
     dispatch({ type: EXPENSE_ERROR, payload: error });
