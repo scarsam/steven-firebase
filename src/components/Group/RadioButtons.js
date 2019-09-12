@@ -15,8 +15,8 @@ const radioButtons = [
 
 function GroupRadioButtons({ values }) {
   return radioButtons.map((button, index) => (
-    <Group>
-      <div className='form-check' key={index}>
+    <Group key={index}>
+      <div className='form-check'>
         <Field name='split'>
           {({ field }) => (
             <input

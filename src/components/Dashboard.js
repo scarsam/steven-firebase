@@ -57,11 +57,11 @@ function Dashboard(props) {
               <Row>
                 <Formik
                   initialValues={{ name: '' }}
-                  onSubmit={async (values, { resetForm }) => {
+                  onSubmit={(values, { resetForm }) => {
                     const { name } = values;
 
                     setShow(false);
-                    await dispatch(createGroup(user, name));
+                    dispatch(createGroup(user, name));
                     resetForm();
                   }}
                   render={() => (

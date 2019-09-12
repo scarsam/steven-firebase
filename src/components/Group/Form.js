@@ -1,13 +1,12 @@
 import React from 'react';
-import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
+import Button from 'react-bootstrap/Button';
 import { useDispatch } from 'react-redux';
-import { Formik, FieldArray } from 'formik';
+import { Formik, Form, FieldArray } from 'formik';
 import GroupAmount from './Amount';
 import GroupAmounts from './Amounts';
-import GroupSubmit from './Submit';
 import GroupRadioButtons from './RadioButtons';
 import GroupDescription from './Description';
 import {
@@ -27,7 +26,6 @@ function ExpenseForm({ group, user, groupId, setExpenseModal }) {
         <Container>
           <Row>
             <Formik
-              enableReinitialize={true}
               initialValues={{
                 description: '',
                 split: 'true',
@@ -51,23 +49,20 @@ function ExpenseForm({ group, user, groupId, setExpenseModal }) {
                   <GroupRadioButtons values={values} />
                   <GroupDescription />
                   {values.split === 'true' ? (
-                    <>
-                      <GroupAmount />
-                      <GroupSubmit text='Submit Expense' />
-                    </>
+                    <GroupAmount />
                   ) : (
                     <FieldArray
                       name='users'
-                      render={() => (
-                        <>
-                          {values.users.map((user, index) => (
-                            <GroupAmounts user={user} index={index} />
-                          ))}
-                          <GroupSubmit text='Submit Expense' />
-                        </>
-                      )}
+                      render={() =>
+                        values.users.map((user, index) => (
+                          <GroupAmounts key={index} user={user} index={index} />
+                        ))
+                      }
                     />
                   )}
+                  <Button type='submit' variant='primary' block>
+                    Submit
+                  </Button>
                 </Form>
               )}
             />
