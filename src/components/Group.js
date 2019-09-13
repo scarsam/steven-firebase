@@ -5,10 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 import { fetchGroup } from '../store/actions/groupActions';
-import {
-  fetchExpenses,
-  fetchAllExpenses
-} from '../store/actions/expenseActions';
+import { fetchExpenses } from '../store/actions/expenseActions';
 import Box from './styles/Box';
 import GroupExpenses from './Group/Expenses';
 import GroupHeader from './Group/Header';
@@ -27,17 +24,14 @@ function Group(props) {
   const totalExpenses = useSelector(store => store.expenseState.totalExpenses);
   const dispatch = useDispatch();
 
-  // HOW DO I GET Totalexpenses to not create infinite loop???????????????????
   useEffect(() => {
     dispatch(fetchGroup(groupId));
     dispatch(fetchExpenses(groupId, user));
   }, [groupId, dispatch, user]);
 
   const toggleFormModal = () => setExpenseModal(currentValue => !currentValue);
-  const toggleExpenseModal = async () => {
-    await dispatch(fetchAllExpenses(groupId, group));
+  const toggleExpenseModal = async () =>
     setGetEvenModal(currentValue => !currentValue);
-  };
 
   return (
     group && (

@@ -20,7 +20,7 @@ import {
   LEAVE_GROUP_REQUEST,
   LEAVE_GROUP_SUCCESS,
   LEAVE_GROUP_ERROR
-} from "../types";
+} from '../types';
 
 const initialState = {
   createdGroups: [],

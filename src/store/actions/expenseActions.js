@@ -143,7 +143,11 @@ export const createExpense = (
     });
 
     await batch.commit();
-    dispatch({ type: CREATED_EXPENSE_SUCCESS, payload: total });
+    dispatch({
+      type: CREATED_EXPENSE_SUCCESS,
+      payload: total,
+      expense: newExpense
+    });
   } catch (error) {
     dispatch({ type: CREATED_EXPENSE_ERROR, payload: error });
   }

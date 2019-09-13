@@ -14,6 +14,7 @@ function GetEven({ totalExpenses }) {
     const sortedPeople = people.sort(
       (personA, personB) => payments[personA] - payments[personB]
     );
+
     const sortedValuesPaid = sortedPeople.map(
       person => payments[person] - mean
     );
@@ -47,7 +48,6 @@ function GetEven({ totalExpenses }) {
       <Modal.Body>
         <Container>
           <Row>{splitPayments(totalExpenses)}</Row>
-          <Row>hi</Row>
         </Container>
       </Modal.Body>
     </>

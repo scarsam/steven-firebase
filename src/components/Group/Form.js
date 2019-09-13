@@ -9,10 +9,7 @@ import GroupAmount from './Amount';
 import GroupAmounts from './Amounts';
 import GroupRadioButtons from './RadioButtons';
 import GroupDescription from './Description';
-import {
-  fetchExpenses,
-  createExpense
-} from '../../store/actions/expenseActions';
+import { createExpense } from '../../store/actions/expenseActions';
 
 function ExpenseForm({ group, user, groupId, setExpenseModal }) {
   const dispatch = useDispatch();
@@ -40,7 +37,6 @@ function ExpenseForm({ group, user, groupId, setExpenseModal }) {
                 await dispatch(
                   createExpense(split, paid, description, users, user, groupId)
                 );
-                await dispatch(fetchExpenses(groupId, user));
                 setExpenseModal(false);
                 resetForm();
               }}

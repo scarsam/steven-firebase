@@ -3,6 +3,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 import history from '../../routes/History';
 import { slugify } from '../../utils/slugify';
+import { fetchAllExpenses } from './expenseActions';
 
 import {
   JOINED_GROUPS_REQUEST,
@@ -122,6 +123,7 @@ export const fetchCreatedGroups = user => async dispatch => {
 };
 
 export const fetchGroup = id => async dispatch => {
+  let group;
   dispatch({ type: GET_GROUP_REQUEST });
   try {
     await firebase
@@ -131,10 +133,11 @@ export const fetchGroup = id => async dispatch => {
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
-          const group = { ...doc.data(), id: doc.id };
+          group = { ...doc.data(), id: doc.id };
           dispatch({ type: GET_GROUP_SUCCESS, payload: group });
         });
       });
+    await dispatch(fetchAllExpenses(id, group));
   } catch (error) {
     dispatch({ type: GET_GROUP_ERROR, payload: error });
   }
