@@ -22,22 +22,16 @@ function Login(props) {
         shared expenses and balances with housemates, trips, groups, friends,
         and family.
       </p>
-      <Form onSubmit={auth}>
+      <Form onSubmit={auth} data-provider='facebook'>
         <Form.Group>
-          <Button
-            variant='btn btn-facebook'
-            type='submit'
-            provider='facebook'
-            block
-          >
+          <Button variant='btn btn-facebook' type='submit' block>
             Continue with Facebook
           </Button>
-          <Button
-            variant='btn btn-google'
-            type='submit'
-            provider='google'
-            block
-          >
+        </Form.Group>
+      </Form>
+      <Form onSubmit={auth} data-provider='google'>
+        <Form.Group>
+          <Button variant='btn btn-google' type='submit' block>
             Continue with Google
           </Button>
         </Form.Group>

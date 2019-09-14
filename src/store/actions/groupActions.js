@@ -137,7 +137,7 @@ export const fetchGroup = id => async dispatch => {
           dispatch({ type: GET_GROUP_SUCCESS, payload: group });
         });
       });
-    await dispatch(fetchAllExpenses(id, group));
+    await dispatch(fetchAllExpenses(id, group.users));
   } catch (error) {
     dispatch({ type: GET_GROUP_ERROR, payload: error });
   }

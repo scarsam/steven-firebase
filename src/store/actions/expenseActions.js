@@ -10,10 +10,10 @@ import {
   CREATED_EXPENSE_ERROR
 } from '../types';
 
-export const fetchAllExpenses = (groupId, group) => dispatch => {
+export const fetchAllExpenses = (groupId, groupUsers) => dispatch => {
   dispatch({ type: EXPENSE_REQUEST });
   try {
-    const users = group.users.reduce((obj, user) => {
+    const users = groupUsers.reduce((obj, user) => {
       let baseRef = firebase
         .firestore()
         .collection('groups')
@@ -23,7 +23,12 @@ export const fetchAllExpenses = (groupId, group) => dispatch => {
         .collection('expenses')
         .doc('--stats--');
       baseRef.get().then(querySnapshot => {
-        const total = querySnapshot.data().total;
+        let total;
+        if (querySnapshot.exists) {
+          total = querySnapshot.data().total;
+        } else {
+          total = 0;
+        }
         obj[user.name] = total;
       });
       return obj;
@@ -87,7 +92,10 @@ export const createExpense = (
     totalAmount = paid;
     userAmounts = users.map(user => ({
       ...user,
-      amount: paid / users.length
+      amount:
+        user.id === currentUser.uid
+          ? (totalAmount / users.length) * (users.length - 1)
+          : totalAmount / users.length
     }));
   } else {
     totalAmount = users.reduce((total, user) => total + user.amount, 0);
@@ -110,6 +118,7 @@ export const createExpense = (
     let increment;
     let totalRef;
     let total;
+    let currentUserExpense;
 
     const batch = firebase.firestore().batch();
     userAmounts
@@ -134,6 +143,9 @@ export const createExpense = (
           amount: userAmount(user.id, user.amount),
           created: Date.now()
         };
+        if (user.id === currentUser.uid) {
+          currentUserExpense = newExpense;
+        }
         batch.set(newExpenseRef, { ...newExpense });
         await totalRef.set({ total: increment }, { merge: true });
       });
@@ -141,13 +153,13 @@ export const createExpense = (
     await totalRef.get().then(doc => {
       total = doc.data().total;
     });
-
     await batch.commit();
-    dispatch({
+    await dispatch({
       type: CREATED_EXPENSE_SUCCESS,
       payload: total,
-      expense: newExpense
+      expense: currentUserExpense
     });
+    await dispatch(fetchAllExpenses(groupId, users));
   } catch (error) {
     dispatch({ type: CREATED_EXPENSE_ERROR, payload: error });
   }

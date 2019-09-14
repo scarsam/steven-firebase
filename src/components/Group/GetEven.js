@@ -22,6 +22,7 @@ function GetEven({ totalExpenses }) {
     let i = 0;
     let j = sortedPeople.length - 1;
     let debt;
+    let debts = [];
 
     while (i < j) {
       debt = Math.min(-sortedValuesPaid[i], sortedValuesPaid[j]);
@@ -29,6 +30,12 @@ function GetEven({ totalExpenses }) {
       sortedValuesPaid[j] -= debt;
 
       console.log(`${sortedPeople[i]} owes ${sortedPeople[j]} $${debt}`);
+
+      debts.push({
+        [sortedPeople[i]]: [
+          { [sortedPeople[j]]: parseFloat(parseFloat(debt).toFixed(2)) }
+        ]
+      });
 
       if (sortedValuesPaid[i] === 0) {
         i++;
@@ -38,6 +45,7 @@ function GetEven({ totalExpenses }) {
         j--;
       }
     }
+    return debts;
   };
 
   return (
@@ -47,7 +55,19 @@ function GetEven({ totalExpenses }) {
       </Modal.Header>
       <Modal.Body>
         <Container>
-          <Row>{splitPayments(totalExpenses)}</Row>
+          <Row>
+            {splitPayments(totalExpenses).map(debt => (
+              <p>
+                {Object.keys(debt)} owes{' '}
+                {Object.values(debt).map(expense =>
+                  expense.map(
+                    result =>
+                      `${Object.keys(result)} - ${Object.values(result)}`
+                  )
+                )}
+              </p>
+            ))}
+          </Row>
         </Container>
       </Modal.Body>
     </>
