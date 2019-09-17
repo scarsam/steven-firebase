@@ -1,4 +1,6 @@
-import firebase from "firebase/app";
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/firestore';
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -9,6 +11,34 @@ const config = {
   messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID
 };
 
-firebase.initializeApp(config);
+class Firebase {
+  constructor() {
+    firebase.initializeApp(config);
+    this.auth = firebase.auth();
+    this.google = new firebase.auth.GoogleAuthProvider();
+    this.facebook = new firebase.auth.FacebookAuthProvider();
+  }
 
-export default firebase;
+  currentUser() {
+    return this.auth.currentUser();
+  }
+
+  signInWithPopup(provider) {
+    return provider === 'google'
+      ? this.auth.signInWithPopup(this.google)
+      : this.auth.signInWithPopup(this.facebook);
+  }
+
+  addUser({ user }) {
+    return this.firestore()
+      .collection('users')
+      .doc(user.uid);
+  }
+
+  signOut() {
+    return this.auth.signOut();
+  }
+}
+
+const FirebaseAPI = new Firebase();
+export default FirebaseAPI;

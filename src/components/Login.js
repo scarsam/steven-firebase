@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import { userAuth } from '../store/actions/userActions';
 import Box from './styles/Box';
 
-function Login(props) {
+function Login() {
   const dispatch = useDispatch();
 
   const auth = event => {
