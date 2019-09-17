@@ -15,12 +15,21 @@ class Firebase {
   constructor() {
     firebase.initializeApp(config);
     this.auth = firebase.auth();
+    this.db = firebase.firestore();
     this.google = new firebase.auth.GoogleAuthProvider();
     this.facebook = new firebase.auth.FacebookAuthProvider();
   }
 
   currentUser() {
-    return this.auth.currentUser();
+    return new Promise((resolve, reject) => {
+      this.auth.onAuthStateChanged(user => {
+        if (user) {
+          resolve(user);
+        } else {
+          reject('No currently logged in user');
+        }
+      });
+    });
   }
 
   signInWithPopup(provider) {
@@ -29,10 +38,8 @@ class Firebase {
       : this.auth.signInWithPopup(this.facebook);
   }
 
-  addUser({ user }) {
-    return this.firestore()
-      .collection('users')
-      .doc(user.uid);
+  addUser(user) {
+    return this.db.collection('users').doc(user.uid);
   }
 
   signOut() {

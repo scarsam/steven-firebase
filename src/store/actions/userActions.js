@@ -12,7 +12,7 @@ import {
 export const userAuth = provider => async dispatch => {
   dispatch({ type: USER_REQUEST });
   try {
-    const user = await FirebaseAPI.signInWithPopup(provider);
+    const { user } = await FirebaseAPI.signInWithPopup(provider);
     await FirebaseAPI.addUser(user);
     dispatch({ type: USER_SUCCESS, payload: user });
     history.push('/dashboard');
@@ -23,9 +23,11 @@ export const userAuth = provider => async dispatch => {
 
 export const fetchCurrentUser = async dispatch => {
   dispatch({ type: USER_REQUEST });
-  const user = await FirebaseAPI.currentUser();
-  if (user) dispatch({ type: CURRENT_USER, payload: user });
-  if (!user) {
+  try {
+    const user = await FirebaseAPI.currentUser();
+    dispatch({ type: CURRENT_USER, payload: user });
+  } catch (error) {
+    console.info(error);
     dispatch({ type: NO_CURRENT_USER, payload: null });
     if (window.location.pathname.includes('invite')) {
       const url = window.location.pathname;
