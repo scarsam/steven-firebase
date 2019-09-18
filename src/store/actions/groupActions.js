@@ -1,27 +1,21 @@
-import firebase from '../../firebase';
-import 'firebase/auth';
-import 'firebase/firestore';
 import FirebaseAPI from '../../firebase';
 import history from '../../routes/History';
 import { slugify } from '../../utils/slugify';
 import { fetchAllExpenses } from './expenseActions';
 
 import {
-  JOINED_GROUPS_REQUEST,
-  JOINED_GROUPS_SUCCESS,
-  JOINED_GROUPS_ERROR,
+  FETCH_GROUPS_REQUEST,
+  FETCH_GROUPS_SUCCESS,
+  FETCH_GROUPS_ERROR,
   JOIN_GROUP_REQUEST,
   JOIN_GROUP_SUCCESS,
   JOIN_GROUP_ERROR,
-  CREATED_GROUPS_REQUEST,
-  CREATED_GROUPS_SUCCESS,
-  CREATED_GROUPS_ERROR,
   CREATE_GROUP_REQUEST,
   CREATE_GROUP_SUCCESS,
   CREATE_GROUP_ERROR,
-  GET_GROUP_REQUEST,
-  GET_GROUP_SUCCESS,
-  GET_GROUP_ERROR,
+  FETCH_GROUP_REQUEST,
+  FETCH_GROUP_SUCCESS,
+  FETCH_GROUP_ERROR,
   USER_REQUEST,
   USER_SUCCESS,
   USER_ERROR,
@@ -53,54 +47,28 @@ export const deleteGroup = id => async dispatch => {
   }
 };
 
-// export const fetchJoinedGroups = user => async dispatch => {
-//   dispatch({ type: JOINED_GROUPS_REQUEST });
-//   try {
-//     await firebase
-//       .firestore()
-//       .collectionGroup('groups')
-//       .where('users', 'array-contains', {
-//         id: user.uid,
-//         name: user.displayName
-//       })
-//       .get()
-//       .then(snapshot => {
-//         const groups = snapshot.docs
-//           .map(doc => ({
-//             id: doc.id,
-//             ...doc.data()
-//           }))
-//           .filter(group => group.owner.id !== user.uid);
-//         dispatch({ type: JOINED_GROUPS_SUCCESS, payload: groups });
-//       });
-//   } catch (error) {
-//     console.log(error);
-//     dispatch({ type: JOINED_GROUPS_ERROR, payload: error });
-//   }
-// };
-
 export const fetchGroups = user => async dispatch => {
-  dispatch({ type: CREATED_GROUPS_REQUEST });
+  dispatch({ type: FETCH_GROUPS_REQUEST });
   try {
-    const createdGroups = await FirebaseAPI.fetchGroups(user);
-    const joinedGroups = createdGroups.filter(
-      group => group.owner.id !== user.uid
-    );
-    dispatch({ type: CREATED_GROUPS_SUCCESS, payload: createdGroups });
-    dispatch({ type: JOINED_GROUPS_SUCCESS, payload: joinedGroups });
+    const createdGroups = await FirebaseAPI.fetchCreatedGroups(user);
+    const joinedGroups = await FirebaseAPI.fetchJoinedGroups(user);
+    dispatch({
+      type: FETCH_GROUPS_SUCCESS,
+      payload: { createdGroups, joinedGroups }
+    });
   } catch (error) {
-    dispatch({ type: CREATED_GROUPS_ERROR, payload: error });
+    dispatch({ type: FETCH_GROUPS_ERROR, payload: error });
   }
 };
 
 export const fetchGroup = id => async dispatch => {
-  dispatch({ type: GET_GROUP_REQUEST });
+  dispatch({ type: FETCH_GROUP_REQUEST });
   try {
     const group = await FirebaseAPI.fetchGroups(id);
-    dispatch({ type: GET_GROUP_SUCCESS, payload: group });
+    dispatch({ type: FETCH_GROUP_SUCCESS, payload: group });
     dispatch(fetchAllExpenses(id, group.users));
   } catch (error) {
-    dispatch({ type: GET_GROUP_ERROR, payload: error });
+    dispatch({ type: FETCH_GROUP_ERROR, payload: error });
   }
 };
 

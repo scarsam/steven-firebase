@@ -1,16 +1,13 @@
 import {
-  JOINED_GROUPS_REQUEST,
-  JOINED_GROUPS_SUCCESS,
-  JOINED_GROUPS_ERROR,
-  CREATED_GROUPS_REQUEST,
-  CREATED_GROUPS_SUCCESS,
-  CREATED_GROUPS_ERROR,
+  FETCH_GROUPS_REQUEST,
+  FETCH_GROUPS_SUCCESS,
+  FETCH_GROUPS_ERROR,
   CREATE_GROUP_REQUEST,
   CREATE_GROUP_SUCCESS,
   CREATE_GROUP_ERROR,
-  GET_GROUP_REQUEST,
-  GET_GROUP_SUCCESS,
-  GET_GROUP_ERROR,
+  FETCH_GROUP_REQUEST,
+  FETCH_GROUP_SUCCESS,
+  FETCH_GROUP_ERROR,
   JOIN_GROUP_REQUEST,
   JOIN_GROUP_SUCCESS,
   JOIN_GROUP_ERROR,
@@ -86,37 +83,21 @@ function groupReducer(state = initialState, action) {
         error: action.payload,
         pending: false
       };
-    case JOINED_GROUPS_REQUEST:
+    case FETCH_GROUPS_REQUEST:
       return {
         ...state,
         pending: true
       };
-    case JOINED_GROUPS_SUCCESS:
+    case FETCH_GROUPS_SUCCESS:
+      const { joinedGroups, createdGroups } = action.payload;
       return {
         ...state,
-        joinedGroups: action.payload,
+        joinedGroups,
+        createdGroups,
         group: null,
         pending: false
       };
-    case JOINED_GROUPS_ERROR:
-      return {
-        ...state,
-        error: action.payload,
-        pending: false
-      };
-    case CREATED_GROUPS_REQUEST:
-      return {
-        ...state,
-        pending: false
-      };
-    case CREATED_GROUPS_SUCCESS:
-      return {
-        ...state,
-        createdGroups: action.payload,
-        group: null,
-        pending: false
-      };
-    case CREATED_GROUPS_ERROR:
+    case FETCH_GROUPS_ERROR:
       return {
         ...state,
         error: action.payload,
@@ -139,18 +120,18 @@ function groupReducer(state = initialState, action) {
         error: action.payload,
         pending: false
       };
-    case GET_GROUP_REQUEST:
+    case FETCH_GROUP_REQUEST:
       return {
         ...state,
         pending: true
       };
-    case GET_GROUP_SUCCESS:
+    case FETCH_GROUP_SUCCESS:
       return {
         ...state,
         group: action.payload,
         pending: false
       };
-    case GET_GROUP_ERROR:
+    case FETCH_GROUP_ERROR:
       return {
         ...state,
         error: action.payload,

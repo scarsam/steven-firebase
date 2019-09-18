@@ -46,7 +46,7 @@ class Firebase {
     return this.auth.signOut();
   }
 
-  fetchGroups(user) {
+  fetchCreatedGroups(user) {
     return this.db
       .collection('users')
       .doc(user.uid)
@@ -58,6 +58,24 @@ class Firebase {
           ...doc.data()
         }));
         return groups;
+      });
+  }
+
+  fetchJoinedGroups(user) {
+    return this.db
+      .collectionGroup('groups')
+      .where('users', 'array-contains', {
+        id: user.uid,
+        name: user.displayName
+      })
+      .get()
+      .then(snapshot => {
+        return snapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }))
+          .filter(group => group.owner.id !== user.uid);
       });
   }
 

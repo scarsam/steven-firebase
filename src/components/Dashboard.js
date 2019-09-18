@@ -7,15 +7,11 @@ import Col from 'react-bootstrap/Col';
 import { Group } from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
-import {
-  fetchGroups,
-  fetchCreatedGroups,
-  createGroup
-} from '../store/actions/groupActions';
+import { fetchGroups, createGroup } from '../store/actions/groupActions';
 import Groups from './Groups';
 import Box from './styles/Box';
 
-function Dashboard(props) {
+function Dashboard() {
   const [show, setShow] = useState(false);
   const createdGroups = useSelector(store => store.groupState.createdGroups);
   const joinedGroups = useSelector(store => store.groupState.joinedGroups);
@@ -23,7 +19,6 @@ function Dashboard(props) {
   const dispatch = useDispatch();
 
   React.useEffect(() => {
-    // dispatch(fetchCreatedGroups(user));
     dispatch(fetchGroups(user));
   }, [user, dispatch]);
 
