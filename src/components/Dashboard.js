@@ -8,7 +8,7 @@ import { Group } from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import {
-  fetchJoinedGroups,
+  fetchGroups,
   fetchCreatedGroups,
   createGroup
 } from '../store/actions/groupActions';
@@ -23,8 +23,8 @@ function Dashboard(props) {
   const dispatch = useDispatch();
 
   React.useEffect(() => {
-    dispatch(fetchCreatedGroups(user));
-    dispatch(fetchJoinedGroups(user));
+    // dispatch(fetchCreatedGroups(user));
+    dispatch(fetchGroups(user));
   }, [user, dispatch]);
 
   const handleClose = () => setShow(false);
