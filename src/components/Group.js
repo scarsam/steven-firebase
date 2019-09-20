@@ -5,7 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 import { fetchGroup } from '../store/actions/groupActions';
-import { fetchExpenses } from '../store/actions/expenseActions';
+import { fetchUserExpenses } from '../store/actions/expenseActions';
 import Box from './styles/Box';
 import GroupExpenses from './Group/Expenses';
 import GroupHeader from './Group/Header';
@@ -26,7 +26,7 @@ function Group(props) {
 
   useEffect(() => {
     dispatch(fetchGroup(groupId));
-    dispatch(fetchExpenses(groupId, user));
+    dispatch(fetchUserExpenses(user, groupId));
   }, [groupId, dispatch, user]);
 
   const toggleFormModal = () => setExpenseModal(currentValue => !currentValue);

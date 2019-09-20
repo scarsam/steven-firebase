@@ -1,4 +1,5 @@
 import firebase from 'firebase/app';
+import { amountsCalculator } from '../utils/expense';
 import 'firebase/auth';
 import 'firebase/firestore';
 
@@ -85,10 +86,11 @@ class Firebase {
       .where('id', '==', id)
       .get()
       .then(querySnapshot => {
-        debugger;
-        querySnapshot.docs.map(doc => {
-          return { ...doc.data(), id: doc.id };
-        });
+        const group = querySnapshot.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id
+        }));
+        return group[0];
       });
   }
 
@@ -166,6 +168,109 @@ class Firebase {
           });
         });
       });
+  }
+
+  fetchUsersTotal(users, id) {
+    return users.reduce((obj, user) => {
+      let baseRef = firebase
+        .firestore()
+        .collection('groups')
+        .doc(`${id}`)
+        .collection('users')
+        .doc(`${user.id}`)
+        .collection('expenses')
+        .doc('--stats--');
+      baseRef.get().then(querySnapshot => {
+        let total;
+        if (querySnapshot.exists) {
+          total = querySnapshot.data().total;
+        } else {
+          total = 0;
+        }
+        obj[user.name] = total;
+      });
+      return obj;
+    }, {});
+  }
+
+  fetchUserExpenses(user, id) {
+    return this.db
+      .collection('groups')
+      .doc(`${id}`)
+      .collection('users')
+      .doc(`${user.uid}`)
+      .collection('expenses')
+      .orderBy('created', 'desc')
+      .get()
+      .then(querySnapshot => {
+        return querySnapshot.docs
+          .map(doc => ({ ...doc.data() }))
+          .filter(doc => doc.id !== '--stats--');
+      });
+  }
+
+  fetchUserTotal(user, id) {
+    return this.db
+      .collection('groups')
+      .doc(`${id}`)
+      .collection('users')
+      .doc(`${user.uid}`)
+      .collection('expenses')
+      .doc('--stats--')
+      .get()
+      .then(doc => (doc.exists ? doc.data().total : 0));
+  }
+
+  async createExpense(split, paid, description, users, currentUser, groupId) {
+    let newExpense;
+    let newExpenseRef;
+    let increment;
+    let totalRef;
+    let currentUserExpense;
+    const batch = this.db.batch();
+
+    const { totalAmount, userAmounts } = amountsCalculator(
+      split,
+      paid,
+      users,
+      currentUser
+    );
+
+    const positiveOrNegative = (userId, amount) => {
+      return userId === currentUser.uid
+        ? parseFloat(parseFloat(amount).toFixed(2))
+        : -parseFloat(parseFloat(amount).toFixed(2));
+    };
+    userAmounts
+      .filter(user => user.amount !== '')
+      .forEach(async user => {
+        let baseRef = this.db
+          .collection('groups')
+          .doc(`${groupId}`)
+          .collection('users')
+          .doc(`${user.id}`)
+          .collection('expenses');
+        increment = firebase.firestore.FieldValue.increment(
+          positiveOrNegative(user.id, user.amount)
+        );
+        totalRef = baseRef.doc('--stats--');
+        newExpenseRef = baseRef.doc();
+        newExpense = {
+          description,
+          payerId: currentUser.uid,
+          totalAmount,
+          amount: positiveOrNegative(user.id, user.amount),
+          created: Date.now()
+        };
+        batch.set(newExpenseRef, { ...newExpense });
+        if (user.id === currentUser.uid) {
+          currentUserExpense = newExpense;
+        }
+        await totalRef.set({ total: increment }, { merge: true });
+      });
+
+    await batch.commit();
+    return currentUserExpense;
   }
 }
 

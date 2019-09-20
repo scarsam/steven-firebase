@@ -1,7 +1,7 @@
 import FirebaseAPI from '../../firebase';
 import history from '../../routes/History';
 import { slugify } from '../../utils/slugify';
-import { fetchAllExpenses } from './expenseActions';
+import { fetchUsersTotal } from './expenseActions';
 
 import {
   FETCH_GROUPS_REQUEST,
@@ -64,9 +64,9 @@ export const fetchGroups = user => async dispatch => {
 export const fetchGroup = id => async dispatch => {
   dispatch({ type: FETCH_GROUP_REQUEST });
   try {
-    const group = await FirebaseAPI.fetchGroups(id);
+    const group = await FirebaseAPI.fetchGroup(id);
     dispatch({ type: FETCH_GROUP_SUCCESS, payload: group });
-    dispatch(fetchAllExpenses(id, group.users));
+    dispatch(fetchUsersTotal(group.users, id));
   } catch (error) {
     dispatch({ type: FETCH_GROUP_ERROR, payload: error });
   }

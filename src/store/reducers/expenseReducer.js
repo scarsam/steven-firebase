@@ -49,10 +49,11 @@ function expenseReducer(state = initialState, action) {
         pending: true
       };
     case CREATED_EXPENSE_SUCCESS:
+      const { total, expense } = action.payload;
       return {
         ...state,
-        total: action.payload,
-        expenses: [action.expense, ...state.expenses],
+        total,
+        expenses: [expense, ...state.expenses],
         pending: false
       };
     case CREATED_EXPENSE_ERROR:
