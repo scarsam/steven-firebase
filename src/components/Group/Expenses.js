@@ -1,5 +1,6 @@
 import React from 'react';
 import Table from 'react-bootstrap/Table';
+import Alert from 'react-bootstrap/Alert';
 
 function GroupExpenses({ user, group, expenses }) {
   const renderExpense = ({ payerId, amount }) => {
@@ -15,7 +16,7 @@ function GroupExpenses({ user, group, expenses }) {
       : `${payer.name} paid $${totalAmount}`;
   };
 
-  return (
+  return group.users.length > 1 ? (
     <Table responsive>
       <thead>
         <tr>
@@ -35,6 +36,14 @@ function GroupExpenses({ user, group, expenses }) {
           ))}
       </tbody>
     </Table>
+  ) : (
+    <Alert variant='info'>
+      <h5>Invite your friends</h5>
+      <p>
+        Before you can add expenses, use the <strong>copy invite link</strong>{' '}
+        in the top right corner to invite your friends
+      </p>
+    </Alert>
   );
 }
 

@@ -49,7 +49,7 @@ function Group(props) {
           />
           <GroupExpenses group={group} user={user} expenses={expenses} />
         </Box>
-        {group.users.length && (
+        {group.users.length >= 2 && (
           <Row className='mt-4 text-center'>
             <Col>
               <Button variant='primary' onClick={toggleFormModal}>

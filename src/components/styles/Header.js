@@ -9,7 +9,9 @@ function Header({ children }) {
       <Container>
         <Row className='justify-content-center'>
           <Col className='d-flex justify-content-between' xs={6}>
-            <h1 className='text-white font-weight-bold m-0'>Steven</h1>
+            <a href='/dashboard'>
+              <h1 className='text-white font-weight-bold m-0'>Steven</h1>
+            </a>
             {children}
           </Col>
         </Row>

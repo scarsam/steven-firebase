@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
+import Alert from 'react-bootstrap/Alert';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Group } from 'react-bootstrap/Form';
@@ -15,6 +16,7 @@ function Dashboard() {
   const [show, setShow] = useState(false);
   const createdGroups = useSelector(store => store.groupState.createdGroups);
   const joinedGroups = useSelector(store => store.groupState.joinedGroups);
+  const pending = useSelector(store => store.groupState.pending);
   const user = useSelector(store => store.userState.user);
   const dispatch = useDispatch();
 
@@ -28,6 +30,15 @@ function Dashboard() {
   return (
     <>
       <Box>
+        {!pending && joinedGroups.length === 0 && createdGroups.length === 0 && (
+          <Alert variant='info'>
+            <h5>Create a group</h5>
+            <p>
+              Before you can add expenses, you need to create a new group. Click
+              the <strong>button below</strong> to get started.
+            </p>
+          </Alert>
+        )}
         <Groups
           joinedGroups={joinedGroups}
           createdGroups={createdGroups}
