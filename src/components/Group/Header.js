@@ -4,7 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import CopyClipboard from '../CopyClipboard';
 
-function GroupHeader({ group, total, toggleExpenseModal }) {
+function GroupHeader({ group, total, toggleExpenseModal, expenses }) {
   return (
     <>
       <Row>
@@ -17,11 +17,13 @@ function GroupHeader({ group, total, toggleExpenseModal }) {
         <Col className='align-self-center'>
           Your balance is: ${parseFloat(parseFloat(total).toFixed(2))}
         </Col>
-        <Col className='text-right'>
-          <Button variant='primary' size='sm' onClick={toggleExpenseModal}>
-            Get even
-          </Button>
-        </Col>
+        {expenses.length >= 1 && (
+          <Col className='text-right'>
+            <Button variant='primary' size='sm' onClick={toggleExpenseModal}>
+              Get even
+            </Button>
+          </Col>
+        )}
       </Row>
     </>
   );

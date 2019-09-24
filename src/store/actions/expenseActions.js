@@ -3,20 +3,36 @@ import {
   EXPENSE_REQUEST,
   EXPENSE_SUCCESS,
   EXPENSE_ERROR,
-  EXPENSES_SUCCESS,
+  USERS_TOTAL_REQUEST,
+  USERS_TOTAL_SUCCESS,
+  USERS_TOTAL_ERROR,
+  USER_TOTAL_REQUEST,
+  USER_TOTAL_SUCCESS,
+  USER_TOTAL_ERROR,
   CREATED_EXPENSE_REQUEST,
   CREATED_EXPENSE_SUCCESS,
   CREATED_EXPENSE_ERROR
 } from '../types';
 
 export const fetchUsersTotal = (users, id) => async dispatch => {
-  dispatch({ type: EXPENSE_REQUEST });
+  dispatch({ type: USERS_TOTAL_REQUEST });
   try {
     const expenses = await FirebaseAPI.fetchUsersTotal(users, id);
-    dispatch({ type: EXPENSES_SUCCESS, payload: expenses });
+    dispatch({ type: USERS_TOTAL_SUCCESS, payload: expenses });
   } catch (error) {
-    console.log(error);
-    dispatch({ type: EXPENSE_ERROR, payload: error });
+    console.error(error);
+    dispatch({ type: USERS_TOTAL_ERROR, payload: error });
+  }
+};
+
+export const fetchUserTotal = (user, id) => async dispatch => {
+  dispatch({ type: USER_TOTAL_REQUEST });
+  try {
+    const total = await FirebaseAPI.fetchUserTotal(user, id);
+    dispatch({ type: USER_TOTAL_SUCCESS, payload: total });
+  } catch (error) {
+    console.error(error);
+    dispatch({ type: USER_TOTAL_ERROR, payload: error });
   }
 };
 
@@ -24,13 +40,9 @@ export const fetchUserExpenses = (user, id) => async dispatch => {
   dispatch({ type: EXPENSE_REQUEST });
   try {
     const expenses = await FirebaseAPI.fetchUserExpenses(user, id);
-    //
-    // Break this up into separate action
-    //
-    const total = await FirebaseAPI.fetchUserTotal(user, id);
-    dispatch({ type: EXPENSE_SUCCESS, payload: expenses, total });
+    dispatch({ type: EXPENSE_SUCCESS, payload: expenses });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     dispatch({ type: EXPENSE_ERROR, payload: error });
   }
 };
@@ -60,6 +72,7 @@ export const createExpense = (
     });
     await dispatch(fetchUsersTotal(users, groupId));
   } catch (error) {
+    console.error(error);
     dispatch({ type: CREATED_EXPENSE_ERROR, payload: error });
   }
 };

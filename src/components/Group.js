@@ -5,7 +5,10 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 import { fetchGroup } from '../store/actions/groupActions';
-import { fetchUserExpenses } from '../store/actions/expenseActions';
+import {
+  fetchUserExpenses,
+  fetchUserTotal
+} from '../store/actions/expenseActions';
 import Box from './styles/Box';
 import GroupExpenses from './Group/Expenses';
 import GroupHeader from './Group/Header';
@@ -27,6 +30,7 @@ function Group(props) {
   useEffect(() => {
     dispatch(fetchGroup(groupId));
     dispatch(fetchUserExpenses(user, groupId));
+    dispatch(fetchUserTotal(user, groupId));
   }, [groupId, dispatch, user]);
 
   const toggleFormModal = () => setExpenseModal(currentValue => !currentValue);
@@ -40,6 +44,7 @@ function Group(props) {
           <GroupHeader
             group={group}
             total={total}
+            expenses={expenses}
             toggleExpenseModal={toggleExpenseModal}
           />
           <GroupExpenses group={group} user={user} expenses={expenses} />

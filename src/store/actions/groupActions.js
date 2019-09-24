@@ -33,6 +33,7 @@ export const leaveGroup = (user, id) => async dispatch => {
     await FirebaseAPI.leaveGroup(user, id);
     dispatch({ type: LEAVE_GROUP_SUCCESS, payload: id, user });
   } catch (error) {
+    console.error(error);
     dispatch({ type: LEAVE_GROUP_ERROR, payload: error });
   }
 };
@@ -43,6 +44,7 @@ export const deleteGroup = id => async dispatch => {
     await FirebaseAPI.deleteGroup(id);
     dispatch({ type: DELETE_GROUP_SUCCESS, payload: id });
   } catch (error) {
+    console.error(error);
     dispatch({ type: DELETE_GROUP_ERROR, payload: error });
   }
 };
@@ -57,6 +59,7 @@ export const fetchGroups = user => async dispatch => {
       payload: { createdGroups, joinedGroups }
     });
   } catch (error) {
+    console.error(error);
     dispatch({ type: FETCH_GROUPS_ERROR, payload: error });
   }
 };
@@ -68,6 +71,7 @@ export const fetchGroup = id => async dispatch => {
     dispatch({ type: FETCH_GROUP_SUCCESS, payload: group });
     dispatch(fetchUsersTotal(group.users, id));
   } catch (error) {
+    console.error(error);
     dispatch({ type: FETCH_GROUP_ERROR, payload: error });
   }
 };
@@ -80,6 +84,7 @@ export const joinGroup = (provider, user, id, group) => async dispatch => {
       await FirebaseAPI.addUser(user);
       dispatch({ type: USER_SUCCESS, payload: user });
     } catch (error) {
+      console.error(error);
       dispatch({ type: USER_ERROR, payload: error });
     }
   }
@@ -89,6 +94,7 @@ export const joinGroup = (provider, user, id, group) => async dispatch => {
     await FirebaseAPI.joinGroup(id, user);
     dispatch({ type: JOIN_GROUP_SUCCESS });
   } catch (error) {
+    console.error(error);
     dispatch({ type: JOIN_GROUP_ERROR, payload: error });
   }
   history.push(`/group/${id}/${slugify(group.name)}`);
@@ -100,6 +106,7 @@ export const createGroup = (user, name) => async dispatch => {
     const newGroup = await FirebaseAPI.createGroup(user, name);
     dispatch({ type: CREATE_GROUP_SUCCESS, payload: newGroup });
   } catch (error) {
+    console.error(error);
     dispatch({ type: CREATE_GROUP_ERROR, payload: error });
   }
 };

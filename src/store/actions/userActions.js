@@ -17,6 +17,7 @@ export const userAuth = provider => async dispatch => {
     dispatch({ type: USER_SUCCESS, payload: user });
     history.push('/dashboard');
   } catch (error) {
+    console.error(error);
     dispatch({ type: USER_ERROR, payload: error });
   }
 };
@@ -27,7 +28,7 @@ export const fetchCurrentUser = async dispatch => {
     const user = await FirebaseAPI.currentUser();
     dispatch({ type: CURRENT_USER, payload: user });
   } catch (error) {
-    console.info(error);
+    console.error(error);
     dispatch({ type: NO_CURRENT_USER, payload: null });
     if (window.location.pathname.includes('invite')) {
       const url = window.location.pathname;
@@ -43,8 +44,9 @@ export const userLogout = async dispatch => {
   try {
     await FirebaseAPI.signOut();
     dispatch({ type: USER_LOGOUT });
-  } catch (err) {
-    dispatch({ type: USER_ERROR, payload: err });
+  } catch (error) {
+    console.error(error);
+    dispatch({ type: USER_ERROR, payload: error });
   }
   history.push('/');
 };

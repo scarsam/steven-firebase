@@ -268,7 +268,6 @@ class Firebase {
         }
         await totalRef.set({ total: increment }, { merge: true });
       });
-
     await batch.commit();
     return currentUserExpense;
   }
