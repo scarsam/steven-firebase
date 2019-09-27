@@ -17,7 +17,7 @@ function Groups({ joinedGroups, createdGroups, user }) {
 
   const renderGroup = (created, groupArray) => (
     <>
-      <h2 className='pb-2'>
+      <h2 className='pb-2 pt-4'>
         {created ? "Groups you've created" : "Groups you've joined"}
       </h2>
       <ListGroup variant='flush'>

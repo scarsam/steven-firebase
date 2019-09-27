@@ -77,10 +77,12 @@ export const fetchGroup = id => async dispatch => {
 };
 
 export const joinGroup = (provider, user, id, group) => async dispatch => {
-  if (!user) {
+  let currentUser = user;
+  if (!currentUser) {
     dispatch({ type: USER_REQUEST });
     try {
       const { user } = await FirebaseAPI.signInWithPopup(provider);
+      currentUser = user;
       await FirebaseAPI.addUser(user);
       dispatch({ type: USER_SUCCESS, payload: user });
     } catch (error) {
@@ -91,7 +93,7 @@ export const joinGroup = (provider, user, id, group) => async dispatch => {
 
   dispatch({ type: JOIN_GROUP_REQUEST });
   try {
-    await FirebaseAPI.joinGroup(id, user);
+    await FirebaseAPI.joinGroup(id, currentUser);
     dispatch({ type: JOIN_GROUP_SUCCESS });
   } catch (error) {
     console.error(error);

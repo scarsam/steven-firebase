@@ -172,12 +172,11 @@ class Firebase {
 
   fetchUsersTotal(users, id) {
     return users.reduce((obj, user) => {
-      let baseRef = firebase
-        .firestore()
-        .collection('groups')
-        .doc(`${id}`)
+      let baseRef = this.db
         .collection('users')
         .doc(`${user.id}`)
+        .collection('groups')
+        .doc(`${id}`)
         .collection('expenses')
         .doc('--stats--');
       baseRef.get().then(querySnapshot => {
@@ -195,10 +194,10 @@ class Firebase {
 
   fetchUserExpenses(user, id) {
     return this.db
-      .collection('groups')
-      .doc(`${id}`)
       .collection('users')
       .doc(`${user.uid}`)
+      .collection('groups')
+      .doc(`${id}`)
       .collection('expenses')
       .orderBy('created', 'desc')
       .get()
@@ -211,10 +210,10 @@ class Firebase {
 
   fetchUserTotal(user, id) {
     return this.db
-      .collection('groups')
-      .doc(`${id}`)
       .collection('users')
       .doc(`${user.uid}`)
+      .collection('groups')
+      .doc(`${id}`)
       .collection('expenses')
       .doc('--stats--')
       .get()
@@ -245,10 +244,10 @@ class Firebase {
       .filter(user => user.amount !== '')
       .forEach(async user => {
         let baseRef = this.db
-          .collection('groups')
-          .doc(`${groupId}`)
           .collection('users')
           .doc(`${user.id}`)
+          .collection('groups')
+          .doc(`${groupId}`)
           .collection('expenses');
         increment = firebase.firestore.FieldValue.increment(
           positiveOrNegative(user.id, user.amount)

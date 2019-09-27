@@ -55,6 +55,7 @@ export const createExpense = (
   currentUser,
   groupId
 ) => async dispatch => {
+  debugger;
   dispatch({ type: CREATED_EXPENSE_REQUEST });
   try {
     const expense = await FirebaseAPI.createExpense(
