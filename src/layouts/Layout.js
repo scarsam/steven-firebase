@@ -5,9 +5,9 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import { userLogout } from '../store/actions/userActions';
-import Header from '../components/styles/Header';
-import Main from '../components/styles/Main';
-import Footer from '../components/styles/Footer';
+import Header from './Header';
+import Main from './Main';
+import Footer from './Footer';
 
 function Layout({ children }) {
   const user = useSelector(store => store.userState.user);

@@ -5,11 +5,29 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import { useDispatch } from 'react-redux';
 import { Formik, Form, FieldArray } from 'formik';
+import * as Yup from 'yup';
 import GroupAmount from './Amount';
 import GroupAmounts from './Amounts';
 import GroupRadioButtons from './RadioButtons';
 import GroupDescription from './Description';
 import { createExpense } from '../../store/actions/expenseActions';
+
+const validationSchema = Yup.object().shape({
+  split: Yup.boolean(),
+  description: Yup.string().required('Description is required!'),
+  paid: Yup.string().when('split', {
+    is: true,
+    then: Yup.string().required('Amount is required!')
+  }),
+  users: Yup.array().when('split', {
+    is: false,
+    then: Yup.array().of(
+      Yup.object().shape({
+        amount: Yup.string().required('Amount is required!')
+      })
+    )
+  })
+});
 
 function ExpenseForm({ group, user, groupId, setExpenseModal }) {
   const dispatch = useDispatch();
@@ -32,6 +50,7 @@ function ExpenseForm({ group, user, groupId, setExpenseModal }) {
                   ...user
                 }))
               }}
+              validationSchema={validationSchema}
               onSubmit={async (values, { resetForm }) => {
                 const { split, description, paid, users } = values;
                 await dispatch(
@@ -40,18 +59,33 @@ function ExpenseForm({ group, user, groupId, setExpenseModal }) {
                 setExpenseModal(false);
                 resetForm();
               }}
-              render={({ values }) => (
+              render={({ values, errors, touched, handleChange }) => (
                 <Form className='col'>
                   <GroupRadioButtons values={values} />
-                  <GroupDescription />
+                  <GroupDescription
+                    errors={errors}
+                    touched={touched}
+                    handleChange={handleChange}
+                  />
                   {values.split === 'true' ? (
-                    <GroupAmount />
+                    <GroupAmount
+                      handleChange={handleChange}
+                      errors={errors}
+                      touched={touched}
+                    />
                   ) : (
                     <FieldArray
                       name='users'
                       render={() =>
                         values.users.map((user, index) => (
-                          <GroupAmounts key={index} user={user} index={index} />
+                          <GroupAmounts
+                            key={index}
+                            user={user}
+                            index={index}
+                            errors={errors}
+                            touched={touched}
+                            handleChange={handleChange}
+                          />
                         ))
                       }
                     />

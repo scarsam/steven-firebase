@@ -1,14 +1,20 @@
 import React from 'react';
-import { Field } from 'formik';
+import Form from 'react-bootstrap/Form';
 
-function GroupDescription() {
+function GroupDescription({ errors, touched, handleChange }) {
   return (
-    <Field
-      placeholder='Description'
-      className='form-control mb-3'
-      type='text'
-      name='description'
-    />
+    <>
+      <Form.Control
+        placeholder='Description'
+        type='text'
+        name='description'
+        onChange={handleChange}
+        isInvalid={!!errors.description && touched.description}
+      />
+      <Form.Control.Feedback type='invalid'>
+        {errors.description}
+      </Form.Control.Feedback>
+    </>
   );
 }
 

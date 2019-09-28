@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import { fetchGroups, createGroup } from '../store/actions/groupActions';
 import Groups from './Groups';
-import Box from './styles/Box';
+import Box from './Box';
 
 function Dashboard() {
   const [show, setShow] = useState(false);

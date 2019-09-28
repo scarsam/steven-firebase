@@ -9,7 +9,7 @@ import {
   fetchUserExpenses,
   fetchUserTotal
 } from '../store/actions/expenseActions';
-import Box from './styles/Box';
+import Box from './Box';
 import GroupExpenses from './Group/Expenses';
 import GroupHeader from './Group/Header';
 import ExpenseForm from './Group/Form';

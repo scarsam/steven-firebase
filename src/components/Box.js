@@ -4,7 +4,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 
-function Box({ isLoading = false, center = false, children }) {
+function Box({ isLoading = false, children }) {
   return isLoading ? (
     <Row className='justify-content-center'>
       <Col sm='auto'>
