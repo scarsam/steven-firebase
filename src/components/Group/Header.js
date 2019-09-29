@@ -9,7 +9,7 @@ function GroupHeader({ group, total, toggleExpenseModal, expenses }) {
     <>
       <Row>
         <Col className='align-self-center'>Group name: {group.name}</Col>
-        <Col className='text-right'>
+        <Col className='text-right overflow-hidden'>
           <CopyClipboard />
         </Col>
       </Row>

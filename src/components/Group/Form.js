@@ -59,20 +59,15 @@ function ExpenseForm({ group, user, groupId, setExpenseModal }) {
                 setExpenseModal(false);
                 resetForm();
               }}
-              render={({ values, errors, touched, handleChange }) => (
+              render={({ values, errors, handleChange, handleSubmit }) => (
                 <Form className='col'>
                   <GroupRadioButtons values={values} />
                   <GroupDescription
                     errors={errors}
-                    touched={touched}
                     handleChange={handleChange}
                   />
                   {values.split === 'true' ? (
-                    <GroupAmount
-                      handleChange={handleChange}
-                      errors={errors}
-                      touched={touched}
-                    />
+                    <GroupAmount handleChange={handleChange} errors={errors} />
                   ) : (
                     <FieldArray
                       name='users'
@@ -83,14 +78,18 @@ function ExpenseForm({ group, user, groupId, setExpenseModal }) {
                             user={user}
                             index={index}
                             errors={errors}
-                            touched={touched}
                             handleChange={handleChange}
                           />
                         ))
                       }
                     />
                   )}
-                  <Button type='submit' variant='primary' block>
+                  <Button
+                    onClick={handleSubmit}
+                    type='submit'
+                    variant='primary'
+                    block
+                  >
                     Submit
                   </Button>
                 </Form>

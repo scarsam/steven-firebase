@@ -5,12 +5,18 @@ import Container from 'react-bootstrap/Container';
 import Alert from 'react-bootstrap/Alert';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import * as Yup from 'yup';
 import { Group } from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import { fetchGroups, createGroup } from '../store/actions/groupActions';
 import Groups from './Groups';
+import NewGroup from './Dashboard/NewGroup';
 import Box from './Box';
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required('Group name is required!')
+});
 
 function Dashboard() {
   const [show, setShow] = useState(false);
@@ -54,37 +60,32 @@ function Dashboard() {
           </Col>
         </Row>
 
-        <Modal show={show} size='sm' onHide={handleClose} centered>
+        <Modal show={show} size='md' onHide={handleClose} centered>
           <Modal.Header closeButton>
             <Modal.Title>Create a new group</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Container>
-              <Row>
-                <Formik
-                  initialValues={{ name: '' }}
-                  onSubmit={(values, { resetForm }) => {
-                    const { name } = values;
+              <Formik
+                initialValues={{ name: '' }}
+                onSubmit={(values, { resetForm }) => {
+                  const { name } = values;
 
-                    setShow(false);
-                    dispatch(createGroup(user, name));
-                    resetForm();
-                  }}
-                  render={() => (
-                    <Form className='form-inline'>
-                      <Group>
-                        <Field
-                          className='pl-1 mr-2 form-control'
-                          placeholder='Group name'
-                          type='text'
-                          name='name'
-                        />
-                        <Button variant='primary'>Submit</Button>
-                      </Group>
-                    </Form>
-                  )}
-                />
-              </Row>
+                  setShow(false);
+                  dispatch(createGroup(user, name));
+                  resetForm();
+                }}
+                validationSchema={validationSchema}
+                render={({ errors, handleChange, handleSubmit }) => (
+                  <Form className='form-inline row'>
+                    <NewGroup
+                      errors={errors}
+                      handleChange={handleChange}
+                      handleSubmit={handleSubmit}
+                    />
+                  </Form>
+                )}
+              />
             </Container>
           </Modal.Body>
         </Modal>

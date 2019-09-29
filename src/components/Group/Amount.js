@@ -2,7 +2,7 @@ import React from 'react';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 
-function GroupAmount({ errors, touched, handleChange }) {
+function GroupAmount({ errors, handleChange }) {
   return (
     <Form.Group>
       <InputGroup className='mb-3 mt-3'>
@@ -14,7 +14,7 @@ function GroupAmount({ errors, touched, handleChange }) {
           type='number'
           name='paid'
           onChange={handleChange}
-          isInvalid={!!errors.paid && touched.paid}
+          isInvalid={!!errors.paid}
         />
         <Form.Control.Feedback type='invalid'>
           {errors.paid}

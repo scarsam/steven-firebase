@@ -1,9 +1,11 @@
 import React from 'react';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
+import { getIn } from 'formik';
 
-function GroupAmounts({ user, index, errors, touched, handleChange }) {
-  console.log(errors);
+function GroupAmounts({ user, index, errors, handleChange }) {
+  const amount = `users[${index}].amount`;
+  const errorMsg = getIn(errors, amount);
   return (
     <Form.Group key={index}>
       <InputGroup className='mb-3 mt-3'>
@@ -16,12 +18,14 @@ function GroupAmounts({ user, index, errors, touched, handleChange }) {
           className='form-control'
           type='number'
           onChange={handleChange}
-          isInvalid={errors.users && touched.users}
+          isInvalid={errorMsg}
           name={`users[${index}].amount`}
         />
-        <Form.Control.Feedback type='invalid'>
-          {typeof errors.users === 'string' ? errors.users : null}
-        </Form.Control.Feedback>
+        {errorMsg && (
+          <Form.Control.Feedback type='invalid'>
+            {errorMsg}
+          </Form.Control.Feedback>
+        )}
       </InputGroup>
     </Form.Group>
   );
