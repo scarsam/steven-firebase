@@ -10,11 +10,15 @@ import { fetchGroup } from '../store/actions/groupActions';
 import {
   fetchUserExpenses,
   fetchUserTotal
-} from '../sto../components/Expenses/Expensemport Box from '../component../components/Expenses/Header'../components/Expense/Expen../components/Expenses/Formcomponents/Expense/Paid'../components/Expenses/GetEven/components/Expense/Header';
-import ExpenseForm from '../components/Expense/Form';
-import GetEven from '../components/Expense/GetEven';
+} from '../store/actions/expenseActions';
+import Box from '../layouts/Box';
+import ExpenseForm from '../components/Expenses/Form/Form';
+import GetEven from '../components/Expenses/GetEven';
+import GroupHeader from '../components/Expenses/Header';
+import Paid from '../components/Expenses/Paid';
+import Expense from '../components/Expenses/Expense';
 
-function Group(props) {
+function Expenses(props) {
   const [expenseModal, setExpenseModal] = useState(false);
   const [getEvenModal, setGetEvenModal] = useState(false);
   const groupId = props.match.params.groupId;
@@ -48,17 +52,17 @@ function Group(props) {
               toggleExpenseModal={toggleExpenseModal}
             />
             {group.users.length > 1 ? (
-              expenses.map(expense => (
-                <Table responsive>
-                  <thead>
-                    <tr>
-                      <th>Description</th>
-                      <th>Paid</th>
-                      <th>Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
+              <Table responsive>
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Paid</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {expenses.map((expense, index) => (
+                    <tr key={index}>
                       <td>{expense.description}</td>
                       <td>
                         <Paid user={user} group={group} expense={expense} />
@@ -67,9 +71,9 @@ function Group(props) {
                         <Expense user={user} group={group} expense={expense} />
                       </td>
                     </tr>
-                  </tbody>
-                </Table>
-              ))
+                  ))}
+                </tbody>
+              </Table>
             ) : (
               <Alert variant='info'>
                 <h5>Invite your friends</h5>
@@ -94,7 +98,7 @@ function Group(props) {
         <>
           <Modal
             show={expenseModal}
-            size='sm'
+            size='md'
             onHide={toggleFormModal}
             centered
           >
@@ -119,4 +123,4 @@ function Group(props) {
   );
 }
 
-export default Group;
+export default Expenses;

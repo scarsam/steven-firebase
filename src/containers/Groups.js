@@ -6,20 +6,19 @@ import Alert from 'react-bootstrap/Alert';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ListGroup from 'react-bootstrap/ListGroup';
-import { Group } from 'react-bootstrap/Form';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form } from 'formik';
 import { fetchGroups, createGroup } from '../store/actions/groupActions';
 import Group from '../components/Group';
-import NewGroup from '.../components/Form;
-import Box from '../components/Box';
+import NewGroup from '../components/Groups/Form';
+import Box from '../layouts/Box';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Group name is required!')
 });
 
-function Dashboard() {
+function Groups() {
   const [show, setShow] = useState(false);
   const createdGroups = useSelector(store => store.groupState.createdGroups);
   const joinedGroups = useSelector(store => store.groupState.joinedGroups);
@@ -49,7 +48,7 @@ function Dashboard() {
             </p>
           </Alert>
         )}
-        {joinedGroups.length > 1 && (
+        {joinedGroups.length >= 1 && (
           <ListGroup variant='flush'>
             <h2 className='pb-2 pt-4'>Groups you've joined</h2>
             {joinedGroups.map(group => (
@@ -57,7 +56,7 @@ function Dashboard() {
             ))}
           </ListGroup>
         )}
-        {createdGroups.length > 1 && (
+        {createdGroups.length >= 1 && (
           <ListGroup variant='flush'>
             <h2 className='pb-2 pt-4'>Groups you've created</h2>
             {createdGroups.map(group => (
@@ -105,4 +104,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default Groups;

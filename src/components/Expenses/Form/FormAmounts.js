@@ -6,6 +6,7 @@ import { getIn } from 'formik';
 function GroupAmounts({ user, index, errors, handleChange }) {
   const amount = `users[${index}].amount`;
   const errorMsg = getIn(errors, amount);
+
   return (
     <Form.Group key={index}>
       <InputGroup className='mb-3 mt-3'>
@@ -16,9 +17,9 @@ function GroupAmounts({ user, index, errors, handleChange }) {
         <Form.Control
           placeholder='amount'
           type='number'
-          onChange={handleChange}
           isInvalid={errorMsg}
           name={`users[${index}].amount`}
+          onChange={handleChange}
         />
         {errorMsg && (
           <Form.Control.Feedback type='invalid'>

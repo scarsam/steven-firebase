@@ -8,7 +8,7 @@ import Col from 'react-bootstrap/Col';
 import { slugify } from '../utils/slugify';
 import { deleteGroup, leaveGroup } from '../store/actions/groupActions';
 
-function Groups({ group, user }) {
+function Group({ group, user }) {
   const dispatch = useDispatch();
 
   const onSubmit = (created, id) => {
@@ -17,7 +17,7 @@ function Groups({ group, user }) {
       : dispatch(leaveGroup(user, id));
   };
 
-  const created = (group, user) => group.owner === user.id;
+  const created = (group, user) => group.owner.id === user.uid;
 
   return (
     <ListGroup.Item key={group.id}>
@@ -41,4 +41,4 @@ function Groups({ group, user }) {
   );
 }
 
-export default Groups;
+export default Group;

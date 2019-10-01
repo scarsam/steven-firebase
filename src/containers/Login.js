@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { userAuth } from '../store/actions/userActions';
-import Box from '../components/Box';
+import Box from '../layouts/Box';
 
 function Login() {
   const dispatch = useDispatch();

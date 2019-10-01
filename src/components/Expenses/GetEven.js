@@ -56,8 +56,8 @@ function GetEven({ totalExpenses }) {
       <Modal.Body>
         <Container>
           <Row>
-            {splitPayments(totalExpenses).map(debt => (
-              <p>
+            {splitPayments(totalExpenses).map((debt, index) => (
+              <p key={index}>
                 {Object.keys(debt)} owes{' '}
                 {Object.values(debt).map(expense =>
                   expense.map(

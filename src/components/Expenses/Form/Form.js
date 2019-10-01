@@ -10,7 +10,7 @@ import GroupAmount from './FormAmount';
 import GroupAmounts from './FormAmounts';
 import GroupRadioButtons from './FormRadioButtons';
 import GroupDescription from './FormDescription';
-import { createExpense } from '../../store/actions/expenseActions';
+import { createExpense } from '../../../store/actions/expenseActions';
 
 const validationSchema = Yup.object().shape({
   split: Yup.boolean(),
@@ -51,6 +51,7 @@ function ExpenseForm({ group, user, groupId, setExpenseModal }) {
                 }))
               }}
               validationSchema={validationSchema}
+              validateOnChange={false}
               onSubmit={async (values, { resetForm }) => {
                 const { split, description, paid, users } = values;
                 await dispatch(
@@ -59,22 +60,35 @@ function ExpenseForm({ group, user, groupId, setExpenseModal }) {
                 setExpenseModal(false);
                 resetForm();
               }}
-              render={({ values, errors, handleSubmit }) => (
+              render={({
+                values,
+                errors,
+                handleChange,
+                handleSubmit,
+                setFieldValue
+              }) => (
                 <Form className='col'>
-                  <GroupRadioButtons values={values} />
-                  <GroupDescription errors={errors} />
+                  <GroupRadioButtons
+                    values={values}
+                    setFieldValue={setFieldValue}
+                  />
+                  <GroupDescription
+                    errors={errors}
+                    handleChange={handleChange}
+                  />
                   {values.split === 'true' ? (
-                    <GroupAmount errors={errors} />
+                    <GroupAmount errors={errors} handleChange={handleChange} />
                   ) : (
                     <FieldArray
                       name='users'
-                      render={() =>
+                      render={({ form }) =>
                         values.users.map((user, index) => (
                           <GroupAmounts
                             key={index}
                             user={user}
                             index={index}
                             errors={errors}
+                            handleChange={handleChange}
                           />
                         ))
                       }

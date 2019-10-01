@@ -1,10 +1,10 @@
 import React from 'react';
 import { Router, Switch, Route } from 'react-router-dom';
-import Login from './components/Login';
+import Login from './containers/Login';
 import Layout from './layouts/Layout';
-import DashboardContainer from './components/DashboardContainer';
-import GroupContainer from './components/GroupContainer';
-import Invite from './components/Invite';
+import Groups from './containers/Groups';
+import Expenses from './containers/Expenses';
+import Invite from './containers/Invite';
 import history from './routes/History';
 import PrivateRouter from './routes/PrivateRoute';
 import './styles/base.scss';
@@ -16,11 +16,11 @@ function App() {
         <Layout>
           <Route exact path='/' component={Login} />
           <Route path='/group/:groupId/:groupName/invite' component={Invite} />
-          <PrivateRouter path='/dashboard' component={DashboardContainer} />
+          <PrivateRouter path='/dashboard' component={Groups} />
           <PrivateRouter
             exact
             path='/group/:groupId/:groupName'
-            component={GroupContainer}
+            component={Expenses}
           />
         </Layout>
       </Switch>
@@ -32,6 +32,3 @@ export default App;
 
 // TODO
 // - Firebase security rules
-// - Look over component names
-// - Move form into component
-// - Added calculate expense code
