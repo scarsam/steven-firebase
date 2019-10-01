@@ -2,18 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
+import Table from 'react-bootstrap/Table';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
+import Alert from 'react-bootstrap/Alert';
 import { fetchGroup } from '../store/actions/groupActions';
 import {
   fetchUserExpenses,
   fetchUserTotal
-} from '../store/actions/expenseActions';
-import Box from './Box';
-import GroupExpenses from './Group/Expenses';
-import GroupHeader from './Group/Header';
-import ExpenseForm from './Group/Form';
-import GetEven from './Group/GetEven';
+} from '../sto../components/Expenses/Expensemport Box from '../component../components/Expenses/Header'../components/Expense/Expen../components/Expenses/Formcomponents/Expense/Paid'../components/Expenses/GetEven/components/Expense/Header';
+import ExpenseForm from '../components/Expense/Form';
+import GetEven from '../components/Expense/GetEven';
 
 function Group(props) {
   const [expenseModal, setExpenseModal] = useState(false);
@@ -41,13 +40,47 @@ function Group(props) {
     group && (
       <>
         <Box isLoading={pending}>
-          <GroupHeader
-            group={group}
-            total={total}
-            expenses={expenses}
-            toggleExpenseModal={toggleExpenseModal}
-          />
-          <GroupExpenses group={group} user={user} expenses={expenses} />
+          <>
+            <GroupHeader
+              group={group}
+              total={total}
+              expenses={expenses}
+              toggleExpenseModal={toggleExpenseModal}
+            />
+            {group.users.length > 1 ? (
+              expenses.map(expense => (
+                <Table responsive>
+                  <thead>
+                    <tr>
+                      <th>Description</th>
+                      <th>Paid</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{expense.description}</td>
+                      <td>
+                        <Paid user={user} group={group} expense={expense} />
+                      </td>
+                      <td>
+                        <Expense user={user} group={group} expense={expense} />
+                      </td>
+                    </tr>
+                  </tbody>
+                </Table>
+              ))
+            ) : (
+              <Alert variant='info'>
+                <h5>Invite your friends</h5>
+                <p>
+                  Before you can add expenses, use the{' '}
+                  <strong>copy invite link</strong> in the top right corner to
+                  invite your friends
+                </p>
+              </Alert>
+            )}
+          </>
         </Box>
         {group.users.length >= 2 && (
           <Row className='mt-4 text-center'>

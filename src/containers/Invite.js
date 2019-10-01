@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchGroup, joinGroup } from '../store/actions/groupActions';
-import Box from './Box';
+import Box from '../components/Box';
 
 function Invite(props) {
   const groupId = props.match.params.groupId;

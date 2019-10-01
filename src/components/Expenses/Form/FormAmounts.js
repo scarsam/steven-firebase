@@ -15,7 +15,6 @@ function GroupAmounts({ user, index, errors, handleChange }) {
         </InputGroup.Prepend>
         <Form.Control
           placeholder='amount'
-          className='form-control'
           type='number'
           onChange={handleChange}
           isInvalid={errorMsg}

@@ -2,7 +2,7 @@ import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
-function NewGroup({ errors, handleChange, handleSubmit }) {
+function NewGroup({ errors, handleSubmit }) {
   return (
     <>
       <Form.Control
@@ -10,7 +10,6 @@ function NewGroup({ errors, handleChange, handleSubmit }) {
         placeholder='Group name'
         type='text'
         name='name'
-        onChange={handleChange}
         isInvalid={!!errors.name}
       />
       <Button variant='primary' onClick={handleSubmit}>

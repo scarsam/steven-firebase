@@ -5,14 +5,15 @@ import Container from 'react-bootstrap/Container';
 import Alert from 'react-bootstrap/Alert';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import * as Yup from 'yup';
+import ListGroup from 'react-bootstrap/ListGroup';
 import { Group } from 'react-bootstrap/Form';
+import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form } from 'formik';
 import { fetchGroups, createGroup } from '../store/actions/groupActions';
-import Groups from './Groups';
-import NewGroup from './Dashboard/NewGroup';
-import Box from './Box';
+import Group from '../components/Group';
+import NewGroup from '.../components/Form;
+import Box from '../components/Box';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Group name is required!')
@@ -33,10 +34,13 @@ function Dashboard() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  const noGroups = () =>
+    !pending && joinedGroups.length === 0 && createdGroups.length === 0;
+
   return (
     <>
       <Box>
-        {!pending && joinedGroups.length === 0 && createdGroups.length === 0 && (
+        {noGroups() && (
           <Alert variant='info'>
             <h5>Create a group</h5>
             <p>
@@ -45,11 +49,22 @@ function Dashboard() {
             </p>
           </Alert>
         )}
-        <Groups
-          joinedGroups={joinedGroups}
-          createdGroups={createdGroups}
-          user={user}
-        />
+        {joinedGroups.length > 1 && (
+          <ListGroup variant='flush'>
+            <h2 className='pb-2 pt-4'>Groups you've joined</h2>
+            {joinedGroups.map(group => (
+              <Group group={group} user={user} />
+            ))}
+          </ListGroup>
+        )}
+        {createdGroups.length > 1 && (
+          <ListGroup variant='flush'>
+            <h2 className='pb-2 pt-4'>Groups you've created</h2>
+            {createdGroups.map(group => (
+              <Group group={group} user={user} />
+            ))}
+          </ListGroup>
+        )}
       </Box>
       <>
         <Row className='mt-4 text-center'>
@@ -76,13 +91,9 @@ function Dashboard() {
                   resetForm();
                 }}
                 validationSchema={validationSchema}
-                render={({ errors, handleChange, handleSubmit }) => (
+                render={({ errors, handleSubmit }) => (
                   <Form className='form-inline row'>
-                    <NewGroup
-                      errors={errors}
-                      handleChange={handleChange}
-                      handleSubmit={handleSubmit}
-                    />
+                    <NewGroup errors={errors} handleSubmit={handleSubmit} />
                   </Form>
                 )}
               />

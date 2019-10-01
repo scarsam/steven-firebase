@@ -6,10 +6,10 @@ import Button from 'react-bootstrap/Button';
 import { useDispatch } from 'react-redux';
 import { Formik, Form, FieldArray } from 'formik';
 import * as Yup from 'yup';
-import GroupAmount from './Amount';
-import GroupAmounts from './Amounts';
-import GroupRadioButtons from './RadioButtons';
-import GroupDescription from './Description';
+import GroupAmount from './FormAmount';
+import GroupAmounts from './FormAmounts';
+import GroupRadioButtons from './FormRadioButtons';
+import GroupDescription from './FormDescription';
 import { createExpense } from '../../store/actions/expenseActions';
 
 const validationSchema = Yup.object().shape({
@@ -59,15 +59,12 @@ function ExpenseForm({ group, user, groupId, setExpenseModal }) {
                 setExpenseModal(false);
                 resetForm();
               }}
-              render={({ values, errors, handleChange, handleSubmit }) => (
+              render={({ values, errors, handleSubmit }) => (
                 <Form className='col'>
                   <GroupRadioButtons values={values} />
-                  <GroupDescription
-                    errors={errors}
-                    handleChange={handleChange}
-                  />
+                  <GroupDescription errors={errors} />
                   {values.split === 'true' ? (
-                    <GroupAmount handleChange={handleChange} errors={errors} />
+                    <GroupAmount errors={errors} />
                   ) : (
                     <FieldArray
                       name='users'
@@ -78,7 +75,6 @@ function ExpenseForm({ group, user, groupId, setExpenseModal }) {
                             user={user}
                             index={index}
                             errors={errors}
-                            handleChange={handleChange}
                           />
                         ))
                       }
