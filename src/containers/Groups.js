@@ -52,7 +52,7 @@ function Groups() {
           <ListGroup variant='flush'>
             <h2 className='pb-2 pt-4'>Groups you've joined</h2>
             {joinedGroups.map(group => (
-              <Group group={group} user={user} />
+              <Group key={group.id} group={group} user={user} />
             ))}
           </ListGroup>
         )}
@@ -60,7 +60,7 @@ function Groups() {
           <ListGroup variant='flush'>
             <h2 className='pb-2 pt-4'>Groups you've created</h2>
             {createdGroups.map(group => (
-              <Group group={group} user={user} />
+              <Group key={group.id} group={group} user={user} />
             ))}
           </ListGroup>
         )}

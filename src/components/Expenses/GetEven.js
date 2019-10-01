@@ -29,7 +29,7 @@ function GetEven({ totalExpenses }) {
       sortedValuesPaid[i] += debt;
       sortedValuesPaid[j] -= debt;
 
-      console.log(`${sortedPeople[i]} owes ${sortedPeople[j]} $${debt}`);
+      // console.log(`${sortedPeople[i]} owes ${sortedPeople[j]} $${debt}`);
 
       debts.push({
         [sortedPeople[i]]: [
