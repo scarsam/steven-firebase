@@ -17,7 +17,7 @@ function Group({ group, user }) {
       : dispatch(leaveGroup(user, id));
   };
 
-  const created = (group, user) => group.owner.id === user.uid;
+  const isOwner = (group, user) => group.owner.id === user.uid;
 
   return (
     <ListGroup.Item key={group.id}>
@@ -30,10 +30,10 @@ function Group({ group, user }) {
         <Col>{group.users.length} members</Col>
         <Col md='auto'>
           <Badge
-            onClick={() => onSubmit(created(group, user), group.id)}
+            onClick={() => onSubmit(isOwner(group, user), group.id)}
             variant='danger'
           >
-            {created(group, user) ? 'Delete' : 'Leave'}
+            {isOwner(group, user) ? 'Delete' : 'Leave'}
           </Badge>
         </Col>
       </Row>

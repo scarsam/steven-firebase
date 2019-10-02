@@ -90,9 +90,13 @@ function Groups() {
                   resetForm();
                 }}
                 validationSchema={validationSchema}
-                render={({ errors, handleSubmit }) => (
+                render={({ errors, handleSubmit, handleChange }) => (
                   <Form className='form-inline row'>
-                    <NewGroup errors={errors} handleSubmit={handleSubmit} />
+                    <NewGroup
+                      errors={errors}
+                      handleSubmit={handleSubmit}
+                      handleChange={handleChange}
+                    />
                   </Form>
                 )}
               />
