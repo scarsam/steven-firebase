@@ -3,6 +3,7 @@ import {
   EXPENSE_REQUEST,
   EXPENSE_SUCCESS,
   EXPENSE_ERROR,
+  EXPENSE_RESET,
   USERS_TOTAL_REQUEST,
   USERS_TOTAL_SUCCESS,
   USERS_TOTAL_ERROR,
@@ -13,6 +14,10 @@ import {
   CREATED_EXPENSE_SUCCESS,
   CREATED_EXPENSE_ERROR
 } from '../types';
+
+export const resetExpenses = () => dispatch => {
+  dispatch({ type: EXPENSE_RESET });
+};
 
 export const fetchUsersTotal = (users, id) => async dispatch => {
   dispatch({ type: USERS_TOTAL_REQUEST });

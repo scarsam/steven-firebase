@@ -10,6 +10,7 @@ import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form } from 'formik';
 import { fetchGroups, createGroup } from '../store/actions/groupActions';
+import { resetExpenses } from '../store/actions/expenseActions';
 import Group from '../components/Group';
 import NewGroup from '../components/Groups/Form';
 import Box from '../layouts/Box';
@@ -28,6 +29,7 @@ function Groups() {
 
   React.useEffect(() => {
     dispatch(fetchGroups(user));
+    dispatch(resetExpenses());
   }, [user, dispatch]);
 
   const handleClose = () => setShow(false);

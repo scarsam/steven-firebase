@@ -171,7 +171,7 @@ class Firebase {
   }
 
   fetchUsersTotal(users, id) {
-    return users.reduce((obj, user) => {
+    return users.reduce((arr, user) => {
       let baseRef = this.db
         .collection('users')
         .doc(`${user.id}`)
@@ -181,15 +181,18 @@ class Firebase {
         .doc('--stats--');
       baseRef.get().then(querySnapshot => {
         let total;
+        let obj = {};
         if (querySnapshot.exists) {
           total = querySnapshot.data().total;
         } else {
           total = 0;
         }
-        obj[user.name] = total;
+        obj.name = user.name;
+        obj.total = total;
+        arr.push(obj);
       });
-      return obj;
-    }, {});
+      return arr;
+    }, []);
   }
 
   fetchUserExpenses(user, id) {

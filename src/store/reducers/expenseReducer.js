@@ -2,6 +2,7 @@ import {
   EXPENSE_REQUEST,
   EXPENSE_SUCCESS,
   EXPENSE_ERROR,
+  EXPENSE_RESET,
   USERS_TOTAL_REQUEST,
   USERS_TOTAL_SUCCESS,
   USERS_TOTAL_ERROR,
@@ -39,6 +40,15 @@ function expenseReducer(state = initialState, action) {
         ...state,
         expenses: [],
         error: action.payload,
+        pending: false
+      };
+    case EXPENSE_RESET:
+      return {
+        ...state,
+        expenses: [],
+        totalExpenses: null,
+        total: 0,
+        error: null,
         pending: false
       };
     case USERS_TOTAL_REQUEST:

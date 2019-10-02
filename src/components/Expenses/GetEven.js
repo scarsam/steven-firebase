@@ -5,43 +5,39 @@ import Container from 'react-bootstrap/Container';
 
 function GetEven({ totalExpenses }) {
   const splitPayments = payments => {
-    const people = Object.keys(payments);
-    const valuesPaid = Object.values(payments);
+    const sum = payments.reduce((acc, user) => acc + user.total, 0);
+    const mean = sum / payments.length;
 
-    const sum = valuesPaid.reduce((acc, curr) => curr + acc);
-    const mean = sum / people.length;
-
-    const sortedPeople = people.sort(
-      (personA, personB) => payments[personA] - payments[personB]
+    const sortedPayments = payments.sort(
+      (personA, personB) => personA.total - personB.total
     );
-
-    const sortedValuesPaid = sortedPeople.map(
-      person => payments[person] - mean
-    );
+    const sortedPaid = sortedPayments.map(person => ({
+      ...person,
+      total: person.total - mean
+    }));
 
     let i = 0;
-    let j = sortedPeople.length - 1;
+    let j = sortedPaid.length - 1;
     let debt;
     let debts = [];
 
     while (i < j) {
-      debt = Math.min(-sortedValuesPaid[i], sortedValuesPaid[j]);
-      sortedValuesPaid[i] += debt;
-      sortedValuesPaid[j] -= debt;
+      debt = Math.min(-sortedPaid[i].total, sortedPaid[j].total);
 
-      // console.log(`${sortedPeople[i]} owes ${sortedPeople[j]} $${debt}`);
+      sortedPaid[i].total += debt;
+      sortedPaid[j].total -= debt;
 
       debts.push({
-        [sortedPeople[i]]: [
-          { [sortedPeople[j]]: parseFloat(parseFloat(debt).toFixed(2)) }
-        ]
+        payer: sortedPaid[i].name,
+        payee: sortedPaid[j].name,
+        debt: parseFloat(parseFloat(debt).toFixed(2))
       });
 
-      if (sortedValuesPaid[i] === 0) {
+      if (sortedPaid[i].total === 0) {
         i++;
       }
 
-      if (sortedValuesPaid[j] === 0) {
+      if (sortedPaid[j].total === 0) {
         j--;
       }
     }
@@ -58,13 +54,7 @@ function GetEven({ totalExpenses }) {
           <Row>
             {splitPayments(totalExpenses).map((debt, index) => (
               <p key={index}>
-                {Object.keys(debt)} owes{' '}
-                {Object.values(debt).map(expense =>
-                  expense.map(
-                    result =>
-                      `${Object.keys(result)} - ${Object.values(result)}`
-                  )
-                )}
+                {debt.payer} owes {debt.payee} ${debt.debt}
               </p>
             ))}
           </Row>
