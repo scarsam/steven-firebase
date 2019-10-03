@@ -4,6 +4,7 @@ import {
   EXPENSE_SUCCESS,
   EXPENSE_ERROR,
   EXPENSE_RESET,
+  EXPENSE_DELETED,
   USERS_TOTAL_REQUEST,
   USERS_TOTAL_SUCCESS,
   USERS_TOTAL_ERROR,
@@ -79,5 +80,17 @@ export const createExpense = (
   } catch (error) {
     console.error(error);
     dispatch({ type: CREATED_EXPENSE_ERROR, payload: error });
+  }
+};
+
+export const deleteExpense = (users, expense, groupId) => async dispatch => {
+  dispatch({ type: EXPENSE_REQUEST });
+  try {
+    await FirebaseAPI.deleteExpense(users, expense.id, groupId);
+    await FirebaseAPI.updateUsersTotal(users, expense, groupId);
+    dispatch({ type: EXPENSE_DELETED, payload: expense.id });
+  } catch (error) {
+    console.error(error);
+    dispatch({ type: EXPENSE_ERROR, payload: error });
   }
 };

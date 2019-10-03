@@ -3,6 +3,7 @@ import {
   EXPENSE_SUCCESS,
   EXPENSE_ERROR,
   EXPENSE_RESET,
+  EXPENSE_DELETED,
   USERS_TOTAL_REQUEST,
   USERS_TOTAL_SUCCESS,
   USERS_TOTAL_ERROR,
@@ -48,6 +49,32 @@ function expenseReducer(state = initialState, action) {
         expenses: [],
         totalExpenses: null,
         total: 0,
+        error: null,
+        pending: false
+      };
+    case EXPENSE_DELETED:
+      const deletedExpense = state.expenses.find(
+        expense => expense.id === action.payload
+      );
+      const updateTotal = expense => {
+        if (Math.sign(expense.total) === 1) {
+          return expense.total - deletedExpense.amount;
+        } else {
+          return expense.total + deletedExpense.amount;
+        }
+      };
+      const fileteredExpenses = state.expenses.filter(
+        expense => expense.id !== action.payload
+      );
+      const updatedTotal = state.totalExpenses.map(expense => ({
+        ...expense,
+        total: updateTotal(expense)
+      }));
+      return {
+        ...state,
+        expenses: fileteredExpenses,
+        totalExpenses: updatedTotal,
+        total: state.total - deletedExpense.amount,
         error: null,
         pending: false
       };

@@ -2,6 +2,7 @@ import firebase from 'firebase/app';
 import { amountsCalculator } from '../utils/expense';
 import 'firebase/auth';
 import 'firebase/firestore';
+import uniqid from 'uniqid';
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -223,6 +224,46 @@ class Firebase {
       .then(doc => (doc.exists ? doc.data().total : 0));
   }
 
+  deleteExpense(users, id, groupId) {
+    users.forEach(async user => {
+      await this.db
+        .collection('users')
+        .doc(`${user.id}`)
+        .collection('groups')
+        .doc(`${groupId}`)
+        .collection('expenses')
+        .where('id', '==', id)
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            doc.ref.delete();
+          });
+        });
+    });
+  }
+
+  updateUsersTotal(users, expense, groupId) {
+    const amount = expense.amount;
+    const updateTotal = ({ total }) => {
+      if (Math.sign(total) === 1) {
+        return total - amount;
+      } else {
+        return total + amount;
+      }
+    };
+    users.forEach(async user => {
+      await this.db
+        .collection('users')
+        .doc(`${user.id}`)
+        .collection('groups')
+        .doc(`${groupId}`)
+        .collection('expenses')
+        .doc('--stats--')
+        .get()
+        .then(doc => doc.ref.update({ total: updateTotal(doc.data()) }));
+    });
+  }
+
   async createExpense(split, paid, description, users, currentUser, groupId) {
     let newExpense;
     let newExpenseRef;
@@ -230,6 +271,7 @@ class Firebase {
     let totalRef;
     let currentUserExpense;
     const batch = this.db.batch();
+    const id = uniqid();
 
     const { totalAmount, userAmounts } = amountsCalculator(
       split,
@@ -258,6 +300,7 @@ class Firebase {
         totalRef = baseRef.doc('--stats--');
         newExpenseRef = baseRef.doc();
         newExpense = {
+          id,
           description,
           payerId: currentUser.uid,
           totalAmount,

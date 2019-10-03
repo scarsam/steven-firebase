@@ -3,13 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Table from 'react-bootstrap/Table';
+import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 import Alert from 'react-bootstrap/Alert';
 import { fetchGroup } from '../store/actions/groupActions';
 import {
   fetchUserExpenses,
-  fetchUserTotal
+  fetchUserTotal,
+  deleteExpense
 } from '../store/actions/expenseActions';
 import Box from '../layouts/Box';
 import ExpenseForm from '../components/Expenses/Form/Form';
@@ -40,6 +42,7 @@ function Expenses(props) {
   const toggleExpenseModal = async () =>
     setGetEvenModal(currentValue => !currentValue);
 
+  console.log(expenses);
   return (
     group && (
       <>
@@ -70,6 +73,20 @@ function Expenses(props) {
                       <td>
                         <Expense user={user} group={group} expense={expense} />
                       </td>
+                      {expense.payerId === user.uid && (
+                        <td>
+                          <Badge
+                            onClick={() =>
+                              dispatch(
+                                deleteExpense(group.users, expense, groupId)
+                              )
+                            }
+                            variant='danger'
+                          >
+                            Delete
+                          </Badge>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

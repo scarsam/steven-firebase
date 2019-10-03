@@ -32,7 +32,7 @@ export default App;
 
 // TODO
 // - Firebase security rules
-// - Delete your own expenses
+// - Delete your own expenses¡
 // - Add timestamps for each expense
 // - Sort groups newest at the top
 // - Start adding unit tests
