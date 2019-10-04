@@ -236,31 +236,14 @@ class Firebase {
         .get()
         .then(querySnapshot => {
           querySnapshot.forEach(doc => {
+            const reverseAmount = doc.data().amount * -1;
+            const updateValue = firebase.firestore.FieldValue.increment(
+              reverseAmount
+            );
+            doc.ref.parent.doc('--stats--').update({ total: updateValue });
             doc.ref.delete();
           });
         });
-    });
-  }
-
-  updateUsersTotal(users, expense, groupId) {
-    const amount = expense.amount;
-    const updateTotal = ({ total }) => {
-      if (Math.sign(total) === 1) {
-        return total - amount;
-      } else {
-        return total + amount;
-      }
-    };
-    users.forEach(async user => {
-      await this.db
-        .collection('users')
-        .doc(`${user.id}`)
-        .collection('groups')
-        .doc(`${groupId}`)
-        .collection('expenses')
-        .doc('--stats--')
-        .get()
-        .then(doc => doc.ref.update({ total: updateTotal(doc.data()) }));
     });
   }
 

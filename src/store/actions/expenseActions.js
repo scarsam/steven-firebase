@@ -87,7 +87,6 @@ export const deleteExpense = (users, expense, groupId) => async dispatch => {
   dispatch({ type: EXPENSE_REQUEST });
   try {
     await FirebaseAPI.deleteExpense(users, expense.id, groupId);
-    await FirebaseAPI.updateUsersTotal(users, expense, groupId);
     dispatch({ type: EXPENSE_DELETED, payload: expense.id });
   } catch (error) {
     console.error(error);

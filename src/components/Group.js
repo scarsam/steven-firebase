@@ -11,10 +11,8 @@ import { deleteGroup, leaveGroup } from '../store/actions/groupActions';
 function Group({ group, user }) {
   const dispatch = useDispatch();
 
-  const onSubmit = (created, id) => {
-    created(group, user)
-      ? dispatch(deleteGroup(id))
-      : dispatch(leaveGroup(user, id));
+  const onSubmit = (owner, id) => {
+    owner ? dispatch(deleteGroup(id)) : dispatch(leaveGroup(user, id));
   };
 
   const isOwner = (group, user) => group.owner.id === user.uid;
