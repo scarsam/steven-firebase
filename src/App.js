@@ -32,8 +32,6 @@ export default App;
 
 // TODO
 // - Firebase security rules
-// - Delete your own expenses¡
 // - Add timestamps for each expense
 // - Sort groups newest at the top
 // - Start adding unit tests
-// - Deleting expense, will it return the expense? If so I can decrement --stats-- from same method
