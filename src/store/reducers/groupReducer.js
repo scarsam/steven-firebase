@@ -111,7 +111,7 @@ function groupReducer(state = initialState, action) {
     case CREATE_GROUP_SUCCESS:
       return {
         ...state,
-        createdGroups: [...state.createdGroups, action.payload],
+        createdGroups: [action.payload, ...state.createdGroups],
         pending: false
       };
     case CREATE_GROUP_ERROR:

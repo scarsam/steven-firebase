@@ -53,6 +53,7 @@ class Firebase {
       .collection('users')
       .doc(user.uid)
       .collection('groups')
+      .orderBy('created', 'desc')
       .get()
       .then(snapshot => {
         const groups = snapshot.docs.map(doc => ({
@@ -70,6 +71,7 @@ class Firebase {
         id: user.uid,
         name: user.displayName
       })
+      .orderBy('created', 'desc')
       .get()
       .then(snapshot => {
         return snapshot.docs
