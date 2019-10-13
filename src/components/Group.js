@@ -7,6 +7,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { slugify } from '../utils/slugify';
 import { deleteGroup, leaveGroup } from '../store/actions/groupActions';
+import printDate from '../utils/date';
 
 function Group({ group, user }) {
   const dispatch = useDispatch();
@@ -20,6 +21,7 @@ function Group({ group, user }) {
   return (
     <ListGroup.Item key={group.id}>
       <Row>
+        <Col xs='auto'>{printDate(group.created)}</Col>
         <Col>
           <Link to={`/group/${group.id}/${slugify(group.name)}`}>
             {group.name}

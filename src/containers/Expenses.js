@@ -19,6 +19,7 @@ import GetEven from '../components/Expenses/GetEven';
 import GroupHeader from '../components/Expenses/Header';
 import Paid from '../components/Expenses/Paid';
 import Expense from '../components/Expenses/Expense';
+import printDate from '../utils/date';
 
 function Expenses(props) {
   const [expenseModal, setExpenseModal] = useState(false);
@@ -58,6 +59,7 @@ function Expenses(props) {
               <Table responsive>
                 <thead>
                   <tr>
+                    <th>Created</th>
                     <th>Description</th>
                     <th>Paid</th>
                     <th>Amount</th>
@@ -66,6 +68,7 @@ function Expenses(props) {
                 <tbody>
                   {expenses.map((expense, index) => (
                     <tr key={index}>
+                      <td>{printDate(expense.created)}</td>
                       <td>{expense.description}</td>
                       <td>
                         <Paid user={user} group={group} expense={expense} />

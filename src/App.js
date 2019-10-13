@@ -32,5 +32,4 @@ export default App;
 
 // TODO
 // - Firebase security rules
-// - Add timestamps for each expense
 // - Start adding unit tests
